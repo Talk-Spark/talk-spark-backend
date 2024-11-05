@@ -51,3 +51,10 @@ Talk-Spark 백엔드 레포지토리
 
   커밋 메시지에는 이슈번호를 #과 함께 입력해줍니다.
 </details>
+
+## ❗️❗️❗️ application.yaml 관련 주의사항 ❗️❗️❗️
+/src/main/resources에 application.yaml이 있습니다. <br>
+<img width="376" alt="스크린샷 2024-11-05 오전 11 40 26" src="https://github.com/user-attachments/assets/19fc0c8f-4a08-4b36-9621-126418f2c20a"> <br>
+이 파일에는 위 사진과 같은 내용만 있습니다. 각자 로컬에서 작업할 때 이 파일의 내용은 수정하지 않습니다. <br> <br>
+<img width="205" alt="스크린샷 2024-11-05 오전 11 41 46" src="https://github.com/user-attachments/assets/edccd8ea-0136-4b2c-ae17-2209c5583623"> <br>
+/src/main/resources/config 디렉토리를 생성하고, 그 디렉토리에서 secret.yaml 파일을 생성합니다. 이 파일을 각자 설정에 사용하도록 합니다. 이는 gitignore에 포함되어 github에 올라오지 않습니다. 예시를 위한 파일 내용은 다른 채널을 통해 공유하겠습니다.
