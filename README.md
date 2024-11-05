@@ -1,6 +1,8 @@
 # Backend
 Talk-Spark 백엔드 레포지토리
 
+자바 17버전을 사용합니다.
+
 <details>
   <summary> <b> 🏃 작업 진행 과정 </b> </summary>
   <img width="389" alt="1" src="https://github.com/user-attachments/assets/86c1bb8c-00fa-4989-9712-5e111842833b"> <br>
