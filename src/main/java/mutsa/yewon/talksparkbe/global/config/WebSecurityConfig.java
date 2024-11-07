@@ -1,5 +1,6 @@
 package mutsa.yewon.talksparkbe.global.config;
 
+import mutsa.yewon.talksparkbe.global.security.JWTCheckFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -11,6 +12,7 @@ import org.springframework.security.config.annotation.web.configurers.HttpBasicC
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -32,10 +34,11 @@ public class WebSecurityConfig {
                 .sessionManagement(it ->
                         it.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
-                .authorizeHttpRequests(
-                        authorize -> authorize
-                                .anyRequest().permitAll()
-                );
+                .addFilterBefore(new JWTCheckFilter(), UsernamePasswordAuthenticationFilter.class );
+//                .authorizeHttpRequests(
+//                        authorize -> authorize
+//                                .anyRequest().permitAll()
+//                );
         return http.build();
     }
 

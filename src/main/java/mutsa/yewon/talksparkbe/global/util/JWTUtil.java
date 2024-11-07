@@ -2,6 +2,7 @@ package mutsa.yewon.talksparkbe.global.util;
 
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
+import lombok.extern.log4j.Log4j2;
 import mutsa.yewon.talksparkbe.global.exception.CustomTalkSparkException;
 import mutsa.yewon.talksparkbe.global.exception.ErrorCode;
 
@@ -11,6 +12,7 @@ import java.time.ZonedDateTime;
 import java.util.Date;
 import java.util.Map;
 
+@Log4j2
 public class JWTUtil {
 
 
@@ -39,6 +41,7 @@ public class JWTUtil {
     }
 
     public static Map<String, Object> validateToken(String token) {
+        log.info("validation token");
         Map<String, Object> claims = null;
 
         try {
