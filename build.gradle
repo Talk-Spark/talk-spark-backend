@@ -39,6 +39,18 @@ dependencies {
     // redis
     implementation("org.springframework.boot:spring-boot-starter-data-redis")
     implementation 'org.redisson:redisson-spring-boot-starter:3.17.0'
+
+    //jwt
+    implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
+    runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.11.5'
+    runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.11.5'
+
+    //WEBClient
+    implementation 'org.springframework.boot:spring-boot-starter-webflux'
+
+    //Gson 라이브러리
+    implementation 'com.google.code.gson:gson:2.10.1'
+
 }
 
 tasks.named('test') {
