@@ -2,9 +2,13 @@ package mutsa.yewon.talksparkbe.global.util;
 
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import mutsa.yewon.talksparkbe.global.exception.CustomTalkSparkException;
 import mutsa.yewon.talksparkbe.global.exception.ErrorCode;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import javax.crypto.SecretKey;
 import java.io.IOException;
@@ -13,17 +17,20 @@ import java.util.Date;
 import java.util.Map;
 
 @Log4j2
+@Component
+@RequiredArgsConstructor
 public class JWTUtil {
 
 
-    private static String key = "1234567890123456789012345678901234567890"; // 키 값으 최소 30자 이상
+    @Value("${secret.key}")
+    private String jwtKey;
 
-    public static String generateToken(Map<String, Object> claims, int min) {
+    public String generateToken(Map<String, Object> claims, int min) {
 
         SecretKey key = null;
 
         try {
-            key = Keys.hmacShaKeyFor(JWTUtil.key.getBytes("UTF-8"));
+            key = Keys.hmacShaKeyFor(jwtKey.getBytes("UTF-8"));
 
         }catch (Exception e) {
             throw new RuntimeException(e.getMessage());
@@ -40,12 +47,12 @@ public class JWTUtil {
         return jwt;
     }
 
-    public static Map<String, Object> validateToken(String token) {
+    public Map<String, Object> validateToken(String token) {
         log.info("validation token");
         Map<String, Object> claims = null;
 
         try {
-            SecretKey key = Keys.hmacShaKeyFor(JWTUtil.key.getBytes("UTF-8"));
+            SecretKey key = Keys.hmacShaKeyFor(jwtKey.getBytes("UTF-8"));
 
             claims = Jwts.parserBuilder()
                     .setSigningKey(key)

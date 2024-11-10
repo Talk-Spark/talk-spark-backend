@@ -5,6 +5,7 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import mutsa.yewon.talksparkbe.domain.sparkUser.dto.SparkUserDTO;
 import mutsa.yewon.talksparkbe.global.exception.CustomTalkSparkException;
@@ -21,7 +22,10 @@ import java.util.List;
 import java.util.Map;
 
 @Log4j2
+@RequiredArgsConstructor
 public class JWTCheckFilter extends OncePerRequestFilter {
+
+    private final JWTUtil jwtUtil;
 
 
     @Override
@@ -48,7 +52,7 @@ public class JWTCheckFilter extends OncePerRequestFilter {
 
         try {
             String accessToken = authorization.substring(7);
-            Map<String, Object> claims = JWTUtil.validateToken(accessToken);
+            Map<String, Object> claims = jwtUtil.validateToken(accessToken);
 
             String kakaoId = (String) claims.get("kakaoId");
             String name = (String) claims.get("name");

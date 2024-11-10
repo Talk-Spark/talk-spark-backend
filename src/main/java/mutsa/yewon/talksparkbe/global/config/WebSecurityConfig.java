@@ -1,6 +1,8 @@
 package mutsa.yewon.talksparkbe.global.config;
 
+import lombok.RequiredArgsConstructor;
 import mutsa.yewon.talksparkbe.global.security.JWTCheckFilter;
+import mutsa.yewon.talksparkbe.global.util.JWTUtil;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -21,7 +23,10 @@ import java.util.Arrays;
 
 @Configuration
 @EnableWebSecurity
+@RequiredArgsConstructor
 public class WebSecurityConfig {
+
+    private final JWTUtil jwtUtil;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -34,11 +39,11 @@ public class WebSecurityConfig {
                 .sessionManagement(it ->
                         it.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
-                .addFilterBefore(new JWTCheckFilter(), UsernamePasswordAuthenticationFilter.class );
-//                .authorizeHttpRequests(
-//                        authorize -> authorize
-//                                .anyRequest().permitAll()
-//                );
+//                .addFilterBefore(jwtCheckFilter(), UsernamePasswordAuthenticationFilter.class );
+                .authorizeHttpRequests(
+                        authorize -> authorize
+                                .anyRequest().permitAll()
+                );
         return http.build();
     }
 
@@ -61,6 +66,11 @@ public class WebSecurityConfig {
         source.registerCorsConfiguration("/**", configuration);
 
         return source;
+    }
+
+    @Bean
+    public JWTCheckFilter jwtCheckFilter() {
+        return new JWTCheckFilter(jwtUtil);
     }
 
 }

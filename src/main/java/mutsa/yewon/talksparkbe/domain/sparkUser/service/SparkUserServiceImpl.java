@@ -40,7 +40,7 @@ public class SparkUserServiceImpl implements SparkUserService {
         Optional<SparkUser> sparkUser = sparkUserRepository.findByKakaoId(kakaoId);
 
         if(sparkUser.isPresent()) {
-            SparkUserDTO sparkUserDTO = entityToDTO(sparkUser.get());
+            SparkUserDTO sparkUserDTO = SparkUserDTO.from(sparkUser.get());
             return sparkUserDTO;
         }
 
@@ -48,7 +48,7 @@ public class SparkUserServiceImpl implements SparkUserService {
 
         sparkUserRepository.save(createdUser);
 
-        SparkUserDTO sparkUserDTO = entityToDTO(createdUser);
+        SparkUserDTO sparkUserDTO = SparkUserDTO.from(createdUser);
 
         return sparkUserDTO;
     }
@@ -66,18 +66,14 @@ public class SparkUserServiceImpl implements SparkUserService {
                 .bodyToMono(LinkedHashMap.class)
                 .block();
 
-        log.info(response);
 
         String kakaoId = String.valueOf(response.get("id"));
-        log.info(kakaoId);
 
         LinkedHashMap<String, String> properties = (LinkedHashMap<String, String>) response.get("properties");
 
-        log.info(properties);
 
         String name = properties.get("nickname");
 
-        log.info(name);
 
         return Map.of("kakaoId", kakaoId, "name", name);
     }
