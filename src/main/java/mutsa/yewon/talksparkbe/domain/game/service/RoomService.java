@@ -86,13 +86,13 @@ public class RoomService {
         }
     }
 
-    public int getParticipateCount(Long roomId) {
-        String count = (String) redisTemplate.opsForHash().get(ROOM_COUNT_KEY, roomId.toString());
-        return count != null ? Integer.parseInt(count) : 0;
-    }
     private boolean canJoin(Room room) {
         int currentCount = getParticipateCount(room.getRoomId());
         return currentCount < room.getMaxPeople();
+    }
+    public int getParticipateCount(Long roomId) {
+        String count = (String) redisTemplate.opsForHash().get(ROOM_COUNT_KEY, roomId.toString());
+        return count != null ? Integer.parseInt(count) : 0;
     }
     private void addParticipateToRoom(Room room, SparkUser sparkUser) {
         RoomParticipate roomParticipate = RoomParticipate.builder().room(room).sparkUser(sparkUser).isOwner(false).build();
