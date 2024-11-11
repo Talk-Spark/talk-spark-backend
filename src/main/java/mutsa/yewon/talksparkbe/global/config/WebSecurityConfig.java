@@ -39,11 +39,11 @@ public class WebSecurityConfig {
                 .sessionManagement(it ->
                         it.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
-//                .addFilterBefore(jwtCheckFilter(), UsernamePasswordAuthenticationFilter.class );
-                .authorizeHttpRequests(
-                        authorize -> authorize
-                                .anyRequest().permitAll()
-                );
+                .addFilterBefore(jwtCheckFilter(), UsernamePasswordAuthenticationFilter.class );
+//                .authorizeHttpRequests(
+//                        authorize -> authorize
+//                                .anyRequest().permitAll()
+//                );
         return http.build();
     }
 
