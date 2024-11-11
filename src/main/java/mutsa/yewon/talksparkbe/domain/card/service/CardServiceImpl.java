@@ -37,12 +37,23 @@ public class CardServiceImpl implements CardService {
 
     @Override
     public List<CardResponseDTO> getCards(String kakaoId) {
-        return List.of();
+        List<Card> cardList = cardRepository.findBySparkUserId(kakaoId);
+
+        if (cardList.isEmpty()) {
+            throw new CustomTalkSparkException(ErrorCode.MUST_MAKE_CARD_FIRST);
+        }
+
+        List<CardResponseDTO> cardResponseDTOList = cardList.stream()
+                .map(CardResponseDTO::fromCard).toList();
+
+        return cardResponseDTOList;
     }
 
     @Override
     public CardResponseDTO getCard(Long id) {
-        return null;
+        Card card = cardRepository.findById(id)
+                .orElseThrow(() -> new CustomTalkSparkException(ErrorCode.CARD_NOT_EXIST));
+        return CardResponseDTO.fromCard(card);
     }
 
     @Override
