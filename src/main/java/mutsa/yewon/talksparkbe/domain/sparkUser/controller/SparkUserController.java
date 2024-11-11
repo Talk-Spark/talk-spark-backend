@@ -16,6 +16,7 @@ import java.util.Map;
 public class SparkUserController {
 
     private final SparkUserService sparkUserService;
+    private final JWTUtil jwtUtil;
 
     @GetMapping("/api/member/kakao")
     public Map<String, Object> login(String accessToken) {
@@ -23,22 +24,20 @@ public class SparkUserController {
 
         Map<String, Object> claims = kakaoUser.getClaims();
 
-        String JWTAccessToken = JWTUtil.generateToken(claims, 10);
-        String JWTRefreshToken = JWTUtil.generateToken(claims, 60 * 24);
+        String JWTAccessToken = jwtUtil.generateToken(claims, 10);
+        String JWTRefreshToken = jwtUtil.generateToken(claims, 60 * 24);
 
         claims.put("accessToken", JWTAccessToken);
         claims.put("refreshToken", JWTRefreshToken);
-
-        log.info(claims);
 
         return claims;
     }
 
     @GetMapping("/api/member/refresh")
     public Map<String, Object> refresh(String refreshToken) {
-        Map<String, Object> claims = JWTUtil.validateToken(refreshToken);
+        Map<String, Object> claims = jwtUtil.validateToken(refreshToken);
 
-        String accessToken = JWTUtil.generateToken(claims, 10);
+        String accessToken = jwtUtil.generateToken(claims, 10);
 
         return Map.of("accessToken", accessToken, "refreshToken", refreshToken);
     }

@@ -22,6 +22,9 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 class JWTUtilTest {
 
     @Autowired
+    private JWTUtil jwtUtil;
+
+    @Autowired
     private ObjectMapper objectMapper;
 
     @Autowired
@@ -40,7 +43,7 @@ class JWTUtilTest {
         String accessToken = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJwYXNzd29yZCI6IiQyYSQxMCRJWEo3cHlFY2pQLmEzUldEWFlZaFgubnk5V2JPaGdMbVpJcURHSjVrOUlLZXplTmxiNU5wYSIsIm5hbWUiOiLrsJXsirnrspQiLCJrYWthb0lkIjoiMzc3Njg4NTE5MiIsInJvbGVOYW1lcyI6WyJVU0VSIl0sImlhdCI6MTczMDg5Njg5NiwiZXhwIjoxNzMwODk3NDk2fQ.0qSUBzb6Mg4LEKuApmoJLyohdKYaTzNHr-IAkbZ_6zE";
 
         CustomTalkSparkException ex = assertThrows(CustomTalkSparkException.class, () -> {
-            JWTUtil.validateToken(accessToken);
+            jwtUtil.validateToken(accessToken);
         });
 
         String expectedMessage = "만료된 토큰 입니다.";
