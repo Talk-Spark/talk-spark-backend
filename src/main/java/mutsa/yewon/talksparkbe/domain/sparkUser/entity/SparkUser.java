@@ -14,12 +14,14 @@ import java.util.List;
 @ToString(exclude = "roles")
 public class SparkUser {
 
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "spark_user_id")
-    private Long id;
+//    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+//    @Column(name = "spark_user_id")
+//    private Long id;
+
 
     private String name;
 
+    @Id
     private String kakaoId;
 
     private String password;
