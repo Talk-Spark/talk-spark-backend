@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Create Room</title>
+    <style>
+        .form-container {
+            max-width: 500px;
+            margin: 30px auto;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            background-color: #ffffff;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        .form-group input {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        .submit-btn {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            width: 100%;
+            font-size: 16px;
+        }
+        .submit-btn:hover {
+            background-color: #45a049;
+        }
+        .error-message {
+            color: red;
+            display: none;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+<div class="form-container">
+    <h1>Create Room</h1>
+    <form id="roomForm">
+        <div class="form-group">
+            <label for="roomName">Room Name:</label>
+            <input type="text" id="roomName" name="roomName" required>
+        </div>
+
+        <div class="form-group">
+            <label for="maxPeople">Max People:</label>
+            <input type="number" id="maxPeople" name="maxPeople" required min="2">
+        </div>
+
+        <div class="form-group">
+            <label for="difficulty">Difficulty:</label>
+            <input type="number" id="difficulty" name="difficulty" required min="1" max="5">
+        </div>
+
+        <button type="submit" class="submit-btn">Create Room</button>
+        <p id="errorMessage" class="error-message"></p>
+    </form>
+</div>
+
+<script>
+    document.getElementById('roomForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        // localStorage에서 액세스 토큰 가져오기
+        const accessToken = localStorage.getItem('accessToken');
+        if (!accessToken) {
+            window.location.href = '/login';
+            return;
+        }
+
+        // 폼 데이터 수집
+        const formData = {
+            roomName: document.getElementById('roomName').value,
+            maxPeople: parseInt(document.getElementById('maxPeople').value),
+            difficulty: parseInt(document.getElementById('difficulty').value)
+        };
+
+        // API 요청
+        fetch('/rooms', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + accessToken
+            },
+            body: JSON.stringify(formData)
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Room creation failed');
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log(data);
+                window.location.href = `/views/rooms/${data}`;
+            })
+            .catch(error => {
+                // 에러 메시지 표시
+                const errorMessage = document.getElementById('errorMessage');
+                errorMessage.textContent = 'Failed to create room. Please try again.';
+                errorMessage.style.display = 'block';
+                console.error('Error:', error);
+            });
+    });
+</script>
+</body>
+</html>
