@@ -1,25 +1,20 @@
 package mutsa.yewon.talksparkbe.domain.guestBook.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import mutsa.yewon.talksparkbe.domain.game.entity.Room;
 import mutsa.yewon.talksparkbe.domain.sparkUser.entity.SparkUser;
 import org.springframework.data.annotation.CreatedDate;
 
 import java.time.LocalDateTime;
 
-@Builder
 @Entity
-@NoArgsConstructor
-@AllArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 public class GuestBook {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long guestId;
+    private Long guestBookId;
 
     @ManyToOne
     @JoinColumn(name = "spark_user_id")
@@ -33,5 +28,14 @@ public class GuestBook {
 
     @CreatedDate
     private LocalDateTime guestBookDateTime;
+
+    @Builder
+    public GuestBook(Long guestBookId, SparkUser sparkUser, Room room, String guestBookContent, LocalDateTime guestBookDateTime) {
+        this.room = room;
+        this.sparkUser = sparkUser;
+        this.guestBookId = guestBookId;
+        this.guestBookContent = guestBookContent;
+        this.guestBookDateTime = guestBookDateTime;
+    }
 
 }

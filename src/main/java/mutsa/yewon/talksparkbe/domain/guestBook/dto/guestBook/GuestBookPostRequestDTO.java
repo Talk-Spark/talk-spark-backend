@@ -1,6 +1,5 @@
-package mutsa.yewon.talksparkbe.domain.guestBook.dto;
+package mutsa.yewon.talksparkbe.domain.guestBook.dto.guestBook;
 
-import jakarta.persistence.PrePersist;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
@@ -19,11 +18,10 @@ public class GuestBookPostRequestDTO {
     private String content;
     private LocalDateTime createdAt;
 
-    public GuestBookPostRequestDTO(Long roomId, Long sparkUserId, GuestBookContentDTO contentDTO) {
+    public GuestBookPostRequestDTO(Long roomId, Long sparkUserId, GuestBookContent content) {
         this.roomId = roomId;
         this.sparkUserId = sparkUserId;
-        this.content = contentDTO.getContent();
-        this.createdAt = LocalDateTime.now();
+        this.content = content.getContent();
     }
 
 }

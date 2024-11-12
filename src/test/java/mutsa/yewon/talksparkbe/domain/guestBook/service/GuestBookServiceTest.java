@@ -50,12 +50,12 @@ class GuestBookServiceTest {
 
         guestBookRepository.save(guestBook);
 
-        System.out.println("GuestBook ID: " + guestBook.getGuestId());
+        System.out.println("GuestBook ID: " + guestBook.getGuestBookId());
         System.out.println("GuestBook Content: " + guestBook.getGuestBookContent());
         System.out.println("SparkUser Name: " + guestBook.getSparkUser().getName());
         System.out.println("Room Name: " + guestBook.getRoom().getRoomName());
 
-        assertNotNull(guestBook.getGuestId(), "GuestBook ID is null");
+        assertNotNull(guestBook.getGuestBookId(), "GuestBook ID is null");
         assertEquals("멋사최고", guestBook.getGuestBookContent(),
                 "Expected GuestBook Content: 멋사최고, but was: " + guestBook.getGuestBookContent());
         assertEquals("이윤정", guestBook.getSparkUser().getName(),
