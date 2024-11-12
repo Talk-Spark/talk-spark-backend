@@ -1,6 +1,8 @@
 package mutsa.yewon.talksparkbe.global.security;
 
 import com.google.gson.Gson;
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.MalformedJwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -18,6 +20,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.security.SignatureException;
 import java.util.List;
 import java.util.Map;
 
@@ -52,25 +55,46 @@ public class JWTCheckFilter extends OncePerRequestFilter {
 
         try {
             String accessToken = authorization.substring(7);
+
+            // 토큰 검증 단계에서 발생할 수 있는 예외를 디버깅하기 위해 로그 추가
+            log.info("Access Token: " + accessToken);
+
             Map<String, Object> claims = jwtUtil.validateToken(accessToken);
+            log.info("Token validation completed. Claims: " + claims);
 
             String kakaoId = (String) claims.get("kakaoId");
             String name = (String) claims.get("name");
             String password = (String) claims.get("password");
             List<String> roleNames = (List<String>) claims.get("roleNames");
+            Number sparkUserIdNumber = (Number) claims.get("sparkUserId");
+            Long sparkUserId = (sparkUserIdNumber != null) ? sparkUserIdNumber.longValue() : null;
 
-            SparkUserDTO sparkUserDTO = new SparkUserDTO(kakaoId, name, password, roleNames);
+            log.info("Parsed Claims: kakaoId=" + kakaoId + ", name=" + name + ", password=" + password + ", sparkUserId=" + sparkUserId);
+
+            SparkUserDTO sparkUserDTO = new SparkUserDTO(sparkUserId, kakaoId, name, password, roleNames);
 
             UsernamePasswordAuthenticationToken authenticationToken =
                     new UsernamePasswordAuthenticationToken(sparkUserDTO, password, sparkUserDTO.getAuthorities());
 
             SecurityContextHolder.getContext().setAuthentication(authenticationToken);
-
             filterChain.doFilter(request, response);
+
         } catch (CustomTalkSparkException e) {
+            // Custom 예외 처리
+            log.error("Custom exception occurred: " + e.getMessage(), e);
             handleCustomException(response, e);
+        }catch (MalformedJwtException e) {
+            // 잘못된 형식의 JWT 예외
+            log.error("Malformed JWT error: " + e.getMessage(), e);
+            writeErrorResponse(response, HttpStatus.BAD_REQUEST, "MALFORMED_JWT_ERROR");
+        } catch (ExpiredJwtException e) {
+            // 만료된 JWT 예외
+            log.error("Expired JWT error: " + e.getMessage(), e);
+            writeErrorResponse(response, HttpStatus.UNAUTHORIZED, "JWT_EXPIRED_ERROR");
         } catch (Exception e) {
-            writeErrorResponse(response, HttpStatus.BAD_REQUEST, "JWT_SIGNATURE_ERROR");
+            // 그 외의 일반 예외 처리
+            log.error("General exception occurred: " + e.getMessage(), e);
+            writeErrorResponse(response, HttpStatus.BAD_REQUEST, "GENERAL_JWT_ERROR");
         }
     }
 

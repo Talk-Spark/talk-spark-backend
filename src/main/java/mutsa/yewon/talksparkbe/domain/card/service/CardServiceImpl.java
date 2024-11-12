@@ -10,6 +10,7 @@ import mutsa.yewon.talksparkbe.domain.sparkUser.entity.SparkUser;
 import mutsa.yewon.talksparkbe.domain.sparkUser.repository.SparkUserRepository;
 import mutsa.yewon.talksparkbe.global.exception.CustomTalkSparkException;
 import mutsa.yewon.talksparkbe.global.exception.ErrorCode;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -27,7 +28,7 @@ public class CardServiceImpl implements CardService {
     @Override
     public Long createCard(CardCreateDTO cardCreateDTO) {
 
-        SparkUser sparkUser = sparkUserRepository.findByKakaoId(cardCreateDTO.getKakaoId())
+        SparkUser sparkUser = sparkUserRepository.findById(cardCreateDTO.getSparkUserId())
                 .orElseThrow(() -> new CustomTalkSparkException(ErrorCode.USER_NOT_EXIST));
 
         Card card = CardCreateDTO.toCard(cardCreateDTO, sparkUser);
@@ -36,8 +37,9 @@ public class CardServiceImpl implements CardService {
     }
 
     @Override
-    public List<CardResponseDTO> getCards(String kakaoId) {
-        List<Card> cardList = cardRepository.findBySparkUserId(kakaoId);
+    public List<CardResponseDTO> getCards(Long sparkUserId) {
+
+        List<Card> cardList = cardRepository.findBySparkUserId(sparkUserId);
 
         if (cardList.isEmpty()) {
             throw new CustomTalkSparkException(ErrorCode.MUST_MAKE_CARD_FIRST);
@@ -51,18 +53,45 @@ public class CardServiceImpl implements CardService {
 
     @Override
     public CardResponseDTO getCard(Long id) {
+
         Card card = cardRepository.findById(id)
                 .orElseThrow(() -> new CustomTalkSparkException(ErrorCode.CARD_NOT_EXIST));
+
         return CardResponseDTO.fromCard(card);
     }
 
     @Override
-    public Map<String, String> modifyCard(CardCreateDTO cardCreateDTO) {
-        return Map.of();
+    public Map<String, Long> modifyCard(Long id, CardCreateDTO cardCreateDTO) {
+
+        Card card = cardRepository.findById(id)
+                .orElseThrow(() -> new CustomTalkSparkException(ErrorCode.CARD_NOT_EXIST));
+
+        authorizeSparkUser(card);
+
+        card.update(cardCreateDTO);
+        cardRepository.save(card);
+
+        return Map.of("UPDATED CARD", id);
     }
 
     @Override
-    public Map<String, String> deleteCard(Long id) {
-        return Map.of();
+    public Map<String, Long> deleteCard(Long id) {
+
+        Card card = cardRepository.findById(id)
+                .orElseThrow(() -> new CustomTalkSparkException(ErrorCode.CARD_NOT_EXIST));
+
+        authorizeSparkUser(card);
+
+        cardRepository.delete(card);
+
+        return Map.of("DELETE COMPLETED", id);
     }
+
+    private static void authorizeSparkUser(Card card){
+        String kakaoId = SecurityContextHolder.getContext().getAuthentication().getName();
+        if (!card.getSparkUser().getKakaoId().equals(kakaoId)) {
+            throw new IllegalStateException("not authorized");
+        }
+    }
+
 }

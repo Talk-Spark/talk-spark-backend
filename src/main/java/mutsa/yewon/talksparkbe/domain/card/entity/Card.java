@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import mutsa.yewon.talksparkbe.domain.card.dto.CardCreateDTO;
 import mutsa.yewon.talksparkbe.domain.sparkUser.entity.SparkUser;
 
 @Entity
@@ -41,4 +42,16 @@ public class Card {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "spark_user_id")
     private SparkUser sparkUser;
+
+    public void update(CardCreateDTO cardCreateDTO) {
+        this.name = cardCreateDTO.getName();
+        this.age = cardCreateDTO.getAge();
+        this.major = cardCreateDTO.getMajor();
+        this.mbti = cardCreateDTO.getMbti();
+        this.hobby = cardCreateDTO.getHobby();
+        this.lookAlike = cardCreateDTO.getLookAlike();
+        this.slogan = cardCreateDTO.getSlogan();
+        this.tmi = cardCreateDTO.getTmi();
+    }
+
 }
