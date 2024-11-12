@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Room List</title>
+</head>
+<body>
+<h1>Room List</h1>
+
+<button onclick="window.location.href='/views/rooms/create'">Create Room</button>
+
+<table border="1">
+    <thead>
+    <tr>
+        <th>Room ID</th>
+        <th>Room Name</th>
+        <th>Host Name</th>
+        <th>Current People</th>
+        <th>Max People</th>
+        <th>Action</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="room : ${rooms}">
+        <td th:text="${room.roomId}">1</td>
+        <td th:text="${room.roomName}">Room Name</td>
+        <td th:text="${room.hostName}">Host Name</td>
+        <td th:text="${room.currentPeople}">0</td>
+        <td th:text="${room.maxPeople}">10</td>
+        <td>
+            <input type="text" placeholder="SparkUserId 입력" th:id="'userId-' + ${room.roomId}" />
+            <button th:onclick="'joinRoom(' + ${room.roomId} + ')'">입장</button>
+        </td>
+    </tr>
+    </tbody>
+</table>
+
+<script>
+    // 방에 입장 요청 함수
+    async function joinRoom(roomId) {
+        const userIdInput = document.getElementById(`userId-${roomId}`);
+        const sparkUserId = userIdInput.value;
+
+        if (!sparkUserId) {
+            alert("SparkUserId를 입력하세요.");
+            return;
+        }
+
+        const response = await fetch(`/rooms/join`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ roomId: roomId, sparkUserId: parseInt(sparkUserId) })
+        });
+
+        if (response.ok) {
+            // 방 입장 성공 시 방 내부 화면으로 이동
+            window.location.href = `/views/rooms/${roomId}`;
+        } else {
+            // 실패 시 에러 메시지 표시
+            const error = await response.json();
+            alert(`방 입장 실패: ${error.message}`);
+        }
+    }
+</script>
+
+</body>
+</html>

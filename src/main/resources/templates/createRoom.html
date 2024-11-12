@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Create Room</title>
+</head>
+<body>
+<h1>Create Room</h1>
+<form action="/views/rooms/create" method="post">
+    <label for="roomName">Room Name:</label>
+    <input type="text" id="roomName" name="roomName" required><br><br>
+
+    <label for="maxPeople">Max People:</label>
+    <input type="number" id="maxPeople" name="maxPeople" required><br><br>
+
+    <label for="difficulty">Difficulty:</label>
+    <input type="number" id="difficulty" name="difficulty" required><br><br>
+
+    <label for="hostId">Host ID:</label>
+    <input type="number" id="hostId" name="hostId" required><br><br>
+
+    <button type="submit">Create Room</button>
+</form>
+</body>
+</html>

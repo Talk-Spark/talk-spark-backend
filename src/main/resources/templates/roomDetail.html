@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Room Detail</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.5.1/sockjs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+</head>
+<body>
+<h1>Room Detail</h1>
+<p>Room ID: <span th:text="${roomId}"></span></p>
+
+<h2>Participants</h2>
+<ul id="participant-list"></ul>
+
+<script type="text/javascript">
+    const roomId = [[${roomId}]]; // 방 ID
+    const socket = new SockJS('/ws'); // WebSocket 엔드포인트
+    const stompClient = Stomp.over(socket);
+
+    // WebSocket 연결 및 구독 설정
+    stompClient.connect({}, function () {
+        // 참가자 목록 구독
+        stompClient.subscribe(`/topic/participants/${roomId}`, function (message) {
+            const participants = JSON.parse(message.body);
+            updateParticipantList(participants);
+        });
+
+        // 방에 참가 후 참가자 목록 요청
+        stompClient.send(`/app/participants/${roomId}`, {}, {});
+    });
+
+    // 참가자 목록 업데이트 함수
+    function updateParticipantList(participants) {
+        const participantListElement = document.getElementById('participant-list');
+        participantListElement.innerHTML = '';
+
+        participants.forEach(participant => {
+            const listItem = document.createElement('li');
+            listItem.textContent = participant.name + (participant.owner ? " (Host)" : "");
+            participantListElement.appendChild(listItem);
+        });
+    }
+</script>
+</body>
+</html>
