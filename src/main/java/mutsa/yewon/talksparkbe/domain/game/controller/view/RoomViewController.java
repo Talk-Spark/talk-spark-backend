@@ -7,6 +7,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+// TODO: 타임리프로 방 관련 뷰 통합 테스트를 위한 임시 뷰 컨트롤러입니다. 추후 삭제해야 합니다.
 @Controller
 @RequiredArgsConstructor
 @RequestMapping("/views/rooms")
@@ -24,12 +25,6 @@ public class RoomViewController {
     public String showCreateRoomForm(Model model) {
         model.addAttribute("roomCreateRequest", new RoomCreateRequest());
         return "createRoom";
-    }
-
-    @PostMapping("/create")
-    public String createRoom(@ModelAttribute RoomCreateRequest roomCreateRequest) {
-        Long roomId = roomService.createRoom(roomCreateRequest);
-        return "redirect:/views/rooms/" + roomId;
     }
 
     @GetMapping("/{roomId}")

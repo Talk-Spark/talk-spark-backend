@@ -28,7 +28,6 @@
         <td th:text="${room.currentPeople}">0</td>
         <td th:text="${room.maxPeople}">10</td>
         <td>
-            <input type="text" placeholder="SparkUserId 입력" th:id="'userId-' + ${room.roomId}" />
             <button th:onclick="'joinRoom(' + ${room.roomId} + ')'">입장</button>
         </td>
     </tr>
@@ -36,20 +35,21 @@
 </table>
 
 <script>
+    // localStorage에서 액세스 토큰 가져오기
+    const accessToken = localStorage.getItem('accessToken');
+    if (!accessToken) {
+        window.location.href = '/login';
+    }
+
     // 방에 입장 요청 함수
     async function joinRoom(roomId) {
-        const userIdInput = document.getElementById(`userId-${roomId}`);
-        const sparkUserId = userIdInput.value;
-
-        if (!sparkUserId) {
-            alert("SparkUserId를 입력하세요.");
-            return;
-        }
-
         const response = await fetch(`/rooms/join`, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ roomId: roomId, sparkUserId: parseInt(sparkUserId) })
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + accessToken
+            },
+            body: JSON.stringify({ roomId: roomId })
         });
 
         if (response.ok) {

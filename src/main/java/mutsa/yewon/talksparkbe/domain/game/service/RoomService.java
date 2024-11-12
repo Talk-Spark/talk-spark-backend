@@ -114,4 +114,8 @@ public class RoomService {
         return response;
     }
 
+    public boolean checkHost(Long roomId, SparkUser sparkUser) {
+        RoomParticipate ownerParticipate = roomParticipateRepository.findByRoomIdWithOwner(roomId).orElseThrow(() -> new CustomTalkSparkException(ErrorCode.ROOM_NOT_FOUND));
+        return (sparkUser.equals(ownerParticipate.getSparkUser()));
+    }
 }
