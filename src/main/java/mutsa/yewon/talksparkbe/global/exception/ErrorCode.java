@@ -27,7 +27,6 @@ public enum ErrorCode {
     GUESTBOOK_ROOM_NOT_FOUND(HttpStatus.NOT_FOUND, "방명록 방을 찾지 못했습니다.");
 
     private final HttpStatus httpStatus;
-
     private final String message;
 
 }
