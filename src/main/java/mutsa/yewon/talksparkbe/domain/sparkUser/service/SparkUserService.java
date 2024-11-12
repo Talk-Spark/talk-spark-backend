@@ -10,8 +10,8 @@ public interface SparkUserService {
 
     SparkUserDTO getKakaoUser(String accessToken);
 
-    default SparkUserDTO entityToDTO(SparkUser sparkUser) {
-        return new SparkUserDTO(sparkUser.getKakaoId(), sparkUser.getName(), sparkUser.getPassword(),
-                sparkUser.getRoles().stream().map(role -> role.name()).toList());
-    }
+//    default SparkUserDTO entityToDTO(SparkUser sparkUser) {
+//        return new SparkUserDTO(sparkUser.getKakaoId(), sparkUser.getName(), sparkUser.getPassword(),
+//                sparkUser.getRoles().stream().map(role -> role.name()).toList());
+//    }
 }

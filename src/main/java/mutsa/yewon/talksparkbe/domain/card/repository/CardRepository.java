@@ -9,6 +9,9 @@ import java.util.List;
 
 public interface CardRepository extends JpaRepository<Card, Long> {
 
-    @Query("select c from Card c where c.sparkUser.kakaoId = :sparkUserId")
-    List<Card> findBySparkUserId(@Param("sparkUserId") String sparkUserId);
+//    @Query("select c from Card c where c.sparkUser.kakaoId = :sparkUserId")
+//    List<Card> findBySparkUserId(@Param("sparkUserId") String sparkUserId);
+
+    List<Card> findBySparkUserId(Long sparkUserId);
+
 }

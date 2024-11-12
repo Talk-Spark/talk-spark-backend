@@ -11,8 +11,8 @@ import java.util.Map;
 public interface CardService {
 
     Long createCard(CardCreateDTO cardCreateDTO);
-    List<CardResponseDTO> getCards(String kakaoId);
+    List<CardResponseDTO> getCards(Long sparkUserId);
     CardResponseDTO getCard(Long id);
-    Map<String,String> modifyCard(CardCreateDTO cardCreateDTO);
-    Map<String,String> deleteCard(Long id);
+    Map<String,Long> modifyCard(Long id, CardCreateDTO cardCreateDTO);
+    Map<String,Long> deleteCard(Long id);
 }

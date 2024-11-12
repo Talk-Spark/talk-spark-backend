@@ -11,8 +11,7 @@ import mutsa.yewon.talksparkbe.domain.sparkUser.entity.SparkUser;
 @Data
 public class CardCreateDTO {
 
-    @NotBlank(message = "카카오 ID는 필수항목입니다.")
-    private String kakaoId;
+    private Long sparkUserId ;
 
     @NotBlank(message = "이름은 필수항목입니다.")
     private String name;
