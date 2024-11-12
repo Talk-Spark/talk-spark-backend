@@ -13,10 +13,13 @@
 <h2>Participants</h2>
 <ul id="participant-list"></ul>
 
+<button id="start-button" style="display: none;">Start</button>
+
 <script type="text/javascript">
     const roomId = [[${roomId}]]; // 방 ID
     const socket = new SockJS('/ws'); // WebSocket 엔드포인트
     const stompClient = Stomp.over(socket);
+    const startButton = document.getElementById('start-button');
 
     // WebSocket 연결 및 구독 설정
     stompClient.connect({}, function () {
@@ -41,6 +44,41 @@
             participantListElement.appendChild(listItem);
         });
     }
+
+    // 호스트 확인 요청 보내기
+    function checkHost() {
+        const accessToken = localStorage.getItem('accessToken'); // 로컬스토리지에서 액세스 토큰 가져오기
+        if (!accessToken) {
+            console.error('Access token not found');
+            return;
+        }
+
+        fetch('/rooms/host', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + accessToken
+            },
+            body: JSON.stringify({ roomId: roomId })
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Host check failed');
+                }
+                return response.json();
+            })
+            .then(isHost => {
+                if (isHost) {
+                    startButton.style.display = 'block'; // 호스트인 경우 시작 버튼 표시
+                } else {
+                    startButton.style.display = 'none'; // 호스트가 아닌 경우 시작 버튼 숨기기
+                }
+            })
+            .catch(error => console.error('Error:', error));
+    }
+
+    // 페이지 로드 시 호스트 확인 요청 실행
+    checkHost();
 </script>
 </body>
 </html>
