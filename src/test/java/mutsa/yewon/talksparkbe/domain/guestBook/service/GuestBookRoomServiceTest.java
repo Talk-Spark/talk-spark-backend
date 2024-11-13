@@ -10,6 +10,7 @@ import mutsa.yewon.talksparkbe.domain.guestBook.entity.GuestBook;
 import mutsa.yewon.talksparkbe.domain.guestBook.repository.GuestBookRepository;
 import mutsa.yewon.talksparkbe.domain.sparkUser.entity.SparkUser;
 import mutsa.yewon.talksparkbe.domain.sparkUser.repository.SparkUserRepository;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -30,11 +31,8 @@ class GuestBookRoomServiceTest {
     @Autowired
     private GuestBookRoomService guestBookRoomService;
 
-
-    @Test
-    @Transactional
-    @Rollback
-    void getGuestBookRoomList() {
+    @BeforeEach
+    void setUp() {
         SparkUser sparkUser1 = SparkUser.builder()
                 .name("이윤정")
                 .kakaoId("1234")
@@ -43,9 +41,14 @@ class GuestBookRoomServiceTest {
                 .name("김민우")
                 .kakaoId("5678")
                 .build();
+        SparkUser sparkUser3 = SparkUser.builder()
+                .name("박승범")
+                .kakaoId("9101")
+                .build();
 
         sparkUserRepository.save(sparkUser1);
         sparkUserRepository.save(sparkUser2);
+        sparkUserRepository.save(sparkUser3);
 
         Room room1 = Room.builder()
                 .roomName("테스트")
@@ -68,13 +71,27 @@ class GuestBookRoomServiceTest {
                 .build();
         RoomParticipate roomParticipate2 = RoomParticipate.builder()
                 .room(room1)
-                .sparkUser(sparkUser1)
+                .sparkUser(sparkUser2)
                 .isOwner(false)
+                .build();
+        RoomParticipate roomParticipate3 = RoomParticipate.builder()
+                .room(room1)
+                .sparkUser(sparkUser3)
+                .isOwner(false)
+                .build();
+        RoomParticipate roomParticipate4 = RoomParticipate.builder()
+                .room(room2)
+                .sparkUser(sparkUser1)
+                .isOwner(true)
                 .build();
         roomParticipateRepository.save(roomParticipate1);
         roomParticipateRepository.save(roomParticipate2);
+        roomParticipateRepository.save(roomParticipate3);
+        roomParticipateRepository.save(roomParticipate4);
         room1.getRoomParticipates().add(roomParticipate1);
         room1.getRoomParticipates().add(roomParticipate2);
+        room1.getRoomParticipates().add(roomParticipate3);
+        room2.getRoomParticipates().add(roomParticipate4);
 
         GuestBook guestBook1 = GuestBook.builder()
                 .guestBookContent("멋사최고")
@@ -91,20 +108,36 @@ class GuestBookRoomServiceTest {
         guestBookRepository.save(guestBook2);
         room1.getGuestBooks().add(guestBook1);
         room1.getGuestBooks().add(guestBook2);
+    }
 
+    @Test
+    @Transactional
+    @Rollback
+    void getGuestBookRoomList() {
 
-        System.out.println(room1.getRoomParticipates());
+        // 방 이름으로 검색
+        GuestBookRoomListResponse roomResponseSortedByAlphabetical = guestBookRoomService
+                .getGuestBookRoomList("1234","테스", "alphabetical");
 
-        // 서비스 호출
-        GuestBookRoomListResponse response = guestBookRoomService.getGuestBookRoomList("테스", "alphabetical");
+        GuestBookRoomListResponse roomResponseSortedByDefault = guestBookRoomService
+                .getGuestBookRoomList("1234","테스","");
 
-        // 콘솔에 출력하여 검증
-        System.out.println(response);
+        GuestBookRoomListResponse roomResponseSortedByLatest = guestBookRoomService
+                .getGuestBookRoomList("1234","테스", "latest");
+        System.out.println(roomResponseSortedByAlphabetical);
+        System.out.println(roomResponseSortedByLatest);
 
+        // 참가자 이름으로 검색
+        GuestBookRoomListResponse userNameResponse = guestBookRoomService
+                .getGuestBookRoomList("1234","김민", "alphabetical");
+        System.out.println(userNameResponse);
 
-        assertEquals(2L, response.getRoomGuestBookCount());
-        assertEquals("테스트", response.getRoomGuestBook().get(0).getRoomName());
-        assertEquals("멋사최고2", response.getRoomGuestBook().get(0).getPreViewContent());
+        assertEquals(2L, roomResponseSortedByAlphabetical.getRoomGuestBookCount());
+        assertEquals(1L, userNameResponse.getRoomGuestBookCount());
+        assertEquals(roomResponseSortedByDefault.getRoomGuestBook().get(0).getRoomName(),
+                roomResponseSortedByLatest.getRoomGuestBook().get(0).getRoomName());
+        assertEquals("테스트", roomResponseSortedByAlphabetical.getRoomGuestBook().get(0).getRoomName());
+        assertEquals("멋사최고2", roomResponseSortedByAlphabetical.getRoomGuestBook().get(0).getPreViewContent());
     }
 
 }

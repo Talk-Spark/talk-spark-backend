@@ -8,6 +8,7 @@ import mutsa.yewon.talksparkbe.domain.guestBook.dto.guestBook.GuestBookPostReque
 import mutsa.yewon.talksparkbe.domain.guestBook.dto.guestBook.GuestBookListResponse;
 import mutsa.yewon.talksparkbe.domain.guestBook.dto.room.GuestBookRoomListResponse;
 import mutsa.yewon.talksparkbe.domain.guestBook.entity.GuestBook;
+import mutsa.yewon.talksparkbe.domain.guestBook.repository.GuestBookRepository;
 import mutsa.yewon.talksparkbe.domain.guestBook.service.GuestBookRoomService;
 import mutsa.yewon.talksparkbe.domain.guestBook.service.GuestBookService;
 import mutsa.yewon.talksparkbe.domain.sparkUser.entity.SparkUser;
@@ -27,6 +28,7 @@ import java.util.List;
 public class GuestBookController {
     private final GuestBookService guestBookService;
     private final SparkUserRepository sparkUserRepository;
+    private final GuestBookRepository guestBookRepository;
     private final GuestBookRoomService guestBookRoomService;
 
 
@@ -83,8 +85,22 @@ public class GuestBookController {
         SparkUser sparkUser = sparkUserRepository.findByKakaoId(kakaoId).orElseThrow(() -> new RuntimeException("User not found"));
 
         try {
-            GuestBookRoomListResponse guestBookRoomListResponse = guestBookRoomService.getGuestBookRoomList(search,sortBy);
+            GuestBookRoomListResponse guestBookRoomListResponse = guestBookRoomService.getGuestBookRoomList(kakaoId,search,sortBy);
             ResponseDTO<?> responseDTO = ResponseDTO.ok("방명록 방들이 조회되었습니다.", guestBookRoomListResponse);
+            return ResponseEntity.status(200).body(responseDTO);
+        } catch (IllegalArgumentException e) {
+            throw new CustomTalkSparkException(ErrorCode.INVALID_FORMAT);
+        }
+
+    }
+
+    @DeleteMapping("/{roomId}")
+    public ResponseEntity<?> DeleteGuestBookRoom(@RequestParam String kakaoId,
+                                                 @PathVariable("roomId") Long roomId) {
+        SparkUser sparkUser = sparkUserRepository.findByKakaoId(kakaoId).orElseThrow(() -> new RuntimeException("User not found"));
+        try {
+            guestBookRoomService.deleteGuestBookRoom(kakaoId, roomId);
+            ResponseDTO<?> responseDTO = ResponseDTO.ok("방명록 방이 삭제되었습니다.");
             return ResponseEntity.status(200).body(responseDTO);
         } catch (IllegalArgumentException e) {
             throw new CustomTalkSparkException(ErrorCode.INVALID_FORMAT);
