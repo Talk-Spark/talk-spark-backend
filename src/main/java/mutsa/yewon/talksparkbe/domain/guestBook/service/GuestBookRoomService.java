@@ -12,15 +12,14 @@ import org.springframework.stereotype.Service;
 
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Service
 public class GuestBookRoomService {
 
-    private final SparkUserRepository sparkUserRepository;
     private final RoomRepository roomRepository;
-    private final GuestBookRepository guestBookRepository;
 
     public GuestBookRoomListResponse getGuestBookRoomList(String search, String sortBy) {
 
@@ -31,7 +30,7 @@ public class GuestBookRoomService {
                     .filter(room -> room.getRoomName().contains(search) ||
                             room.getRoomParticipates().stream()
                                     .anyMatch(participant -> participant.getSparkUser().getName().contains(search))) // 참가자 이름으로 필터링
-                    .collect(Collectors.toList());
+                    .toList();
         }
 
             switch (sortBy == null || sortBy.isEmpty() ? "latest" : sortBy) {
@@ -52,6 +51,7 @@ public class GuestBookRoomService {
 
         List<GuestBookRoomListDTO> guestBookRoomListDTO = rooms.stream()
                 .map(room -> GuestBookRoomListDTO.builder()
+                        .roomId(room.getRoomId())
                         .roomName(room.getRoomName())
                         .roomDateTime(room.getCreatedAt())
                         .roomPeopleCount((long) room.getRoomParticipates().size())
@@ -67,9 +67,11 @@ public class GuestBookRoomService {
     }
 
     // 마지막 방명록 대화 가져오기
-    private String getLastGuestBookContent(Room room) {
-        return room.getGuestBooks().stream().max(Comparator.comparing(GuestBook::getGuestBookDateTime))
+    public static String getLastGuestBookContent(Room room) {
+        return room.getGuestBooks().stream()
+                .filter(Objects::nonNull)
+                .max(Comparator.comparing(GuestBook::getGuestBookDateTime))
                 .map(GuestBook::getGuestBookContent)
-                .orElse(null); // 방명록이 없는 경우 null값 반환
+                .orElse("방명록이 없습니다."); // 방명록이 없는 경우 null값 반환
     }
 }

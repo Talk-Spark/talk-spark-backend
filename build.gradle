@@ -36,6 +36,9 @@ dependencies {
     testImplementation 'org.springframework.security:spring-security-test'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
+    // MacOS netty 의존성 추가
+    implementation 'io.netty:netty-resolver-dns-native-macos:4.1.68.Final:osx-aarch_64'
+
     // redis
     implementation("org.springframework.boot:spring-boot-starter-data-redis")
     implementation 'org.redisson:redisson-spring-boot-starter:3.17.0'

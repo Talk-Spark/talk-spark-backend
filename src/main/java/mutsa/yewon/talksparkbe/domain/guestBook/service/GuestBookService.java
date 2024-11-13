@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import mutsa.yewon.talksparkbe.domain.game.entity.Room;
 import mutsa.yewon.talksparkbe.domain.game.repository.RoomRepository;
 import mutsa.yewon.talksparkbe.domain.guestBook.dto.guestBook.GuestBookListDTO;
-import mutsa.yewon.talksparkbe.domain.guestBook.dto.guestBook.GuestBookListRequest;
+import mutsa.yewon.talksparkbe.domain.guestBook.dto.guestBook.GuestBookListRequestDTO;
 import mutsa.yewon.talksparkbe.domain.guestBook.dto.guestBook.GuestBookPostRequestDTO;
 import mutsa.yewon.talksparkbe.domain.guestBook.dto.guestBook.GuestBookListResponse;
 import mutsa.yewon.talksparkbe.domain.guestBook.entity.GuestBook;
@@ -12,6 +12,7 @@ import mutsa.yewon.talksparkbe.domain.guestBook.repository.GuestBookRepository;
 import mutsa.yewon.talksparkbe.domain.sparkUser.entity.SparkUser;
 import mutsa.yewon.talksparkbe.domain.sparkUser.repository.SparkUserRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -27,6 +28,7 @@ public class GuestBookService {
     private RoomRepository roomRepository;
     private SparkUserRepository sparkUserRepository;
 
+    @Transactional
     public GuestBook createGuestBook(GuestBookPostRequestDTO guestBookPostRequestDTO) {
         Room room = roomRepository.findById(guestBookPostRequestDTO.getRoomId())
                 .orElseThrow(() -> new RuntimeException("Room not found"));
@@ -38,17 +40,19 @@ public class GuestBookService {
                 .room(room)
                 .sparkUser(sparkUser)
                 .guestBookContent(guestBookPostRequestDTO.getContent())
-                .guestBookDateTime(LocalDateTime.now())
                 .build();
 
-        return guestBookRepository.save(guestBook);
+        guestBookRepository.save(guestBook);
+        room.addGuestBooks(guestBook);
+        return guestBook;
     }
 
-    public GuestBookListResponse getGuestBookList(GuestBookListRequest guestBookListRequest) {
-        Room room = roomRepository.findById(guestBookListRequest.getRoomId())
+    @Transactional
+    public GuestBookListResponse getGuestBookList(GuestBookListRequestDTO guestBookListRequestDTO) {
+        Room room = roomRepository.findById(guestBookListRequestDTO.getRoomId())
                 .orElseThrow(() -> new RuntimeException("Room not found"));
 
-        SparkUser sparkUser = sparkUserRepository.findById(guestBookListRequest.getSparkUserId())
+        SparkUser sparkUser = sparkUserRepository.findById(guestBookListRequestDTO.getSparkUserId())
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
         Optional<GuestBook> guestBooks = guestBookRepository.findById(room.getRoomId());

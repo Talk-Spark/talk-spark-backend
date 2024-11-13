@@ -30,12 +30,11 @@ public class GuestBook {
     private LocalDateTime guestBookDateTime;
 
     @Builder
-    public GuestBook(Long guestBookId, SparkUser sparkUser, Room room, String guestBookContent, LocalDateTime guestBookDateTime) {
+    public GuestBook(SparkUser sparkUser, Room room, String guestBookContent) {
         this.room = room;
         this.sparkUser = sparkUser;
-        this.guestBookId = guestBookId;
         this.guestBookContent = guestBookContent;
-        this.guestBookDateTime = guestBookDateTime;
+        this.guestBookDateTime = LocalDateTime.now();
     }
 
 }

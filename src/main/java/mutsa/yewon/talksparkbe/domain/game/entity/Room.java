@@ -5,14 +5,12 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import mutsa.yewon.talksparkbe.domain.guestBook.entity.GuestBook;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -57,4 +55,8 @@ public class Room {
         roomParticipate.assignRoom(this);
     }
 
+    @OneToMany(mappedBy = "room")
+    private List<GuestBook> guestBooks = new ArrayList<>();
+
+    public void addGuestBooks(GuestBook guestBook) {this.guestBooks.add(guestBook);}
 }

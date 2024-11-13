@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
-public class GuestBookListRequest {
+public class GuestBookListRequestDTO {
     @NotNull(message = "roomId는 반드시 필요합니다.")
     private Long roomId;
 
