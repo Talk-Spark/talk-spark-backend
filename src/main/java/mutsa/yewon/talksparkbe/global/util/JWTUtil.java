@@ -60,6 +60,8 @@ public class JWTUtil {
                     .parseClaimsJws(token)
                     .getBody();
 
+            log.info(claims.toString());
+
 
         }catch (MalformedJwtException e) {
             throw new CustomTalkSparkException(ErrorCode.JWT_MALFORMED);
