@@ -20,21 +20,21 @@ public class GuestBook {
     @JoinColumn(name = "spark_user_id")
     private SparkUser sparkUser;
 
-    @ManyToOne
-    @JoinColumn(name = "room_id")
-    private Room room;
-
     private String guestBookContent;
 
     @CreatedDate
     private LocalDateTime guestBookDateTime;
 
     @Builder
-    public GuestBook(SparkUser sparkUser, Room room, String guestBookContent) {
-        this.room = room;
+    public GuestBook(SparkUser sparkUser, String guestBookContent) {
         this.sparkUser = sparkUser;
         this.guestBookContent = guestBookContent;
         this.guestBookDateTime = LocalDateTime.now();
     }
+
+    @Setter
+    @ManyToOne
+    @JoinColumn(name = "guestbook_room_id")
+    private GuestBookRoom guestBookRoom;
 
 }

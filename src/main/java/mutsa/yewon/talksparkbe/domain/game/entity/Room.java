@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import mutsa.yewon.talksparkbe.domain.guestBook.entity.GuestBook;
+import mutsa.yewon.talksparkbe.domain.guestBook.entity.GuestBookRoom;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
@@ -39,11 +40,15 @@ public class Room {
     @OneToMany(mappedBy = "room")
     private List<RoomParticipate> roomParticipates = new ArrayList<>();
 
+    @OneToOne(mappedBy = "room")
+    private GuestBookRoom guestBookRoom;
+
     @Builder
     private Room(String roomName, int maxPeople, int difficulty) {
         this.roomName = roomName;
         this.maxPeople = maxPeople;
         this.difficulty = difficulty;
+        this.guestBookRoom = new GuestBookRoom(this);
     }
 
     public void addRoomParticipate(RoomParticipate roomParticipate) {
@@ -54,9 +59,4 @@ public class Room {
         this.addRoomParticipate(roomParticipate);
         roomParticipate.assignRoom(this);
     }
-
-    @OneToMany(mappedBy = "room")
-    private List<GuestBook> guestBooks = new ArrayList<>();
-
-    public void addGuestBooks(GuestBook guestBook) {this.guestBooks.add(guestBook);}
 }

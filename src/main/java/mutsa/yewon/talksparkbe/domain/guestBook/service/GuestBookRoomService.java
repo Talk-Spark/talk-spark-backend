@@ -7,15 +7,17 @@ import mutsa.yewon.talksparkbe.domain.game.repository.RoomRepository;
 import mutsa.yewon.talksparkbe.domain.guestBook.dto.room.GuestBookRoomListDTO;
 import mutsa.yewon.talksparkbe.domain.guestBook.dto.room.GuestBookRoomListResponse;
 import mutsa.yewon.talksparkbe.domain.guestBook.entity.GuestBook;
+import mutsa.yewon.talksparkbe.domain.guestBook.entity.GuestBookRoom;
+import mutsa.yewon.talksparkbe.domain.guestBook.entity.GuestBookRoomSparkUser;
 import mutsa.yewon.talksparkbe.domain.guestBook.repository.GuestBookRepository;
+import mutsa.yewon.talksparkbe.domain.guestBook.repository.GuestBookRoomRepository;
+import mutsa.yewon.talksparkbe.domain.guestBook.repository.GuestBookRoomSparkUserRepository;
 import mutsa.yewon.talksparkbe.domain.sparkUser.entity.SparkUser;
 import mutsa.yewon.talksparkbe.domain.sparkUser.repository.SparkUserRepository;
 import mutsa.yewon.talksparkbe.global.exception.CustomTalkSparkException;
 import mutsa.yewon.talksparkbe.global.exception.ErrorCode;
-import org.aspectj.lang.annotation.RequiredTypes;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.Comparator;
 import java.util.List;
@@ -29,67 +31,68 @@ import static mutsa.yewon.talksparkbe.global.exception.ErrorCode.ROOM_NOT_FOUND;
 public class GuestBookRoomService {
 
     private final RoomRepository roomRepository;
-    private final SparkUserRepository sparkUserRepository;
-    private final GuestBookRepository guestBookRepository;
+    private final GuestBookRoomRepository guestBookRoomRepository;
+    private final GuestBookRoomSparkUserRepository guestBookRoomSparkUserRepository;
 
     @Transactional
-    public GuestBookRoomListResponse getGuestBookRoomList(String kakaoId,
-                                                          String search,
-                                                          String sortBy) {
+    public GuestBookRoomListResponse getGuestBookRoomList(String kakaoId, String search, String sortBy) {
 
-        Optional<SparkUser> sparkUser = sparkUserRepository.findByKakaoId(kakaoId);
-        List<Room> rooms = roomRepository.findRoomsBySparkUser(sparkUser.get());
+        List<GuestBookRoom> guestBookRooms = guestBookRoomRepository
+                .findRoomsBySparkUser(kakaoId);
 
-        if (search != null && !search.isEmpty()){
-            rooms = rooms.stream()
-                    .filter(room -> room.getRoomName().contains(search) ||
-                            room.getRoomParticipates().stream()
-                                    .anyMatch(participant -> participant.getSparkUser().getName().contains(search))) // 참가자 이름으로 필터링
+
+        if (search != null && !search.isEmpty()) {
+            guestBookRooms = guestBookRooms.stream()
+                    .filter(guestBookRoom ->
+                            guestBookRoom.getRoom().getRoomName().contains(search) ||
+                                    guestBookRoom.getGuestBookRoomSparkUsers().stream()
+                                            .anyMatch(guestBookRoomSparkUser ->
+                                                    guestBookRoomSparkUser.getSparkUser()
+                                                            .getName().contains(search))
+                    )
                     .toList();
         }
 
-            switch (sortBy == null || sortBy.isEmpty() ? "latest" : sortBy) {
-                case "latest" ->
-                        rooms = rooms.stream()
-                                .sorted(Comparator.comparing(Room::getCreatedAt).reversed())
-                                .toList();
-                case "alphabetical" ->
-                        rooms = rooms.stream()
-                                .sorted(Comparator.comparing(Room::getRoomName))
-                                .toList();
-            }
+        switch (sortBy == null || sortBy.isEmpty() ? "latest" : sortBy) {
+            case "latest" ->
+                    guestBookRooms = guestBookRooms.stream()
+                            .sorted(Comparator.comparing(guestBookRoom -> guestBookRoom.getRoom().getCreatedAt(), Comparator.reverseOrder()))
+                            .toList();
+            case "alphabetical" ->
+                    guestBookRooms = guestBookRooms.stream()
+                            .sorted(Comparator.comparing(guestBookRoom -> guestBookRoom.getRoom().getRoomName()))
+                            .toList();
+            case "isFavorited" ->
+                    guestBookRooms = guestBookRooms.stream()
+                            .filter(guestBookRoom -> guestBookRoom.getIsGuestBookFavorited().equals(true))
+                            .toList();
+        }
 
-        //TODO: isFavorited 추가되면 구현
-//        } else if ("favorites".equalsIgnoreCase(sortBy)) {
-//            rooms = rooms.stream()
-//                    .filter(Room::isFavorited)
-//                    .collect(Collectors.toList());
-//        }
-
-        List<GuestBookRoomListDTO> guestBookRoomListDTO = rooms.stream()
-                .map(room -> GuestBookRoomListDTO.builder()
-                        .roomId(room.getRoomId())
-                        .roomName(room.getRoomName())
-                        .roomDateTime(room.getCreatedAt())
-                        .roomPeopleCount((long) room.getRoomParticipates().size())
-                        .preViewContent(getLastGuestBookContent(room))
+        List<GuestBookRoomListDTO> guestBookRoomListDTO = guestBookRooms.stream()
+                .map(guestBookRoom -> GuestBookRoomListDTO.builder()
+                        .roomId(guestBookRoom.getRoom().getRoomId())
+                        .roomName(guestBookRoom.getRoom().getRoomName())
+                        .roomDateTime(guestBookRoom.getRoom().getCreatedAt())
+                        .roomPeopleCount((long) guestBookRoom.getRoom().getRoomParticipates().size())
+                        .preViewContent(getLastGuestBookContent(guestBookRoom))
                         .build())
                 .toList();
 
 
         return GuestBookRoomListResponse.builder()
-                .roomGuestBookCount((long) rooms.size())
-                .roomGuestBook(guestBookRoomListDTO)
+                .guestBookRoomCount((long) guestBookRooms.size())
+                .guestBookRooms(guestBookRoomListDTO)
                 .build();
     }
 
     // 마지막 방명록 대화 가져오기
-    public static String getLastGuestBookContent(Room room) {
-        return room.getGuestBooks().stream()
+    public static String getLastGuestBookContent(GuestBookRoom guestBookRoom) {
+        return guestBookRoom
+                .getGuestBooks().stream()
                 .filter(Objects::nonNull)
                 .max(Comparator.comparing(GuestBook::getGuestBookDateTime))
                 .map(GuestBook::getGuestBookContent)
-                .orElse(null); // 방명록이 없는 경우 null값 반환
+                .orElse(null);
     }
 
     @Transactional
@@ -97,10 +100,19 @@ public class GuestBookRoomService {
         Room room = roomRepository.findById(roomId)
                 .orElseThrow(() -> new CustomTalkSparkException(ErrorCode.ROOM_NOT_FOUND));
 
-        room.getRoomParticipates().removeIf(participate ->
-                participate.getSparkUser().getKakaoId().equals(kakaoId)
-        );
+        GuestBookRoom guestBookRoom = room.getGuestBookRoom();
 
-        roomRepository.save(room);
+        GuestBookRoomSparkUser sparkUserToDelete = guestBookRoom.getGuestBookRoomSparkUsers().stream()
+                .filter(deleteSparkUser -> deleteSparkUser.getSparkUser().getKakaoId().equals(kakaoId))
+                .filter(deleteGuestBookRoom -> deleteGuestBookRoom.getGuestBookRoom().getRoom().getRoomId().equals(roomId))
+                .findFirst()
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+
+        guestBookRoom.getGuestBookRoomSparkUsers().remove(sparkUserToDelete);
+
+        guestBookRoomSparkUserRepository.delete(sparkUserToDelete);
+
+        guestBookRoomRepository.save(guestBookRoom);
     }
 }

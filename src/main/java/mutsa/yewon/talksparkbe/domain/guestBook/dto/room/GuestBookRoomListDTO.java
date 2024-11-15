@@ -17,9 +17,6 @@ public class GuestBookRoomListDTO {
     private String roomName;
     private LocalDateTime roomDateTime;
     private Long roomPeopleCount;
-
-//TODO: room entity 변경 후 추가
-//    private boolean isGuestBookFavorited;
-
+    private boolean isGuestBookFavorited;
     private String preViewContent;
 }

@@ -14,5 +14,5 @@ public class GuestBookListDTO {
     private boolean isOwnerGuestBook;
     private String sparkUserName;
     private String guestBookContent;
-    private LocalDateTime guestBookDate;
+    private LocalDateTime guestBookDateTime;
 }

@@ -16,6 +16,4 @@ public interface RoomRepository extends JpaRepository<Room, Long> {
             "where rp.isOwner = true and r.isFinished = false ")
     List<Room> findAllWithParticipates();
 
-    @Query("select r from Room r join r.roomParticipates rp where rp.sparkUser = :sparkUser")
-    List<Room> findRoomsBySparkUser(SparkUser sparkUser);
 }

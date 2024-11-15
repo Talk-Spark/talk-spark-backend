@@ -2,9 +2,14 @@ package mutsa.yewon.talksparkbe.domain.sparkUser.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import mutsa.yewon.talksparkbe.domain.guestBook.entity.GuestBook;
+import mutsa.yewon.talksparkbe.domain.guestBook.entity.GuestBookRoom;
+import mutsa.yewon.talksparkbe.domain.guestBook.entity.GuestBookRoomSparkUser;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Getter
@@ -35,4 +40,7 @@ public class SparkUser {
     public void clearMemberRoleList() {
         roles.clear();
     }
+
+    @OneToMany(mappedBy = "sparkUser")
+    private List<GuestBookRoomSparkUser> guestBookRoomSparkUsers = new ArrayList<>();
 }

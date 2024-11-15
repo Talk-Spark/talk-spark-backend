@@ -10,6 +10,6 @@ import java.util.Optional;
 @AllArgsConstructor
 @Builder
 public class GuestBookRoomListResponse {
-    private Long roomGuestBookCount;
-    private List<GuestBookRoomListDTO> roomGuestBook;
+    private Long guestBookRoomCount;
+    private List<GuestBookRoomListDTO> guestBookRooms;
 }

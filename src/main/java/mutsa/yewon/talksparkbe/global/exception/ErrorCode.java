@@ -18,7 +18,8 @@ public enum ErrorCode {
     ROOM_JOIN_INTERRUPTED(HttpStatus.SERVICE_UNAVAILABLE, "방 입장 처리가 강제로 중단되었습니다. 잠시 후 다시 시도해주세요."),
     ROOM_NOT_FOUND(HttpStatus.NOT_FOUND, "방을 찾지 못했습니다."),
 
-    INVALID_FORMAT(HttpStatus.BAD_REQUEST, "잘못된 형식입니다.");
+    INVALID_FORMAT(HttpStatus.BAD_REQUEST, "잘못된 형식입니다."),
+    GUESTBOOK_ROOM_NOT_FOUND(HttpStatus.NOT_FOUND, "방명록 방을 찾지 못했습니다.");
 
     private final HttpStatus httpStatus;
 

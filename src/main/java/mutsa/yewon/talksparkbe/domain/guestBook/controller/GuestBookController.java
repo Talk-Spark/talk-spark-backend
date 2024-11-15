@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@RequestMapping("/guestBooks")
+@RequestMapping( "/guestBooks")
 @RestController
 @RequiredArgsConstructor
 public class GuestBookController {
@@ -40,10 +40,9 @@ public class GuestBookController {
                                            @PathVariable("roomId") Long roomId,
                                            @Valid @RequestBody GuestBookContent content) {
 
-//        JWTUtil jwtUtil = new JWTUtil();
-//        Map<String, Object> claims = jwtUtil.validateToken(token);
-//        String kakaoId = (String) claims.get("kakaoId");
-        SparkUser sparkUser = sparkUserRepository.findByKakaoId(kakaoId).orElseThrow(() -> new RuntimeException("User not found"));
+        SparkUser sparkUser = sparkUserRepository.findByKakaoId(kakaoId).orElseThrow(()
+                -> new RuntimeException("User not found"));
+
 
         try {
             GuestBookPostRequestDTO guestBookPostRequestDTO = new GuestBookPostRequestDTO(roomId, sparkUser.getId(), content);
@@ -59,10 +58,8 @@ public class GuestBookController {
     public ResponseEntity<?> GetGuestBookList(@RequestParam String kakaoId,
                                               @PathVariable("roomId") Long roomId) {
 
-//        JWTUtil jwtUtil = new JWTUtil();
-//        Map<String, Object> claims = jwtUtil.validateToken(token);
-//        String kakaoId = (String) claims.get("kakaoId");
-        SparkUser sparkUser = sparkUserRepository.findByKakaoId(kakaoId).orElseThrow(() -> new RuntimeException("User not found"));
+        SparkUser sparkUser = sparkUserRepository.findByKakaoId(kakaoId).orElseThrow(()
+                -> new RuntimeException("User not found"));
 
         try {
             GuestBookListRequestDTO guestBookListRequestDTO = new GuestBookListRequestDTO(roomId, sparkUser.getId());
@@ -79,10 +76,8 @@ public class GuestBookController {
                                                   @RequestParam(required = false) String search,
                                                   @RequestParam(required = false) String sortBy) {
 
-//        JWTUtil jwtUtil = new JWTUtil();
-//        Map<String, Object> claims = jwtUtil.validateToken(token);
-//        String kakaoId = (String) claims.get("kakaoId");
-        SparkUser sparkUser = sparkUserRepository.findByKakaoId(kakaoId).orElseThrow(() -> new RuntimeException("User not found"));
+        SparkUser sparkUser = sparkUserRepository.findByKakaoId(kakaoId).orElseThrow(()
+                -> new RuntimeException("User not found"));
 
         try {
             GuestBookRoomListResponse guestBookRoomListResponse = guestBookRoomService.getGuestBookRoomList(kakaoId,search,sortBy);
@@ -97,7 +92,9 @@ public class GuestBookController {
     @DeleteMapping("/{roomId}")
     public ResponseEntity<?> DeleteGuestBookRoom(@RequestParam String kakaoId,
                                                  @PathVariable("roomId") Long roomId) {
-        SparkUser sparkUser = sparkUserRepository.findByKakaoId(kakaoId).orElseThrow(() -> new RuntimeException("User not found"));
+        SparkUser sparkUser = sparkUserRepository.findByKakaoId(kakaoId).orElseThrow(()
+                -> new RuntimeException("User not found"));
+
         try {
             guestBookRoomService.deleteGuestBookRoom(kakaoId, roomId);
             ResponseDTO<?> responseDTO = ResponseDTO.ok("방명록 방이 삭제되었습니다.");

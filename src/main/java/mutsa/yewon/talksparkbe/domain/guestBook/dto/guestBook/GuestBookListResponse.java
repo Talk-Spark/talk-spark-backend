@@ -14,6 +14,6 @@ public class GuestBookListResponse {
     private Long roomId;
     private String roomName;
     private LocalDateTime roomDateTime;
-//    private boolean guestBookFavorited;
+    private boolean isGuestBookFavorited;
     private List<GuestBookListDTO> guestBookData;
 }
