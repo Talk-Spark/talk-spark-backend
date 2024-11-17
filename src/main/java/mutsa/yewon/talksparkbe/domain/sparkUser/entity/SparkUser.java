@@ -24,13 +24,14 @@ public class SparkUser {
     @Column(name = "spark_user_id")
     private Long id;
 
+    private String kakaoId;
 
     private String name;
 
-    @Id
-    private String kakaoId;
-
     private String password;
+
+    @OneToMany(mappedBy = "sparkUser", cascade = CascadeType.ALL)
+    private List<Card> cards;
 
     @Builder.Default
     @ElementCollection(fetch = FetchType.LAZY)
