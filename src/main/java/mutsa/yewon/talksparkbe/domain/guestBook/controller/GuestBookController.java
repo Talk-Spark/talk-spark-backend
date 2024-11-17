@@ -20,9 +20,8 @@ import mutsa.yewon.talksparkbe.global.exception.ErrorCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 
-@RequestMapping( "/guestBooks")
+@RequestMapping( "/guest-books")
 @RestController
 @RequiredArgsConstructor
 public class GuestBookController {
