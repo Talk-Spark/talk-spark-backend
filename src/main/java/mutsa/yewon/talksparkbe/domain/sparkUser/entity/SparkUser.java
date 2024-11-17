@@ -2,6 +2,7 @@ package mutsa.yewon.talksparkbe.domain.sparkUser.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import mutsa.yewon.talksparkbe.domain.card.entity.Card;
 import mutsa.yewon.talksparkbe.domain.guestBook.entity.GuestBook;
 import mutsa.yewon.talksparkbe.domain.guestBook.entity.GuestBookRoom;
 import mutsa.yewon.talksparkbe.domain.guestBook.entity.GuestBookRoomSparkUser;
@@ -19,9 +20,9 @@ import java.util.Set;
 @ToString(exclude = "roles")
 public class SparkUser {
 
-//    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-//    @Column(name = "spark_user_id")
-//    private Long id;
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "spark_user_id")
+    private Long id;
 
 
     private String name;
