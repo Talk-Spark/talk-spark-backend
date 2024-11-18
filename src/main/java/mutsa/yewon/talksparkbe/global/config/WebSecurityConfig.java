@@ -42,18 +42,7 @@ public class WebSecurityConfig {
 
 
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http, HandlerMappingIntrospector introspector) throws Exception {
-
-//        MvcRequestMatcher.Builder mvc = new MvcRequestMatcher.Builder(introspector);
-//
-//        MvcRequestMatcher[] permitWhiteList = {
-//                mvc.pattern("/api/member/**"),
-//                mvc.pattern("/static/js/**"),
-//                mvc.pattern("/static/css/**"),
-//                mvc.pattern("/swagger-ui/**"),
-//                mvc.pattern("/v3/api-docs/**"),
-//                mvc.pattern("/api-docs/**"),
-//        };
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 
 
         http
@@ -65,15 +54,9 @@ public class WebSecurityConfig {
                 .sessionManagement(it ->
                         it.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
-//                .authorizeHttpRequests(auth -> auth.requestMatchers(permitWhiteList).permitAll()
-//                        .anyRequest().authenticated())
+
                 .addFilterBefore(jwtCheckFilter, UsernamePasswordAuthenticationFilter.class);
 
-//                .authorizeHttpRequests(authorizeRequests -> authorizeRequests
-//                        .requestMatchers("/static/js/**", "/static/css/**", "/static/img/**"
-//                                , "/swagger-ui/**", "/v3/api-docs/**", "/api-docs/**").permitAll());
-
-//                .requestMatchers( "/","/swagger-ui/**", "/v3/api-docs/**").permitAll()
 //                .authorizeHttpRequests(
 //                        authorize -> authorize
 //                                .anyRequest().permitAll()
