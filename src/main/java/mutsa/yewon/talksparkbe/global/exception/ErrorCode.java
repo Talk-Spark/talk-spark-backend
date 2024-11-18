@@ -22,6 +22,11 @@ public enum ErrorCode {
     NOT_YOUR_CARD(HttpStatus.UNAUTHORIZED, "본인의 명함만 수정,삭제가 가능합니다."),
     INVALID_PARAMETER(HttpStatus.BAD_REQUEST, "유효하지 않은 카카오 AccessToken 입니다."),
     INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "서버 내부의 문제가 발생했습니다.");
+    ROOM_NOT_FOUND(HttpStatus.NOT_FOUND, "방을 찾지 못했습니다."),
+
+    INVALID_FORMAT(HttpStatus.BAD_REQUEST, "잘못된 형식입니다."),
+    GUESTBOOK_ROOM_NOT_FOUND(HttpStatus.NOT_FOUND, "방명록 방을 찾지 못했습니다.");
+
 
     private final HttpStatus httpStatus;
     private final String message;
