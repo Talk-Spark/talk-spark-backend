@@ -90,7 +90,7 @@ public class CardServiceImpl implements CardService {
     private static void authorizeSparkUser(Card card){
         String kakaoId = SecurityContextHolder.getContext().getAuthentication().getName();
         if (!card.getSparkUser().getKakaoId().equals(kakaoId)) {
-            throw new IllegalStateException("not authorized");
+            throw new CustomTalkSparkException(ErrorCode.NOT_YOUR_CARD);
         }
     }
 

@@ -1,5 +1,7 @@
 package mutsa.yewon.talksparkbe.global.exception;
 
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
@@ -12,7 +14,6 @@ import java.util.Map;
 
 @RestControllerAdvice
 public class TalkSparkExceptionHandler {
-
     @ExceptionHandler(CustomTalkSparkException.class)
     protected ResponseEntity<ErrorResponseEntity> handleCustomTalkSparkException(CustomTalkSparkException ex) {
         return ErrorResponseEntity.errorResponseEntity(ex.getErrorCode());

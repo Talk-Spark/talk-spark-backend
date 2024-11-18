@@ -1,7 +1,14 @@
 package mutsa.yewon.talksparkbe.domain.card.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import mutsa.yewon.talksparkbe.domain.card.CardControllerDocs;
 import mutsa.yewon.talksparkbe.domain.card.dto.CardCreateDTO;
 import mutsa.yewon.talksparkbe.domain.card.dto.CardResponseDTO;
 import mutsa.yewon.talksparkbe.domain.card.service.CardService;
@@ -13,7 +20,7 @@ import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
-public class CardController {
+public class CardController implements CardControllerDocs {
 
     private final CardService cardService;
 
