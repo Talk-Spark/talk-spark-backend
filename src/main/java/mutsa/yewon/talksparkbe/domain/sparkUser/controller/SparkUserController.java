@@ -2,6 +2,7 @@ package mutsa.yewon.talksparkbe.domain.sparkUser.controller;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import mutsa.yewon.talksparkbe.domain.sparkUser.SparkUserControllerDocs;
 import mutsa.yewon.talksparkbe.domain.sparkUser.dto.SparkUserDTO;
 import mutsa.yewon.talksparkbe.domain.sparkUser.service.SparkUserService;
 import mutsa.yewon.talksparkbe.global.util.JWTUtil;
@@ -13,7 +14,7 @@ import java.util.Map;
 @RestController
 @RequiredArgsConstructor
 @Log4j2
-public class SparkUserController {
+public class SparkUserController implements SparkUserControllerDocs {
 
     private final SparkUserService sparkUserService;
     private final JWTUtil jwtUtil;

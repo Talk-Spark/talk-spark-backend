@@ -6,16 +6,16 @@ import mutsa.yewon.talksparkbe.domain.sparkUser.dto.SparkUserDTO;
 import mutsa.yewon.talksparkbe.domain.sparkUser.entity.SparkUser;
 import mutsa.yewon.talksparkbe.domain.sparkUser.entity.SparkUserRole;
 import mutsa.yewon.talksparkbe.domain.sparkUser.repository.SparkUserRepository;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.ResponseEntity;
+import mutsa.yewon.talksparkbe.global.exception.CustomTalkSparkException;
+import mutsa.yewon.talksparkbe.global.exception.ErrorCode;
+import org.springframework.http.*;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
+import reactor.core.publisher.Mono;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -63,6 +63,8 @@ public class SparkUserServiceImpl implements SparkUserService {
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
                 .header("Content-Type", "application/x-www-form-urlencoded;charset=utf-8")
                 .retrieve()
+                .onStatus(HttpStatusCode::is4xxClientError, clientResponse -> Mono.error(new CustomTalkSparkException(ErrorCode.INVALID_PARAMETER)))
+                .onStatus(HttpStatusCode::is5xxServerError, clientResponse -> Mono.error(new CustomTalkSparkException(ErrorCode.INTERNAL_SERVER_ERROR)))
                 .bodyToMono(LinkedHashMap.class)
                 .block();
 

@@ -20,13 +20,14 @@ public class RoomController {
 
     private final RoomService roomService;
     private final SparkUserRepository sparkUserRepository;
+    private final JWTUtil jwtUtil;
 
     // TODO: 인증헤더로 유저 얻어오는거 SecurityUtil 메서드 만들어서 그걸로 바꾸기
     @PostMapping
     public ResponseEntity<?> roomCreate(@RequestBody RoomCreateRequest roomCreateRequest,
                                         @RequestHeader("Authorization") String token) {
         String jwt = token.replace("Bearer ", "");
-        Map<String, Object> claims = JWTUtil.validateToken(jwt);
+        Map<String, Object> claims = jwtUtil.validateToken(jwt);
         String kakaoId = (String) claims.get("kakaoId");
         SparkUser sparkUser = sparkUserRepository.findByKakaoId(kakaoId).orElseThrow(() -> new RuntimeException("유저 못찾음"));
 
@@ -44,7 +45,7 @@ public class RoomController {
     public ResponseEntity<?> roomJoin(@RequestBody RoomJoinRequest roomJoinRequest,
                                       @RequestHeader("Authorization") String token) {
         String jwt = token.replace("Bearer ", "");
-        Map<String, Object> claims = JWTUtil.validateToken(jwt);
+        Map<String, Object> claims = jwtUtil.validateToken(jwt);
         String kakaoId = (String) claims.get("kakaoId");
         SparkUser sparkUser = sparkUserRepository.findByKakaoId(kakaoId).orElseThrow(() -> new RuntimeException("유저 못찾음"));
 
@@ -56,7 +57,7 @@ public class RoomController {
     public ResponseEntity<?> isHost(@RequestBody HostCheckRequest hostCheckRequest,
                                     @RequestHeader("Authorization") String token) {
         String jwt = token.replace("Bearer ", "");
-        Map<String, Object> claims = JWTUtil.validateToken(jwt);
+        Map<String, Object> claims = jwtUtil.validateToken(jwt);
         String kakaoId = (String) claims.get("kakaoId");
         SparkUser sparkUser = sparkUserRepository.findByKakaoId(kakaoId).orElseThrow(() -> new RuntimeException("유저 못찾음"));
 

@@ -16,16 +16,19 @@ import mutsa.yewon.talksparkbe.global.util.JWTUtil;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.security.SignatureException;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
 @Log4j2
 @RequiredArgsConstructor
+@Component
 public class JWTCheckFilter extends OncePerRequestFilter {
 
     private final JWTUtil jwtUtil;
@@ -35,11 +38,15 @@ public class JWTCheckFilter extends OncePerRequestFilter {
     protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
         log.info("-------shouldNotFilter--------");
         String requestURI = request.getRequestURI();
+        log.info("requestURI: " + requestURI);
 
-        if (requestURI.startsWith("/api/member")) {
-            return true;
-        }
-        return false;
+        String[] excludePath = {"/api/member", "/swagger-ui", "/v3/api-docs"};
+
+        return Arrays.stream(excludePath).anyMatch(requestURI::startsWith);
+//        if (requestURI.startsWith("/api/member") || requestURI.startsWith("/swagger-ui")
+//                || requestURI.startsWith("/api-docs")) {
+//            return true;
+//        }
     }
 
     @Override
