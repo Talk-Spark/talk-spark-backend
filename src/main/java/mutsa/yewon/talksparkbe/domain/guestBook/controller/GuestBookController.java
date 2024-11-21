@@ -17,6 +17,7 @@ import mutsa.yewon.talksparkbe.global.dto.ResponseDTO;
 import mutsa.yewon.talksparkbe.global.exception.CustomTalkSparkException;
 import mutsa.yewon.talksparkbe.global.exception.ErrorCode;
 //import mutsa.yewon.talksparkbe.global.util.JWTUtil;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -103,4 +104,22 @@ public class GuestBookController {
         }
 
     }
+
+    @PutMapping("/{roomId}")
+    public ResponseEntity<?> UpdateGuestBookRoomFavorites(@RequestParam String kakaoId,
+                                                          @PathVariable("roomId") Long roomId,
+                                                          @RequestParam("isFavorited") boolean isFavorited){
+        SparkUser sparkUser = sparkUserRepository.findByKakaoId(kakaoId).orElseThrow(()
+                -> new RuntimeException("User not found"));
+
+        try {
+            guestBookRoomService.updateGuestBookRoomFavorites(sparkUser.getId(), roomId, isFavorited);
+            ResponseDTO<?> responseDTO = ResponseDTO.ok("방명록 방 즐겨찾기가 수정되었습니다.");
+            return ResponseEntity.status(200).body(responseDTO);
+        } catch (IllegalArgumentException e) {
+            throw new CustomTalkSparkException(ErrorCode.INVALID_FORMAT);
+        }
+    }
+
+
 }

@@ -33,6 +33,7 @@ public class GuestBookRoomService {
     private final RoomRepository roomRepository;
     private final GuestBookRoomRepository guestBookRoomRepository;
     private final GuestBookRoomSparkUserRepository guestBookRoomSparkUserRepository;
+    private final SparkUserRepository sparkUserRepository;
 
     @Transactional
     public GuestBookRoomListResponse getGuestBookRoomList(String kakaoId, String search, String sortBy) {
@@ -64,7 +65,8 @@ public class GuestBookRoomService {
                             .toList();
             case "isFavorited" ->
                     guestBookRooms = guestBookRooms.stream()
-                            .filter(guestBookRoom -> guestBookRoom.getIsGuestBookFavorited().equals(true))
+                            .filter(guestBookRoom -> guestBookRoom.getGuestBookRoomSparkUsers().stream()
+                                    .anyMatch(guestBookRoomSparkUser -> guestBookRoomSparkUser.getIsGuestBookFavorited().equals(true)))
                             .toList();
         }
 
@@ -114,5 +116,15 @@ public class GuestBookRoomService {
         guestBookRoomSparkUserRepository.delete(sparkUserToDelete);
 
         guestBookRoomRepository.save(guestBookRoom);
+    }
+
+    @Transactional
+    public void updateGuestBookRoomFavorites(Long sparkUserId, Long roomId, boolean isFavorited) {
+        GuestBookRoomSparkUser guestBookRoomSparkUser = (GuestBookRoomSparkUser) guestBookRoomSparkUserRepository
+                .findByGuestBookRoomIdAndSparkUserId(roomId, sparkUserId)
+                .orElseThrow(() -> new CustomTalkSparkException(ErrorCode.GUESTBOOK_ROOM_NOT_FOUND));
+
+        guestBookRoomSparkUser.setIsGuestBookFavorited(isFavorited);
+        guestBookRoomSparkUserRepository.save(guestBookRoomSparkUser);
     }
 }

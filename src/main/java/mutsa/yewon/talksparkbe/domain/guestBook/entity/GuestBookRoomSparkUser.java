@@ -7,6 +7,7 @@ import mutsa.yewon.talksparkbe.domain.sparkUser.entity.SparkUser;
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
+@Setter
 public class GuestBookRoomSparkUser {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -20,9 +21,12 @@ public class GuestBookRoomSparkUser {
     @JoinColumn(name = "spark_user_id", nullable = false)
     private SparkUser sparkUser;
 
+    private Boolean isGuestBookFavorited;
+
     @Builder
     public GuestBookRoomSparkUser(GuestBookRoom guestBookRoom, SparkUser sparkUser) {
         this.guestBookRoom = guestBookRoom;
         this.sparkUser = sparkUser;
+        this.isGuestBookFavorited = false;
     }
 }

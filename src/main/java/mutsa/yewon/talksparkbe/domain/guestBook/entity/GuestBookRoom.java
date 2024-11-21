@@ -34,8 +34,6 @@ public class GuestBookRoom {
     @OneToMany(mappedBy = "guestBookRoom")
     private List<GuestBook> guestBooks = new ArrayList<>();
 
-    private Boolean isGuestBookFavorited;
-
     @Builder
     public GuestBookRoom(Room room,
                          List<GuestBookRoomSparkUser> guestBookRoomSparkUsers,
@@ -43,7 +41,6 @@ public class GuestBookRoom {
         this.room = room;
         this.guestBookRoomSparkUsers = guestBookRoomSparkUsers;
         this.guestBooks = guestBooks;
-        this.isGuestBookFavorited = false;
     }
 
     public GuestBookRoom(Room room) {

@@ -74,11 +74,12 @@ public class GuestBookService {
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
 
+
         return GuestBookListResponse.builder()
                 .roomId(guestBookRoom.getRoom().getRoomId())
                 .roomName(guestBookRoom.getRoom().getRoomName())
                 .roomDateTime(guestBookRoom.getRoom().getCreatedAt())
-                .isGuestBookFavorited(guestBookRoom.getIsGuestBookFavorited())
+                .isGuestBookFavorited(guestBookRoomSparkUser.getIsGuestBookFavorited())
                 .guestBookData(createGuestBookListResponse(guestBookRoom.getGuestBooks(), sparkUser.getKakaoId()))
                 .build();
 
