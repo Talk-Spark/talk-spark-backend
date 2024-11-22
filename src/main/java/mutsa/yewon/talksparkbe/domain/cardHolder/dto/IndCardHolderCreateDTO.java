@@ -1,13 +1,16 @@
 package mutsa.yewon.talksparkbe.domain.cardHolder.dto;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
 
 @Data
-@AllArgsConstructor
-public class BookMarkCreateDTO {
+public class IndCardHolderCreateDTO {
+
+    private String storeType;
+
+    private String name;
 
     private Long cardId;
 
     private Long sparkUserId;
+
 }
