@@ -44,7 +44,6 @@ class CardControllerTest {
         cardService.createCard(new CardCreateDTO(Long.parseLong("1"), "박승범", 24, "컴퓨터공학과", "ISTJ", "코딩", "너구리", "코딩하는 너구리", "TalkSparkIsFun"));
         cardService.createCard(new CardCreateDTO(Long.parseLong("1"), "박승범", 24, "컴퓨터공학과", "ISTJ", "코딩", "너구리", "코딩은 나의 삶, 나의 안식", "TalkSpark"));
 
-
     }
 
     @Test

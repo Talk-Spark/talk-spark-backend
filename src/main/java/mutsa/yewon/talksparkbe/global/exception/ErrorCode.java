@@ -23,7 +23,9 @@ public enum ErrorCode {
     INVALID_PARAMETER(HttpStatus.BAD_REQUEST, "유효하지 않은 카카오 AccessToken 입니다."),
     INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "서버 내부의 문제가 발생했습니다."),
     INVALID_FORMAT(HttpStatus.BAD_REQUEST, "잘못된 형식입니다."),
-    GUESTBOOK_ROOM_NOT_FOUND(HttpStatus.NOT_FOUND, "방명록 방을 찾지 못했습니다.");
+    GUESTBOOK_ROOM_NOT_FOUND(HttpStatus.NOT_FOUND, "방명록 방을 찾지 못했습니다."),
+    CARDHOLDER_NOT_EXIST(HttpStatus.NOT_FOUND, "해당하는 명함은 저장된 이력이 없습니다."),
+    NO_BOOKMARKED_CONTENT(HttpStatus.NOT_FOUND, "즐겨찾기 된 명함이 없습니다.");
 
 
     private final HttpStatus httpStatus;
