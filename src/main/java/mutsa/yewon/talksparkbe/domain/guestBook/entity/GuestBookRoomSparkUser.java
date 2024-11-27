@@ -14,14 +14,23 @@ public class GuestBookRoomSparkUser {
     private Long guestBookRoomSparkUserId;
 
     @ManyToOne
-    @JoinColumn(name = "guestbook_room_id", nullable = false)
+    @JoinColumn(name = "guestbook_room_id")
     private GuestBookRoom guestBookRoom;
 
     @ManyToOne
-    @JoinColumn(name = "spark_user_id", nullable = false)
+    @JoinColumn(name = "spark_user_id")
     private SparkUser sparkUser;
 
+
+    @Column(nullable = false)
     private Boolean isGuestBookFavorited;
+
+    @PrePersist
+    public void prePersist() {
+        if (isGuestBookFavorited == null) {
+            isGuestBookFavorited = false;
+        }
+    }
 
     @Builder
     public GuestBookRoomSparkUser(GuestBookRoom guestBookRoom, SparkUser sparkUser) {

@@ -1,7 +1,6 @@
 package mutsa.yewon.talksparkbe.domain.guestBook.service;
 
 import lombok.RequiredArgsConstructor;
-import mutsa.yewon.talksparkbe.domain.game.repository.RoomRepository;
 import mutsa.yewon.talksparkbe.domain.guestBook.dto.guestBook.GuestBookListDTO;
 import mutsa.yewon.talksparkbe.domain.guestBook.dto.guestBook.GuestBookListRequestDTO;
 import mutsa.yewon.talksparkbe.domain.guestBook.dto.guestBook.GuestBookPostRequestDTO;
@@ -16,7 +15,6 @@ import mutsa.yewon.talksparkbe.domain.sparkUser.entity.SparkUser;
 import mutsa.yewon.talksparkbe.domain.sparkUser.repository.SparkUserRepository;
 import mutsa.yewon.talksparkbe.global.exception.CustomTalkSparkException;
 import mutsa.yewon.talksparkbe.global.exception.ErrorCode;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -36,12 +34,11 @@ public class GuestBookService {
     //TODO: RuntimeException("User not found")) customException으로 수정
     @Transactional
     public GuestBook createGuestBook(GuestBookPostRequestDTO guestBookPostRequestDTO) {
-        SparkUser sparkUser = sparkUserRepository
-                .findById(guestBookPostRequestDTO.getSparkUserId())
-                .orElseThrow(() -> new RuntimeException("User not found"));
-
         GuestBookRoom guestBookRoom = guestBookRoomRepository
                 .findByRoomId(guestBookPostRequestDTO.getRoomId());
+
+        SparkUser sparkUser = sparkUserRepository.findById(guestBookPostRequestDTO.getSparkUserId())
+                .orElseThrow(() -> new CustomTalkSparkException(ErrorCode.USER_NOT_EXIST));
 
         GuestBook guestBook = GuestBook.builder()
                 .sparkUser(sparkUser)
@@ -51,11 +48,14 @@ public class GuestBookService {
 
         guestBookRoom.addGuestBooks(guestBook);
 
-        GuestBookRoomSparkUser guestBookRoomSparkUser = GuestBookRoomSparkUser.builder()
-                .guestBookRoom(guestBookRoom)
-                .sparkUser(sparkUser)
-                .build();
-        guestBookRoom.getGuestBookRoomSparkUsers().add(guestBookRoomSparkUser);
+
+        if(guestBookRoomSparkUserRepository
+                .findByGuestBookRoomIdAndSparkUserId(guestBookRoom.getGuestBookRoomId(), sparkUser.getId())
+                .isEmpty()) {
+            GuestBookRoomSparkUser guestBookRoomSparkUser = new GuestBookRoomSparkUser(guestBookRoom, sparkUser);
+            guestBookRoomSparkUserRepository.save(guestBookRoomSparkUser);
+            guestBookRoom.getGuestBookRoomSparkUsers().add(guestBookRoomSparkUser);
+        }
 
         return guestBook;
     }
@@ -63,7 +63,7 @@ public class GuestBookService {
     @Transactional
     public GuestBookListResponse getGuestBookList(GuestBookListRequestDTO guestBookListRequestDTO) {
 
-        GuestBookRoomSparkUser guestBookRoomSparkUser = (GuestBookRoomSparkUser) guestBookRoomSparkUserRepository
+        GuestBookRoomSparkUser guestBookRoomSparkUser = guestBookRoomSparkUserRepository
                 .findByGuestBookRoomIdAndSparkUserId(guestBookListRequestDTO.getRoomId(), guestBookListRequestDTO.getSparkUserId())
                 .orElseThrow(() -> new CustomTalkSparkException(ErrorCode.GUESTBOOK_ROOM_NOT_FOUND));
 

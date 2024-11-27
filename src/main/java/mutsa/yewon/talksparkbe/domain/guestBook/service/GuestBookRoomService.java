@@ -2,6 +2,7 @@ package mutsa.yewon.talksparkbe.domain.guestBook.service;
 
 import ch.qos.logback.core.spi.ErrorCodes;
 import lombok.RequiredArgsConstructor;
+import mutsa.yewon.talksparkbe.domain.card.entity.Card;
 import mutsa.yewon.talksparkbe.domain.game.entity.Room;
 import mutsa.yewon.talksparkbe.domain.game.repository.RoomRepository;
 import mutsa.yewon.talksparkbe.domain.guestBook.dto.room.GuestBookRoomListDTO;
@@ -16,6 +17,7 @@ import mutsa.yewon.talksparkbe.domain.sparkUser.entity.SparkUser;
 import mutsa.yewon.talksparkbe.domain.sparkUser.repository.SparkUserRepository;
 import mutsa.yewon.talksparkbe.global.exception.CustomTalkSparkException;
 import mutsa.yewon.talksparkbe.global.exception.ErrorCode;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -36,10 +38,10 @@ public class GuestBookRoomService {
     private final SparkUserRepository sparkUserRepository;
 
     @Transactional
-    public GuestBookRoomListResponse getGuestBookRoomList(String kakaoId, String search, String sortBy) {
+    public GuestBookRoomListResponse getGuestBookRoomList(Long sparkUserId, String search, String sortBy) {
 
         List<GuestBookRoom> guestBookRooms = guestBookRoomRepository
-                .findRoomsBySparkUser(kakaoId);
+                .findRoomsBySparkUser(sparkUserId);
 
 
         if (search != null && !search.isEmpty()) {
@@ -98,14 +100,14 @@ public class GuestBookRoomService {
     }
 
     @Transactional
-    public void deleteGuestBookRoom(String kakaoId, Long roomId) {
+    public void deleteGuestBookRoom(Long sparkUserId, Long roomId) {
         Room room = roomRepository.findById(roomId)
                 .orElseThrow(() -> new CustomTalkSparkException(ErrorCode.ROOM_NOT_FOUND));
 
         GuestBookRoom guestBookRoom = room.getGuestBookRoom();
 
         GuestBookRoomSparkUser sparkUserToDelete = guestBookRoom.getGuestBookRoomSparkUsers().stream()
-                .filter(deleteSparkUser -> deleteSparkUser.getSparkUser().getKakaoId().equals(kakaoId))
+                .filter(deleteSparkUser -> deleteSparkUser.getSparkUser().getId().equals(sparkUserId))
                 .filter(deleteGuestBookRoom -> deleteGuestBookRoom.getGuestBookRoom().getRoom().getRoomId().equals(roomId))
                 .findFirst()
                 .orElseThrow(() -> new RuntimeException("User not found"));
@@ -127,4 +129,5 @@ public class GuestBookRoomService {
         guestBookRoomSparkUser.setIsGuestBookFavorited(isFavorited);
         guestBookRoomSparkUserRepository.save(guestBookRoomSparkUser);
     }
+
 }
