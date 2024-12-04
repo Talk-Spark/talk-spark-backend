@@ -2,19 +2,27 @@ package mutsa.yewon.talksparkbe.domain.game.controller;
 
 import com.corundumstudio.socketio.SocketIOServer;
 import jakarta.annotation.PostConstruct;
+import jakarta.annotation.PreDestroy;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import mutsa.yewon.talksparkbe.domain.game.controller.request.AnswerSubmitRequest;
+import mutsa.yewon.talksparkbe.domain.game.controller.request.GameStartRequest;
 import mutsa.yewon.talksparkbe.domain.game.controller.request.RoomCreateRequest;
 import mutsa.yewon.talksparkbe.domain.game.controller.request.RoomJoinRequest;
+import mutsa.yewon.talksparkbe.domain.game.service.dto.CardQuestion;
+import mutsa.yewon.talksparkbe.domain.game.service.GameService;
 import mutsa.yewon.talksparkbe.domain.game.service.RoomService;
 import mutsa.yewon.talksparkbe.global.exception.CustomTalkSparkException;
 import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
+@Slf4j
 public class RoomSocketIOHandler {
 
     private final SocketIOServer server;
     private final RoomService roomService;
+    private final GameService gameService;
 
     @PostConstruct
     public void startServer() {
@@ -28,6 +36,20 @@ public class RoomSocketIOHandler {
         });
 
         server.start();
+    }
+
+    @PreDestroy
+    public void stopServer() {
+        try {
+            if (server != null) {
+                server.stop();
+                log.info("Socket.IO 서버가 성공적으로 종료되었습니다.");
+            } else {
+                log.warn("Socket.IO 서버 인스턴스가 null입니다.");
+            }
+        } catch (Exception e) {
+            log.error("Socket.IO 서버 종료 중 오류 발생", e);
+        }
     }
 
     @PostConstruct
@@ -71,6 +93,7 @@ public class RoomSocketIOHandler {
 
         server.addEventListener("startGame", RoomJoinRequest.class, (client, data, ackSender) -> {
             try {
+                // TODO: 방 디비에 시작처리
                 Long roomId = data.getRoomId();
                 server.getRoomOperations(roomId.toString()).sendEvent("startGame", "게임이 시작됩니다.");
             } catch (Exception e) {
@@ -79,6 +102,43 @@ public class RoomSocketIOHandler {
             }
         });
 
+    }
+
+    /* ================ 게임 관련 ================ */
+
+    @PostConstruct
+    public void startGameListeners() {
+        server.addEventListener("joinGame", RoomJoinRequest.class, (client, data, ackSender) -> {
+            server.getClient(client.getSessionId()).joinRoom(data.getRoomId().toString());
+            client.sendEvent("gameJoined", "게임 참가 완료");
+        });
+
+        server.addEventListener("prepareQuizzes", GameStartRequest.class, (client, data, ackSender) -> {
+            System.out.println("퀴즈를 준비합니다.");
+            Long roomId = data.getRoomId();
+            gameService.startGame(roomId);
+            broadcastNextQuestion(roomId);
+        });
+
+        server.addEventListener("submit", AnswerSubmitRequest.class, (client, data, ackSender) -> {
+            Long roomId = data.getRoomId();
+            Long sparkUserId = data.getSparkUserId();
+            String answer = data.getAnswer();
+
+            String next = gameService.submitAnswer(roomId, sparkUserId, answer);
+            if (next.equals("next")) {
+                broadcastNextQuestion(roomId);
+            }
+        });
+    }
+
+    // 다음 질문 브로드캐스트 메서드
+    private void broadcastNextQuestion(Long roomId) {
+        CardQuestion nextQuestion = gameService.getNextQuestion(roomId);
+        System.out.println("nextQuestion = " + nextQuestion);
+        if (nextQuestion != null) {
+            server.getRoomOperations(roomId.toString()).sendEvent("question", gameService.getCurrentCard(roomId), nextQuestion);
+        }
     }
 
 }

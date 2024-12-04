@@ -1,4 +1,4 @@
-package mutsa.yewon.talksparkbe.domain.game.service.response;
+package mutsa.yewon.talksparkbe.domain.game.service.dto.httpResponse;
 
 import lombok.Builder;
 import lombok.Data;
