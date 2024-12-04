@@ -4,9 +4,7 @@ import lombok.RequiredArgsConstructor;
 import mutsa.yewon.talksparkbe.domain.sparkUser.dto.SparkUserDTO;
 import mutsa.yewon.talksparkbe.domain.sparkUser.service.SparkUserService;
 import mutsa.yewon.talksparkbe.global.util.JWTUtil;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
 
@@ -30,6 +28,15 @@ public class TestUserController {
         claims.put("refreshToken", JWTRefreshToken);
 
         return claims;
+    }
+
+    @CrossOrigin(origins = "http://localhost:3000", allowedHeaders = "Authorization")
+    @GetMapping("/api/user-id")
+    public Long getMyUserId(@RequestHeader("Authorization") String token) {
+        String jwt = token.replace("Bearer ", "");
+        Map<String, Object> claims = jwtUtil.validateToken(jwt);
+        System.out.println("claims.get(\"sparkUserId\") = " + claims.get("sparkUserId"));
+        return Long.valueOf(claims.get("sparkUserId").toString());
     }
 
 }
