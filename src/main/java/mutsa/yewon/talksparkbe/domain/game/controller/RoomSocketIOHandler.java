@@ -5,15 +5,15 @@ import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import mutsa.yewon.talksparkbe.domain.game.controller.request.AnswerSubmitRequest;
-import mutsa.yewon.talksparkbe.domain.game.controller.request.GameStartRequest;
-import mutsa.yewon.talksparkbe.domain.game.controller.request.RoomCreateRequest;
-import mutsa.yewon.talksparkbe.domain.game.controller.request.RoomJoinRequest;
+import mutsa.yewon.talksparkbe.domain.game.controller.request.*;
 import mutsa.yewon.talksparkbe.domain.game.service.dto.CardQuestion;
 import mutsa.yewon.talksparkbe.domain.game.service.GameService;
 import mutsa.yewon.talksparkbe.domain.game.service.RoomService;
+import mutsa.yewon.talksparkbe.domain.game.service.dto.SwitchSubject;
 import mutsa.yewon.talksparkbe.global.exception.CustomTalkSparkException;
 import org.springframework.stereotype.Component;
+
+import java.util.Map;
 
 @Component
 @RequiredArgsConstructor
@@ -114,31 +114,55 @@ public class RoomSocketIOHandler {
         });
 
         server.addEventListener("prepareQuizzes", GameStartRequest.class, (client, data, ackSender) -> {
-            System.out.println("퀴즈를 준비합니다.");
-            Long roomId = data.getRoomId();
-            gameService.startGame(roomId);
-            broadcastNextQuestion(roomId);
+            gameService.startGame(data.getRoomId());
         });
 
-        server.addEventListener("submit", AnswerSubmitRequest.class, (client, data, ackSender) -> {
+        server.addEventListener("getQuestion", QuestionRequest.class, (client, data, ackSender) -> {
+            broadcastQuestion(data.getRoomId());
+        });
+
+        server.addEventListener("submitSelection", AnswerSubmitRequest.class, (client, data, ackSender) -> {
             Long roomId = data.getRoomId();
             Long sparkUserId = data.getSparkUserId();
             String answer = data.getAnswer();
 
-            String next = gameService.submitAnswer(roomId, sparkUserId, answer);
-            if (next.equals("next")) {
-                broadcastNextQuestion(roomId);
+            gameService.submitAnswer(roomId, sparkUserId, answer);
+            if (gameService.allPeopleSubmitted(roomId)) {
+                broadcastSingleQuestionResult(roomId);
             }
+        });
+
+        server.addEventListener("next", QuestionRequest.class, (client, data, ackSender) -> {
+            Long roomId = data.getRoomId();
+
+            SwitchSubject switchSubject = checkSubjectChanged(roomId);
+            if (switchSubject.equals(SwitchSubject.END)) {
+                server.getRoomOperations(roomId.toString()).sendEvent("lastResult", gameService.getCurrentCard(roomId));
+            } else if (switchSubject.equals(SwitchSubject.TRUE)) {
+                server.getRoomOperations(roomId.toString()).sendEvent("singleResult", gameService.getCurrentCard(roomId));
+                gameService.loadNextQuestion(roomId);
+            } else gameService.loadNextQuestion(roomId);
+        });
+
+        server.addEventListener("getEnd", QuestionRequest.class, (client, data, ackSender) -> {
+            server.getRoomOperations(data.getRoomId().toString()).sendEvent("scores", gameService.getScores(data.getRoomId()));
         });
     }
 
-    // 다음 질문 브로드캐스트 메서드
-    private void broadcastNextQuestion(Long roomId) {
-        CardQuestion nextQuestion = gameService.getNextQuestion(roomId);
-        System.out.println("nextQuestion = " + nextQuestion);
-        if (nextQuestion != null) {
-            server.getRoomOperations(roomId.toString()).sendEvent("question", gameService.getCurrentCard(roomId), nextQuestion);
-        }
+    // 질문 브로드캐스트 메서드
+    private void broadcastQuestion(Long roomId) {
+        CardQuestion question = gameService.getQuestion(roomId);
+        server.getRoomOperations(roomId.toString()).sendEvent("question", gameService.getCurrentCard(roomId), question);
+    }
+
+    private void broadcastSingleQuestionResult(Long roomId) {
+        Map<Long, Boolean> singleQuestionScoreBoard = gameService.getSingleQuestionScoreBoard(roomId);
+        if (!singleQuestionScoreBoard.isEmpty())
+            server.getRoomOperations(roomId.toString()).sendEvent("singleQuestionScoreBoard", singleQuestionScoreBoard);
+    }
+
+    private SwitchSubject checkSubjectChanged(Long roomId) {
+        return gameService.isSwitchingSubject(roomId);
     }
 
 }

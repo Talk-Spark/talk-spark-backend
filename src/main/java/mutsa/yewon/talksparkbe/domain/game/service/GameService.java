@@ -8,6 +8,7 @@ import mutsa.yewon.talksparkbe.domain.game.entity.Room;
 import mutsa.yewon.talksparkbe.domain.game.entity.RoomParticipate;
 import mutsa.yewon.talksparkbe.domain.game.repository.RoomRepository;
 import mutsa.yewon.talksparkbe.domain.game.service.dto.CardQuestion;
+import mutsa.yewon.talksparkbe.domain.game.service.dto.SwitchSubject;
 import mutsa.yewon.talksparkbe.domain.game.service.dto.UserCardQuestions;
 import mutsa.yewon.talksparkbe.domain.game.service.util.GameState;
 import mutsa.yewon.talksparkbe.domain.game.service.util.QuestionGenerator;
@@ -39,40 +40,19 @@ public class GameService {
         List<Card> selectedCards = room.getRoomParticipates().stream()
                 .map(RoomParticipate::getSparkUser)
                 .map(SparkUser::getCards)
-                .filter(cardList -> !cardList.isEmpty())  // 빈 리스트 제외
                 .map(cardList -> cardList.get(0)) // 갖고 있는 카드들 중 각각 가장 첫번째 카드 선택
                 .toList(); // 참가자들의 명함 한장씩을 선택함
 
-        List<UserCardQuestions> questions = prepareQuestions(room, selectedCards); // 특정 방 번호에서 선택된 명함들을 가지고 문제 만들기
+        List<UserCardQuestions> questions = questionGenerator.execute(selectedCards, room.getDifficulty()); // 선택된 명함들을 가지고 난이도를 기반으로 문제 만들기
+
         GameState gameState = new GameState(selectedCards, questions, room.getRoomParticipates().size()); // 게임 상태를 초기화
         gameStates.put(roomId, gameState); // 특정 방 번호에 게임 상태 할당
     }
 
-    public CardQuestion getNextQuestion(Long roomId) {
+    public CardQuestion getQuestion(Long roomId) {
         GameState gameState = gameStates.get(roomId);
-        if (gameState == null || !gameState.hasNextQuestion()) {
-            return null; // 게임 종료
-        }
-        return gameState.getNextQuestion();
-    }
-
-    public String submitAnswer(Long roomId, Long sparkUserId, String answer) {
-        GameState gameState = gameStates.get(roomId);
-        if (gameState != null) {
-            gameState.recordAnswer(sparkUserId, answer);
-        }
-        if (gameState.getCurAnswerNum() >= gameState.getRoomPeople()) return "keep";
-        else return "next";
-    }
-
-    public boolean isGameFinished(Long roomId) {
-        GameState gameState = gameStates.get(roomId);
-        return gameState == null || !gameState.hasNextQuestion();
-    }
-
-    public Map<Long, Integer> getScores(Long roomId) {
-        GameState gameState = gameStates.get(roomId);
-        return gameState == null ? Collections.emptyMap() : gameState.getScores();
+        if (gameState == null || !gameState.hasNextQuestion()) return null;
+        return gameState.getCurrentQuestion();
     }
 
     @Transactional(readOnly = true)
@@ -80,10 +60,34 @@ public class GameService {
         return CardResponseDTO.fromCard(gameStates.get(roomId).getCurrentCard());
     }
 
-    @Transactional(readOnly = true)
-    public List<UserCardQuestions> prepareQuestions(Room room, List<Card> selectedCards) {
-        int difficulty = room.getDifficulty();
-        return questionGenerator.execute(selectedCards, difficulty);
+    public void submitAnswer(Long roomId, Long sparkUserId, String answer) {
+        GameState gameState = Optional.ofNullable(gameStates.get(roomId)).orElseThrow();
+        gameState.recordScore(sparkUserId, answer);
+    }
+
+    public boolean allPeopleSubmitted(Long roomId) {
+        GameState gameState = gameStates.get(roomId);
+        return gameState.getCurrentQuestionAnswerNum().equals(gameState.getRoomPeople());
+    }
+
+    public Map<Long, Boolean> getSingleQuestionScoreBoard(Long roomId) {
+        GameState gameState = gameStates.get(roomId);
+        return gameState.getCurrentQuestionCorrect();
+    }
+
+    public void loadNextQuestion(Long roomId) {
+        GameState gameState = gameStates.get(roomId);
+        gameState.loadNextQuestion();
+    }
+
+    public SwitchSubject isSwitchingSubject(Long roomId) {
+        GameState gameState = gameStates.get(roomId);
+        return gameState.isSwitchingSubject();
+    }
+
+    public Map<Long, Integer> getScores(Long roomId) {
+        GameState gameState = gameStates.get(roomId);
+        return gameState == null ? Collections.emptyMap() : gameState.getScores();
     }
 
 }
