@@ -10,22 +10,25 @@ import java.util.*;
 
 @Getter
 public class GameState {
-    private Long currentSubjectId;
 
+    private final List<Long> participantIds = new ArrayList<>();
+
+    private final List<Card> cards;
     private final List<CardQuestion> questions;
 
-    private final Map<Long, Integer> scores = new HashMap<>(); // 유저아이디 : 점수
-
-    private final Map<CardQuestion, Integer> answerNums = new HashMap<>(); // 각 문제마다 답 제출한 사람 수
     private final Integer roomPeople;
-    private final List<Card> cards;
 
+    private Long currentSubjectId;
+    private final Map<CardQuestion, Integer> answerNums = new HashMap<>(); // 각 문제마다 답 제출한 사람 수
     private final Map<Long, Boolean> currentQuestionCorrect = new HashMap<>(); // 현재 문제 정답 여부. 유저아이디 : 맞춤
+
+    private final Map<Long, Integer> scores = new HashMap<>(); // 유저아이디 : 점수
 
     public GameState(List<Card> cards, List<UserCardQuestions> userCardQuestions, Integer roomPeople) {
         this.cards = cards;
         this.questions = new LinkedList<>();
         this.roomPeople = roomPeople;
+        cards.forEach(c -> this.participantIds.add(c.getSparkUser().getId()));
         userCardQuestions.forEach(card -> questions.addAll(card.getQuestions()));
         questions.forEach(cq -> answerNums.put(cq, 0));
         this.currentSubjectId = userCardQuestions.get(0).getSparkUserId();

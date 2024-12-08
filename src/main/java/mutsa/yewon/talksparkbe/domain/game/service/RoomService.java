@@ -27,6 +27,7 @@ import java.util.concurrent.TimeUnit;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class RoomService {
 
     private final SparkUserRepository sparkUserRepository;
@@ -41,30 +42,9 @@ public class RoomService {
 
     @Transactional
     public Long createRoom(RoomCreateRequest roomCreateRequest) {
-//        SparkUser sparkUser = sparkUserRepository.findById(roomCreateRequest.getHostId()).orElseThrow(() -> new RuntimeException("사람 못찾음"));
         Room room = roomRepository.save(roomCreateRequest.toRoomEntity());
-//        RoomParticipate roomParticipate = RoomParticipate.builder().room(room).sparkUser(sparkUser).isOwner(true).build();
-//        roomParticipateRepository.save(roomParticipate);
-//        room.assignRoomParticipate(roomParticipate);
-
         redisTemplate.opsForHash().put(ROOM_COUNT_KEY, room.getRoomId().toString(), "0");
-
         return room.getRoomId();
-    }
-
-    public List<RoomListResponse> listAllRooms() {
-        List<Room> rooms = roomRepository.findAllWithParticipates();
-        List<RoomListResponse> roomListResponses = new ArrayList<>();
-
-        for (Room r : rooms) {
-            RoomListResponse response = RoomListResponse.from(r);
-            response.setHostName(r.getRoomParticipates().get(0).getSparkUser().getName());
-            response.setCurrentPeople(getParticipateCount(r.getRoomId()));
-
-            roomListResponses.add(response);
-        }
-
-        return roomListResponses;
     }
 
     @Transactional
@@ -105,14 +85,10 @@ public class RoomService {
         return response;
     }
 
-    public boolean checkHost(Long roomId, SparkUser sparkUser) {
-        RoomParticipate ownerParticipate = roomParticipateRepository.findByRoomIdWithOwner(roomId).orElseThrow(() -> new CustomTalkSparkException(ErrorCode.ROOM_NOT_FOUND));
-        return (sparkUser.equals(ownerParticipate.getSparkUser()));
-    }
-
-    public int getParticipateCount(Long roomId) {
-        String count = (String) redisTemplate.opsForHash().get(ROOM_COUNT_KEY, roomId.toString());
-        return count != null ? Integer.parseInt(count) : 0;
+    public List<RoomListResponse> searchRooms(String searchName) {
+        return roomRepository.findByRoomNameContaining(searchName).stream()
+                .map(RoomListResponse::from)
+                .toList();
     }
 
     @Transactional
@@ -144,6 +120,26 @@ public class RoomService {
         }
     }
 
+    public boolean checkHost(Long roomId, SparkUser sparkUser) {
+        RoomParticipate ownerParticipate = roomParticipateRepository.findByRoomIdWithOwner(roomId).orElseThrow(() -> new CustomTalkSparkException(ErrorCode.ROOM_NOT_FOUND));
+        return (sparkUser.equals(ownerParticipate.getSparkUser()));
+    }
+
+    public List<RoomListResponse> listAllRooms() {
+        List<Room> rooms = roomRepository.findAllWithParticipates();
+        List<RoomListResponse> roomListResponses = new ArrayList<>();
+
+        for (Room r : rooms) {
+            RoomListResponse response = RoomListResponse.from(r);
+            response.setHostName(r.getRoomParticipates().get(0).getSparkUser().getName());
+            response.setCurrentPeople(getParticipateCount(r.getRoomId()));
+
+            roomListResponses.add(response);
+        }
+
+        return roomListResponses;
+    }
+
     private boolean canJoin(Room room) {
         int currentCount = getParticipateCount(room.getRoomId());
         return currentCount < room.getMaxPeople();
@@ -158,6 +154,18 @@ public class RoomService {
         RoomParticipate roomParticipate = roomParticipateRepository.findByRoomAndSparkUser(room, sparkUser);
         roomParticipateRepository.delete(roomParticipate);
         redisTemplate.opsForHash().increment(ROOM_COUNT_KEY, room.getRoomId().toString(), -1);
+    }
+    public int getParticipateCount(Long roomId) {
+        String count = (String) redisTemplate.opsForHash().get(ROOM_COUNT_KEY, roomId.toString());
+        return count != null ? Integer.parseInt(count) : 0;
+    }
+
+    public void changeStarted(Long roomId) {
+        roomRepository.findById(roomId).orElseThrow().start();
+    }
+
+    public void changeFinished(Long roomId) {
+        roomRepository.findById(roomId).orElseThrow().finish();
     }
 
 }

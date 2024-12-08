@@ -54,16 +54,6 @@ public class RoomSocketIOHandler {
 
     @PostConstruct
     public void startListeners() {
-        server.addEventListener("createRoom", RoomCreateRequest.class, (client, data, ackSender) -> {
-            Long roomId = roomService.createRoom(data);
-            client.sendEvent("roomCreated", roomId); // 생성된 방 ID 반환
-        });
-
-        server.addEventListener("getRooms", Void.class, (client, data, ackSender) -> {
-            System.out.println("방 목록 줘야겠다");
-            client.sendEvent("roomList", roomService.listAllRooms());
-        });
-
         server.addEventListener("joinRoom", RoomJoinRequest.class, (client, data, ackSender) -> {
             try {
                 roomService.joinRoom(data);
@@ -93,8 +83,8 @@ public class RoomSocketIOHandler {
 
         server.addEventListener("startGame", RoomJoinRequest.class, (client, data, ackSender) -> {
             try {
-                // TODO: 방 디비에 시작처리
                 Long roomId = data.getRoomId();
+                roomService.changeStarted(roomId);
                 server.getRoomOperations(roomId.toString()).sendEvent("startGame", "게임이 시작됩니다.");
             } catch (Exception e) {
                 System.err.println("게임 시작 오류: " + e.getMessage());
@@ -102,6 +92,17 @@ public class RoomSocketIOHandler {
             }
         });
 
+
+        /* ================ 테스트할 때만 썼다가 안쓰는거 ================ */
+        server.addEventListener("createRoom", RoomCreateRequest.class, (client, data, ackSender) -> {
+            Long roomId = roomService.createRoom(data);
+            client.sendEvent("roomCreated", roomId); // 생성된 방 ID 반환
+        });
+
+        server.addEventListener("getRooms", Void.class, (client, data, ackSender) -> {
+            System.out.println("방 목록 줘야겠다");
+            client.sendEvent("roomList", roomService.listAllRooms());
+        });
     }
 
     /* ================ 게임 관련 ================ */
@@ -145,7 +146,9 @@ public class RoomSocketIOHandler {
         });
 
         server.addEventListener("getEnd", QuestionRequest.class, (client, data, ackSender) -> {
-            server.getRoomOperations(data.getRoomId().toString()).sendEvent("scores", gameService.getScores(data.getRoomId()));
+            server.getRoomOperations(data.getRoomId().toString()).sendEvent("scores", gameService.getScores(data.getRoomId()), gameService.getAllRelatedCards(data.getRoomId()));
+            gameService.insertCardCopies(data.getRoomId());
+            roomService.changeFinished(data.getRoomId());
         });
     }
 

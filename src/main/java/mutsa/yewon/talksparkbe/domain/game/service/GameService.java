@@ -90,4 +90,18 @@ public class GameService {
         return gameState == null ? Collections.emptyMap() : gameState.getScores();
     }
 
+    public List<CardResponseDTO> getAllRelatedCards(Long roomId) {
+        GameState gameState = gameStates.get(roomId);
+        return gameState.getCards().stream().map(CardResponseDTO::fromCard).toList();
+    }
+
+    @Transactional
+    public void insertCardCopies(Long roomId) {
+        GameState gameState = gameStates.get(roomId);
+        gameState.getParticipantIds();
+        gameState.getCards();
+
+        // 명함 보관함 있는 브랜치랑 병합 후 작업
+    }
+
 }
