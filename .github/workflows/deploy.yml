@@ -36,7 +36,7 @@ jobs:
 
       - name: Docker build
         run: |
-          JAR_FILE=$(find ./src/build/libs -name "*.jar" | head -n 1)
+          JAR_FILE=$(find ./build/libs -name "TalkSpark-BE-0.0.1-SNAPSHOT.jar" | head -n 1)
           if [ -z "$JAR_FILE" ]; then
             echo "JAR file not found! Ensure ./gradlew build executed successfully."
             exit 1
