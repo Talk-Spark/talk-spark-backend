@@ -51,7 +51,7 @@ jobs:
         run: |
           echo "${{ secrets.DEV_EC2_PRIVATE_KEY }}" > private_key.pem
           chmod 600 private_key.pem
-          scp -i private_key.pem -o StrictHostKeyChecking=no docker-compose.yml ${{ secrets.SSH_USER }}@${{ secrets.SSH_KNOWN_HOSTS }}:/home/ubuntu/
+          scp -i private_key.pem -o StrictHostKeyChecking=no docker-compose.yml ${{ secrets.SSH_USER }}@${{ secrets.SSH_KNOWN_HOSTS }}:/home/ubuntu
 
       - name: Deploy
         uses: appleboy/ssh-action@master
