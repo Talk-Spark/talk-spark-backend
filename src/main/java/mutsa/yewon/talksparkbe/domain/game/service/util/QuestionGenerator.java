@@ -47,14 +47,14 @@ public class QuestionGenerator {
             userCardQuestionsList.add(new UserCardQuestions(c.getSparkUser().getId(), questions)); // 어떤 사람의 카드에 대한 질문들 생성 완료
         }
 
-        Collections.shuffle(userCardQuestionsList);
+        userCardQuestionsList.sort(Comparator.comparing(UserCardQuestions::getSparkUserId)); // 유저아이디 오름차순. 그래서 같은 유저아이디의 문제가 쫙 나옴.
         return userCardQuestionsList;
     }
 
     private CardQuestion generateQuestion(Card c, String fieldName, List<Card> cards, int numOfPeople) {
         String correctAnswer = getFieldValue(c, fieldName);
         List<String> options = generateOptions(fieldName, correctAnswer, cards, numOfPeople);
-        return new CardQuestion(c.getId(), fieldName, correctAnswer, options);
+        return new CardQuestion(c.getId(), c.getSparkUser().getId(), fieldName, correctAnswer, options);
     }
 
     // 카드의 특정 필드 값을 반환 (Reflection 활용)

@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/rooms")
+@RequestMapping("/api/rooms")
 @RequiredArgsConstructor
 public class RoomController {
 
@@ -36,8 +36,8 @@ public class RoomController {
     }
 
     @GetMapping
-    public ResponseEntity<?> roomList() {
-        return ResponseEntity.ok(roomService.listAllRooms());
+    public ResponseEntity<?> roomSearch(@RequestParam String searchName) {
+        return ResponseEntity.ok(roomService.searchRooms(searchName));
     }
 
     @PostMapping("/host")
@@ -49,6 +49,11 @@ public class RoomController {
         SparkUser sparkUser = sparkUserRepository.findByKakaoId(kakaoId).orElseThrow(() -> new RuntimeException("유저 못찾음"));
 
         return ResponseEntity.ok(roomService.checkHost(hostCheckRequest.getRoomId(), sparkUser));
+    }
+
+    @GetMapping("/all")
+    public ResponseEntity<?> roomList() {
+        return ResponseEntity.ok(roomService.listAllRooms());
     }
 
 }

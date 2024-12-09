@@ -59,4 +59,13 @@ public class Room {
         this.addRoomParticipate(roomParticipate);
         roomParticipate.assignRoom(this);
     }
+
+    public void start() {
+        this.isStarted = true;
+    }
+
+    public void finish() {
+        this.isFinished = true;
+    }
+
 }
