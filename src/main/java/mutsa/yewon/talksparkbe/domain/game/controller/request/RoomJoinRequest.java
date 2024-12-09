@@ -7,6 +7,8 @@ public class RoomJoinRequest {
 
     private Long roomId;
 
-    private Long sparkUserId;
+    private String accessToken;
+
+    private Boolean isHost;
 
 }

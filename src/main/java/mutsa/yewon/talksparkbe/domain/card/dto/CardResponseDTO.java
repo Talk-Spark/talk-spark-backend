@@ -45,6 +45,8 @@ public class CardResponseDTO {
     @Schema(description = "TMI", example = "TALKSPARK")
     private String tmi;
 
+    private Long ownerId;
+
     public static CardResponseDTO fromCard(Card card) {
         return CardResponseDTO.builder()
                 .id(card.getId())
@@ -57,6 +59,7 @@ public class CardResponseDTO {
                 .kakaoId(card.getSparkUser().getKakaoId())
                 .major(card.getMajor())
                 .mbti(card.getMbti())
+                .ownerId(card.getSparkUser().getId())
                 .build();
     }
 }

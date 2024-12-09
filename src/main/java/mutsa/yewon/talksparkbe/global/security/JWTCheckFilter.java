@@ -41,7 +41,7 @@ public class JWTCheckFilter extends OncePerRequestFilter {
         String requestURI = request.getRequestURI();
         log.info("requestURI: " + requestURI);
 
-        String[] excludePath = {"/api/member", "/swagger-ui", "/v3/api-docs"};
+        String[] excludePath = {"/api/member", "/swagger-ui", "/v3/api-docs", "/views", "/oauth", "/rooms", "/api/member/kakao", "/api/test-user"};
 
         return Arrays.stream(excludePath).anyMatch(requestURI::startsWith);
 //        if (requestURI.startsWith("/api/member") || requestURI.startsWith("/swagger-ui")

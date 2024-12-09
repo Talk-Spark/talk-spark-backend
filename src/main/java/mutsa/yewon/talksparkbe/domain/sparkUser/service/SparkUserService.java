@@ -9,6 +9,7 @@ public interface SparkUserService {
 
 
     SparkUserDTO getKakaoUser(String accessToken);
+    SparkUserDTO generateTestUser(String name);
 
 //    default SparkUserDTO entityToDTO(SparkUser sparkUser) {
 //        return new SparkUserDTO(sparkUser.getKakaoId(), sparkUser.getName(), sparkUser.getPassword(),

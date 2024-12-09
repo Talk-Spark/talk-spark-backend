@@ -48,7 +48,7 @@ public class Room {
         this.roomName = roomName;
         this.maxPeople = maxPeople;
         this.difficulty = difficulty;
-        this.guestBookRoom = new GuestBookRoom(this);
+//        this.guestBookRoom = new GuestBookRoom(this);
     }
 
     public void addRoomParticipate(RoomParticipate roomParticipate) {

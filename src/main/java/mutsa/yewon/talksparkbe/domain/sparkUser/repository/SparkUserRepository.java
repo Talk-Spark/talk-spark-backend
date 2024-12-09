@@ -8,4 +8,7 @@ import java.util.Optional;
 
 public interface SparkUserRepository extends JpaRepository<SparkUser, Long> {
     Optional<SparkUser> findByKakaoId(String kakaoId);
+
+    Optional<SparkUser> findByName(String name);
+
 }
