@@ -34,6 +34,7 @@ public class JWTCheckFilter extends OncePerRequestFilter {
     private final JWTUtil jwtUtil;
 
 
+
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
         log.info("-------shouldNotFilter--------");

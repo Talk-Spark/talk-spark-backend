@@ -1,5 +1,6 @@
 package mutsa.yewon.talksparkbe.domain.guestBook.dto.guestBook;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 
 import java.time.LocalDateTime;

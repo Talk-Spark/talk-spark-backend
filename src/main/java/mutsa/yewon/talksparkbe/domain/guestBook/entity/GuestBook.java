@@ -33,7 +33,7 @@ public class GuestBook {
     }
 
     @Setter
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.REMOVE) //guestBookRoom삭제 시 같이 삭제됨
     @JoinColumn(name = "guestbook_room_id")
     private GuestBookRoom guestBookRoom;
 
