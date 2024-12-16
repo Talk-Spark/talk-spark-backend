@@ -1,12 +1,16 @@
 package mutsa.yewon.talksparkbe.domain.cardHolder.controller;
 
 import lombok.RequiredArgsConstructor;
+import mutsa.yewon.talksparkbe.domain.cardHolder.CardHolderControllerDocs;
 import mutsa.yewon.talksparkbe.domain.cardHolder.dto.IndCardHolderCreateDTO;
 import mutsa.yewon.talksparkbe.domain.cardHolder.dto.TeamCardHolderCreateDTO;
 import mutsa.yewon.talksparkbe.domain.cardHolder.dto.CardHolderListDTO;
 import mutsa.yewon.talksparkbe.domain.cardHolder.dto.StoredCardDTO;
 import mutsa.yewon.talksparkbe.domain.cardHolder.service.StoredCardService;
+import mutsa.yewon.talksparkbe.domain.sparkUser.dto.SparkUserDTO;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -14,7 +18,7 @@ import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
-public class CardHolderController {
+public class CardHolderController implements CardHolderControllerDocs {
 
     private final StoredCardService storedCardService;
 
@@ -37,9 +41,13 @@ public class CardHolderController {
     }
 
     @GetMapping("/api/storedCards")
-    public ResponseEntity<?> getStoredCards(@RequestParam Long sparkUserId,
-                                            @RequestParam String searchType) {
+    public ResponseEntity<?> getStoredCards(@RequestParam String searchType) {
 
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        SparkUserDTO user = (SparkUserDTO) authentication.getPrincipal();
+
+        Long sparkUserId = user.getSparkUserId();
         CardHolderListDTO cardHolderListDTOs = storedCardService.getCardHolderDTOs(searchType, sparkUserId);
 
         return ResponseEntity.status(200).body(cardHolderListDTOs);

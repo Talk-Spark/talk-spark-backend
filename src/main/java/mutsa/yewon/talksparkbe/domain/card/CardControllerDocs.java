@@ -35,7 +35,7 @@ public interface CardControllerDocs {
             content = @Content(mediaType = "application/json",
             schema = @Schema(type = "Long", example = "1")))
     })
-    ResponseEntity<Long> createCard(@Valid @RequestBody CardCreateDTO cardCreateDTO);
+    ResponseEntity<?> createCard(@Valid @RequestBody CardCreateDTO cardCreateDTO);
 
     @Operation(summary = "사용자의 모든 명함을 조회", description = "사용자의 식별자를 기반으로 모든 명함을 조회하는 API")
     @ApiErrorCodes({ErrorCode.USER_NOT_EXIST, ErrorCode.JWT_TOKEN_EXPIRED, ErrorCode.MUST_MAKE_CARD_FIRST,ErrorCode.TOKEN_REQUIRED, ErrorCode.INVALID_JWT_TOKEN})

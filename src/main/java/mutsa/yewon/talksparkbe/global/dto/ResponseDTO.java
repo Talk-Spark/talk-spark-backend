@@ -25,4 +25,8 @@ public class ResponseDTO<D> {
         return new ResponseDTO<>(HttpStatus.CREATED.value(), message, null);
     }
 
+    public static <D> ResponseDTO<D> created(String message, D data) {
+        return new ResponseDTO<>(HttpStatus.CREATED.value(), message, data);
+    }
+
 }

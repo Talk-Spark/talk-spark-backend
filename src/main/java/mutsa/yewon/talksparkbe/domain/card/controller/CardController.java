@@ -12,6 +12,7 @@ import mutsa.yewon.talksparkbe.domain.card.CardControllerDocs;
 import mutsa.yewon.talksparkbe.domain.card.dto.CardCreateDTO;
 import mutsa.yewon.talksparkbe.domain.card.dto.CardResponseDTO;
 import mutsa.yewon.talksparkbe.domain.card.service.CardService;
+import mutsa.yewon.talksparkbe.global.dto.ResponseDTO;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -25,11 +26,13 @@ public class CardController implements CardControllerDocs {
     private final CardService cardService;
 
     @PostMapping("/api/cards")
-    public ResponseEntity<Long> createCard(@Valid @RequestBody CardCreateDTO cardCreateDTO) {
+    public ResponseEntity<?> createCard(@Valid @RequestBody CardCreateDTO cardCreateDTO) {
 
         Long cardId = cardService.createCard(cardCreateDTO);
 
-        return ResponseEntity.status(201).body(cardId);
+        ResponseDTO<Map<String, Long>> card = ResponseDTO.created("명함이 생성되었습니다.", Map.of("cardId", cardId));
+
+        return ResponseEntity.status(201).body(card);
     }
 
     @GetMapping("/api/cards")

@@ -39,6 +39,9 @@ public class Card {
 
     private String tmi;
 
+    @Enumerated(EnumType.STRING)
+    private CardThema cardThema;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "spark_user_id")
     private SparkUser sparkUser;
@@ -52,6 +55,7 @@ public class Card {
         this.lookAlike = cardCreateDTO.getLookAlike();
         this.slogan = cardCreateDTO.getSlogan();
         this.tmi = cardCreateDTO.getTmi();
+
     }
 
 }
