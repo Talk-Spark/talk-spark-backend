@@ -2,6 +2,7 @@ package mutsa.yewon.talksparkbe.domain.card.controller;
 
 import mutsa.yewon.talksparkbe.domain.card.dto.CardCreateDTO;
 import mutsa.yewon.talksparkbe.domain.card.dto.CardResponseDTO;
+import mutsa.yewon.talksparkbe.domain.card.entity.CardThema;
 import mutsa.yewon.talksparkbe.domain.card.service.CardService;
 import mutsa.yewon.talksparkbe.domain.sparkUser.entity.SparkUser;
 import mutsa.yewon.talksparkbe.domain.sparkUser.entity.SparkUserRole;
@@ -40,20 +41,24 @@ class CardControllerTest {
 
         sparkUserRepository.save(sparkUser);
 
-        cardService.createCard(new CardCreateDTO(Long.parseLong("1"), "박승범", 24, "컴퓨터공학과", "ISTJ", "코딩", "너구리", "코딩하는 너구리", "TalkSpark"));
-        cardService.createCard(new CardCreateDTO(Long.parseLong("1"), "박승범", 24, "컴퓨터공학과", "ISTJ", "코딩", "너구리", "코딩하는 너구리", "TalkSparkIsFun"));
-        cardService.createCard(new CardCreateDTO(Long.parseLong("1"), "박승범", 24, "컴퓨터공학과", "ISTJ", "코딩", "너구리", "코딩은 나의 삶, 나의 안식", "TalkSpark"));
+        cardService.createCard(new CardCreateDTO(Long.parseLong("1"), "박승범", 24, "컴퓨터공학과",
+                "ISTJ", "코딩", "너구리", "코딩하는 너구리", "TalkSpark",CardThema.MINT));
+        cardService.createCard(new CardCreateDTO(Long.parseLong("1"), "박승범", 24, "컴퓨터공학과",
+                "ISTJ", "코딩", "너구리", "코딩하는 너구리", "TalkSparkIsFun", CardThema.PINK));
+        cardService.createCard(new CardCreateDTO(Long.parseLong("1"), "박승범", 24, "컴퓨터공학과",
+                "ISTJ", "코딩", "너구리", "코딩은 나의 삶, 나의 안식", "TalkSpark", CardThema.YELLOW));
 
     }
 
     @Test
     @DisplayName("명함 생성 성공을 검증한다.")
     public void createCard() {
-        CardCreateDTO cardCreateDTO = new CardCreateDTO(Long.parseLong("1"), "박승범", 24, "컴퓨터공학과", "ISTJ", "코딩", "너구리", "코딩하는 너구리", "TalkSpark");
+        CardCreateDTO cardCreateDTO = new CardCreateDTO(Long.parseLong("1"), "박승범", 24, "컴퓨터공학과",
+                "ISTJ", "코딩", "너구리", "코딩하는 너구리", "TalkSpark",CardThema.BLUE);
         Long cardId = cardService.createCard(cardCreateDTO);
 
         assertNotNull(cardId);
-        assertEquals(Long.parseLong("1"), cardId);
+        assertEquals(Long.parseLong("4"), cardId);
     }
 
     @Test
@@ -73,7 +78,8 @@ class CardControllerTest {
     @WithMockUser(username = "333335555", roles = {"USER"})
     public void modifyCard() {
         CardCreateDTO cardCreateDTO =
-                new CardCreateDTO(Long.parseLong("1"), "박승범", 25, "컴퓨터공학과", "ISTJ", "운동", "너구리", "코딩하는 너구리", "");
+                new CardCreateDTO(Long.parseLong("1"), "박승범", 25, "컴퓨터공학과", "ISTJ",
+                        "운동", "너구리", "코딩하는 너구리", "",CardThema.YELLOW);
 
         Map<String, Long> modifiedCard = cardService.modifyCard(1L, cardCreateDTO);
 
@@ -97,7 +103,8 @@ class CardControllerTest {
     @WithMockUser(username = "333335556", roles = {"USER"})
     public void ownerCheck(){
         CardCreateDTO cardCreateDTO =
-                new CardCreateDTO(Long.parseLong("1"), "박승범", 25, "컴퓨터공학과", "ISTJ", "운동", "너구리", "코딩하는 너구리", "");
+                new CardCreateDTO(Long.parseLong("1"), "박승범", 25, "컴퓨터공학과", "ISTJ",
+                        "운동", "너구리", "코딩하는 너구리", "", CardThema.BLUE);
 
         assertThrows(CustomTalkSparkException.class, () -> {
             cardService.modifyCard(1L, cardCreateDTO);

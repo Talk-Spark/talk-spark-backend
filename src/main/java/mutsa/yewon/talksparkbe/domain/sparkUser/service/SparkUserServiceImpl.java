@@ -34,6 +34,9 @@ public class SparkUserServiceImpl implements SparkUserService {
 
     @Override
     public SparkUserDTO getKakaoUser(String accessToken) {
+
+        log.info(accessToken);
+
         Map<String, String> kakaoData = getKakaoUserNickname(accessToken);
 
         String kakaoId = kakaoData.get("kakaoId");
@@ -57,6 +60,8 @@ public class SparkUserServiceImpl implements SparkUserService {
 
     private Map<String,String> getKakaoUserNickname(String accessToken) {
         String kakaoGetUserURL = "https://kapi.kakao.com/v2/user/me";
+
+        log.info(accessToken);
 
         WebClient webClient = WebClient.builder().build();
 

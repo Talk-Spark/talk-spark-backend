@@ -32,7 +32,6 @@ import java.util.stream.Collectors;
 @OpenAPIDefinition(
     servers = {
             @Server(url = "http://localhost:8080", description = "로컬 테스트 서버"),
-            @Server(url = "http://43.203.105.243", description = "개발 서버")
     }
 )
 @Configuration

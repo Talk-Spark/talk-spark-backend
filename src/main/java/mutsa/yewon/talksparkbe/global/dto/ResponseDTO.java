@@ -1,15 +1,22 @@
 package mutsa.yewon.talksparkbe.global.dto;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import org.springframework.http.HttpStatus;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
+@Schema(description = "API 응답 DTO")
 public class ResponseDTO<D> {
 
+    @Schema(description = "응답 상태 코드")
     private final int status;
+
+    @Schema(description = "응답 메세지")
     private final String message;
+
+    @Schema(description = "응답 데이터")
     private final D data;
 
     // OK (200)

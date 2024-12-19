@@ -13,6 +13,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import mutsa.yewon.talksparkbe.domain.card.dto.CardCreateDTO;
 import mutsa.yewon.talksparkbe.domain.card.dto.CardResponseDTO;
+import mutsa.yewon.talksparkbe.global.dto.ResponseDTO;
 import mutsa.yewon.talksparkbe.global.exception.ErrorCode;
 import mutsa.yewon.talksparkbe.global.exception.ErrorResponseEntity;
 import mutsa.yewon.talksparkbe.global.swagger.ApiErrorCode;
@@ -33,7 +34,20 @@ public interface CardControllerDocs {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "명함 생성 성공",
             content = @Content(mediaType = "application/json",
-            schema = @Schema(type = "Long", example = "1")))
+            schema = @Schema(implementation = ResponseDTO.class),
+            examples = {
+                    @ExampleObject(
+                            value = """
+                    {
+                      "status": 201,
+                      "message": "명함이 생성되었습니다.",
+                      "data": {
+                        "cardId": 5
+                      }
+                    }
+                    """
+                    ),
+            }))
     })
     ResponseEntity<?> createCard(@Valid @RequestBody CardCreateDTO cardCreateDTO);
 
@@ -42,42 +56,124 @@ public interface CardControllerDocs {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "사용자의 명함 조회 성공",
             content = @Content(mediaType = "application/json",
-                    array = @ArraySchema(schema = @Schema(implementation = CardResponseDTO.class))))
+                    array = @ArraySchema(schema = @Schema(implementation = ResponseDTO.class)),
+            examples = {
+                    @ExampleObject(
+                            value = """
+                                    {
+                                        "status": 200,
+                                        "message": "사용자 명함 조회 성공",
+                                        "data": [
+                                            {
+                                                "id": 4,
+                                                "kakaoId": "3776885192",
+                                                "name": "박승범",
+                                                "age": 24,
+                                                "major": "컴퓨터공학",
+                                                "mbti": "ISTJ",
+                                                "hobby": "코딩",
+                                                "lookAlike": "너구리",
+                                                "slogan": "코딩하는 너구리",
+                                                "tmi": "TalkSparkIsFun!!!",
+                                                "ownerId": 2,
+                                                "cardThema": "YELLOW"
+                                            },
+                                            {
+                                                "id": 5,
+                                                "kakaoId": "3776885192",
+                                                "name": "박승범",
+                                                "age": 24,
+                                                "major": "컴퓨터공학과",
+                                                "mbti": "ISTJ",
+                                                "hobby": "코딩",
+                                                "lookAlike": "너구리",
+                                                "slogan": "개발자가 되",
+                                                "tmi": "TalkSpark",
+                                                "ownerId": 2,
+                                                "cardThema": "BLUE"
+                                            }
+                                        ]
+                                    }
+                                    """
+                    )
+            }))
     })
-    ResponseEntity<List<CardResponseDTO>> getCards(@RequestParam("sparkUserId") Long sparkUserId);
+    ResponseEntity<?> getCards();
 
     @Operation(summary = "특정 명함 조회", description = "명함 식별자를 기반으로 조회하는 API")
     @ApiErrorCodes({ErrorCode.CARD_NOT_EXIST, ErrorCode.JWT_TOKEN_EXPIRED,ErrorCode.TOKEN_REQUIRED, ErrorCode.INVALID_JWT_TOKEN})
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "명함 조회 성공",
             content = @Content(mediaType = "applicaiton/json",
-                    schema = @Schema(implementation = CardResponseDTO.class)))
+                    schema = @Schema(implementation = ResponseDTO.class),
+                    examples = {
+                    @ExampleObject(
+                            value = """
+                                    {
+                                        "status": 200,
+                                        "message": "명함 단건 조회",
+                                        "data": {
+                                            "id": 4,
+                                            "kakaoId": "3776885192",
+                                            "name": "박승범",
+                                            "age": 24,
+                                            "major": "컴퓨터공학",
+                                            "mbti": "ISTJ",
+                                            "hobby": "코딩",
+                                            "lookAlike": "너구리",
+                                            "slogan": "코딩하는 너구리",
+                                            "tmi": "TalkSparkIsFun!!!",
+                                            "ownerId": 2,
+                                            "cardThema": "YELLOW"
+                                        }
+                                    }
+                                    """
+                    )
+                    }))
     })
-    ResponseEntity<CardResponseDTO> getCard(@PathVariable("cardId") Long cardId);
+    ResponseEntity<?> getCard(@PathVariable("cardId") Long cardId);
 
     @Operation(summary = "명함 삭제", description = "명함 삭제를 위한 API ")
     @ApiErrorCodes({ErrorCode.CARD_NOT_EXIST, ErrorCode.JWT_TOKEN_EXPIRED,ErrorCode.TOKEN_REQUIRED,
             ErrorCode.INVALID_JWT_TOKEN,ErrorCode.NOT_YOUR_CARD })
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "명함 삭제 성공",
-            content = @Content(mediaType = "application/json", schema = @Schema(type = "Map", example = """
-                   {
-                        "DELETE COMPLETED" : 1
-                    }
-                    """)))
+            content = @Content(mediaType = "application/json", schema = @Schema(implementation = ResponseDTO.class),
+            examples = {
+                    @ExampleObject(
+                            value = """
+                                    {
+                                        "status": 200,
+                                        "message": "명함이 삭제되었습니다.",
+                                        "data": {
+                                            "cardId": 5
+                                        }
+                                    }
+                                    """
+                    )
+            }))
     })
-    Map<String, Long> deleteCard(@PathVariable("cardId") Long cardId);
+    ResponseEntity<?> deleteCard(@PathVariable("cardId") Long cardId);
 
     @Operation(summary = "명함 수정", description = "명함 수정을 위한 API")
     @ApiErrorCodes({ErrorCode.CARD_NOT_EXIST, ErrorCode.JWT_TOKEN_EXPIRED, ErrorCode.TOKEN_REQUIRED,
             ErrorCode.INVALID_JWT_TOKEN, ErrorCode.NOT_YOUR_CARD})
     @ApiResponse(responseCode = "200", description = "명함 수정 성공",
-            content = @Content(mediaType = "application/json", schema = @Schema(type = "Map", example = """
-                    {
-                        "UPDATED" : 1
-                    }
-                    """)))
-    Map<String, Long> modifyCard(@PathVariable("cardId") Long cardId,
+            content = @Content(mediaType = "application/json", schema = @Schema(implementation = ResponseDTO.class),
+            examples = {
+                    @ExampleObject(
+                            value = """
+                                    {
+                                        "status": 200,
+                                        "message": "명함이 수정되었습니다.",
+                                        "data": {
+                                            "cardId": 4
+                                        }
+                                    }
+                                    """
+                    )
+            }))
+    ResponseEntity<?> modifyCard(@PathVariable("cardId") Long cardId,
                                  @RequestBody @Valid CardCreateDTO cardCreateDTO);
 
 

@@ -71,7 +71,7 @@ public class CardServiceImpl implements CardService {
         card.update(cardCreateDTO);
         cardRepository.save(card);
 
-        return Map.of("UPDATED CARD", id);
+        return Map.of("cardId", id);
     }
 
     @Override
@@ -84,7 +84,7 @@ public class CardServiceImpl implements CardService {
 
         cardRepository.delete(card);
 
-        return Map.of("DELETE COMPLETED", id);
+        return Map.of("cardId", id);
     }
 
     private static void authorizeSparkUser(Card card){

@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import mutsa.yewon.talksparkbe.domain.card.entity.CardThema;
 import mutsa.yewon.talksparkbe.domain.cardHolder.entity.StoredCard;
 
 @Data
@@ -30,6 +31,8 @@ public class StoredCardDTO {
 
     private String tmi;
 
+    private CardThema cardThema;
+
     public static StoredCardDTO entityToDTO(StoredCard storedCard) {
         return StoredCardDTO.builder()
                 .storedCardId(storedCard.getId())
@@ -41,6 +44,7 @@ public class StoredCardDTO {
                 .lookAlike(storedCard.getLookAlike())
                 .slogan(storedCard.getSlogan())
                 .tmi(storedCard.getTmi())
+                .cardThema(storedCard.getCardThema())
                 .build();
     }
 }

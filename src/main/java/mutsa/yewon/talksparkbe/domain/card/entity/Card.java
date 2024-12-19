@@ -55,7 +55,7 @@ public class Card {
         this.lookAlike = cardCreateDTO.getLookAlike();
         this.slogan = cardCreateDTO.getSlogan();
         this.tmi = cardCreateDTO.getTmi();
-
+        this.cardThema = cardCreateDTO.getCardThema();
     }
 
 }

@@ -2,14 +2,17 @@ package mutsa.yewon.talksparkbe.domain.cardHolder;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import mutsa.yewon.talksparkbe.domain.cardHolder.dto.CardHolderDTO;
 import mutsa.yewon.talksparkbe.domain.cardHolder.dto.CardHolderListDTO;
 import mutsa.yewon.talksparkbe.domain.cardHolder.dto.IndCardHolderCreateDTO;
 import mutsa.yewon.talksparkbe.domain.cardHolder.dto.TeamCardHolderCreateDTO;
+import mutsa.yewon.talksparkbe.global.dto.ResponseDTO;
 import mutsa.yewon.talksparkbe.global.exception.ErrorCode;
 import mutsa.yewon.talksparkbe.global.swagger.ApiErrorCodes;
 import org.springframework.http.ResponseEntity;
@@ -24,7 +27,20 @@ public interface CardHolderControllerDocs {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "개별 명함 저장 성공",
                     content = @Content(mediaType = "application/json",
-                            schema = @Schema(type = "Long", example = "1")))
+                            schema = @Schema(implementation = ResponseDTO.class),
+                    examples = {
+                            @ExampleObject(
+                                    value = """
+                                            {
+                                                "status": 201,
+                                                "message": "개별명함이 저장되었습니다.",
+                                                "data": {
+                                                    "cardHolderId": 7
+                                                }
+                                            }
+                                            """
+                            )
+                    }))
     })
     ResponseEntity<?> storeIndCard(@RequestBody IndCardHolderCreateDTO indCardHolderCreateDTO);
 
@@ -34,7 +50,20 @@ public interface CardHolderControllerDocs {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "개별 명함 저장 성공",
                     content = @Content(mediaType = "application/json",
-                            schema = @Schema(type = "Long", example = "1")))
+                            schema = @Schema(implementation = ResponseDTO.class),
+                    examples = {
+                            @ExampleObject(
+                                    value = """
+                                            {
+                                                "status": 201,
+                                                "message": "팀별명함이 저장되었습니다.",
+                                                "data": {
+                                                    "cardHolderId": 8
+                                                }
+                                            }
+                                            """
+                            )
+                    }))
     })
     ResponseEntity<?> storeTeamCard(@RequestBody TeamCardHolderCreateDTO teamCardHolderCreateDTO);
 
@@ -42,15 +71,100 @@ public interface CardHolderControllerDocs {
     @ApiErrorCodes({ErrorCode.JWT_TOKEN_EXPIRED, ErrorCode.TOKEN_REQUIRED, ErrorCode.CARDHOLDER_NOT_EXIST})
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "명함 객체 조회 성공",
-            content = @Content(mediaType = "application/json", schema = @Schema(implementation = CardHolderDTO.class)))
+            content = @Content(mediaType = "application/json", schema = @Schema(implementation = ResponseDTO.class),examples = {
+                    @ExampleObject(
+                            value = """
+                                    {
+                                        "status": 200,
+                                        "message": "모든 팀원들의 명함을 조회합니다.",
+                                        "data": [
+                                            {
+                                                "storedCardId": 9,
+                                                "name": "박승범",
+                                                "age": 24,
+                                                "major": "컴퓨터공학",
+                                                "mbti": "ISTJ",
+                                                "hobby": "코딩",
+                                                "lookAlike": "너구리",
+                                                "slogan": "코딩하는 너구리",
+                                                "tmi": "TalkSparkIsFun!!!",
+                                                "cardThema": "YELLOW"
+                                            },
+                                            {
+                                                "storedCardId": 10,
+                                                "name": "박승범",
+                                                "age": 24,
+                                                "major": "컴퓨터공학과",
+                                                "mbti": "ISTJ",
+                                                "hobby": "코딩",
+                                                "lookAlike": "너구리",
+                                                "slogan": "개발자가 되",
+                                                "tmi": "TalkSpark",
+                                                "cardThema": "MINT"
+                                            }
+                                        ]
+                                    }
+                                    """
+                    )
+            }))
     })
     ResponseEntity<?> getStoredCard(@RequestParam Long cardHolderId);
 
-    @Operation(summary = "명함 보관함 속 명함 객체들 조회", description = "명함 보관함 페이지에서 각 정렬조건에 맞는 명함 객체들을 조회하는 API")
+    @Operation(summary = "명함 보관함 속 명함 객체들 조회", description = """
+            명함 보관함 페이지에서 각 정렬조건에 맞는 명함 객체들을 조회하는 API
+            
+            정렬 조건
+            1. Alphabet : 가나다순
+            2. Bookmark : 보관된 명함들 중 즐겨찾기 된 명함들만 조회
+            3. 빈칸 : 최신순 조회
+            """ )
     @ApiErrorCodes({ErrorCode.USER_NOT_EXIST, ErrorCode.CARDHOLDER_NOT_EXIST, ErrorCode.JWT_TOKEN_EXPIRED, ErrorCode.TOKEN_REQUIRED})
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "명함 객체 리스트 조회 성공",
-            content = @Content(mediaType = "application/json", schema = @Schema(implementation = CardHolderListDTO.class)))
+            content = @Content(mediaType = "application/json", schema = @Schema(implementation = ResponseDTO.class),examples = {
+                    @ExampleObject(
+                            value = """
+                                    {
+                                        "status": 200,
+                                        "message": "정렬 조건에 따라 보관된 명함들을 조회합니다.",
+                                        "data": {
+                                            "numOfCards": 3,
+                                            "searchType": "Default",
+                                            "cardHolders": [
+                                                {
+                                                    "cardHolderId": 8,
+                                                    "cardHolderName": "멋사우주최강",
+                                                    "teamNames": [
+                                                        "박승범",
+                                                        "박승범"
+                                                    ],
+                                                    "bookMark": false,
+                                                    "storedAt": "2024-12-19T14:32:08.602231"
+                                                },
+                                                {
+                                                    "cardHolderId": 7,
+                                                    "cardHolderName": "박승범",
+                                                    "teamNames": [
+                                                        "박승범"
+                                                    ],
+                                                    "bookMark": false,
+                                                    "storedAt": "2024-12-19T14:30:38.027436"
+                                                },
+                                                {
+                                                    "cardHolderId": 6,
+                                                    "cardHolderName": "박승범",
+                                                    "teamNames": [
+                                                        "박승범"
+                                                    ],
+                                                    "bookMark": true,
+                                                    "storedAt": "2024-12-19T01:19:40.331608"
+                                                }
+                                            ]
+                                        }
+                                    }
+                                    """
+                    )
+            }))
     })
     public ResponseEntity<?> getStoredCards(@RequestParam String searchType);
 
@@ -59,14 +173,40 @@ public interface CardHolderControllerDocs {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "명함 객체 즐겨찾기 성공",
             content = @Content(mediaType = "application/json",
-                    schema = @Schema(type = "Map<String, Long>", example = """
-                           {
-                               "UPDATED" : 1
-                           }
-                           """)))
+                    schema = @Schema(implementation = ResponseDTO.class),examples = {
+                    @ExampleObject(
+                            value = """
+                                    {
+                                        "status": 200,
+                                        "message": "보관된 명함을 즐겨찾기 합니다.",
+                                        "data": {
+                                            "cardHolderId": 7
+                                        }
+                                    }
+                                    """
+                    )
+            }))
     })
     ResponseEntity<?> bookMarkCard(@RequestParam Long cardHolderId);
 
     @Operation(summary = "명함 객체 삭제", description = "명함 객체 삭제")
+    @ApiErrorCodes({ErrorCode.JWT_TOKEN_EXPIRED, ErrorCode.TOKEN_REQUIRED, ErrorCode.CARDHOLDER_NOT_EXIST})
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "명함 객체 삭제 성공",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = ResponseDTO.class),examples = {
+                            @ExampleObject(
+                                    value = """
+                                            {
+                                                "status": 200,
+                                                "message": "보관된 명함을 삭제합니다",
+                                                "data": {
+                                                    "cardHolderId": 7
+                                                }
+                                            }
+                                    """
+                            )
+                    }))
+    })
     ResponseEntity<?> deleteCardHolder(@RequestParam Long cardHolderId);
 }
