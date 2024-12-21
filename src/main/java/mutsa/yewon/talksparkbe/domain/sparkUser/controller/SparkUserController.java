@@ -8,6 +8,7 @@ import mutsa.yewon.talksparkbe.domain.sparkUser.service.SparkUserService;
 import mutsa.yewon.talksparkbe.global.util.JWTUtil;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Map;
@@ -21,7 +22,10 @@ public class SparkUserController implements SparkUserControllerDocs {
     private final JWTUtil jwtUtil;
 
     @PostMapping("/api/member/kakao")
-    public Map<String, Object> login(String accessToken) {
+    public Map<String, Object> login(@RequestParam("accessToken") String accessToken) {
+
+        log.info(accessToken);
+
         SparkUserDTO kakaoUser = sparkUserService.getKakaoUser(accessToken);
 
         Map<String, Object> claims = kakaoUser.getClaims();

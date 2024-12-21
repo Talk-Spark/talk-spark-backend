@@ -12,6 +12,8 @@ import mutsa.yewon.talksparkbe.domain.card.CardControllerDocs;
 import mutsa.yewon.talksparkbe.domain.card.dto.CardCreateDTO;
 import mutsa.yewon.talksparkbe.domain.card.dto.CardResponseDTO;
 import mutsa.yewon.talksparkbe.domain.card.service.CardService;
+import mutsa.yewon.talksparkbe.global.dto.ResponseDTO;
+import mutsa.yewon.talksparkbe.global.util.SecurityUtil;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -24,41 +26,48 @@ public class CardController implements CardControllerDocs {
 
     private final CardService cardService;
 
+    private final SecurityUtil securityUtil;
+
     @PostMapping("/api/cards")
-    public ResponseEntity<Long> createCard(@Valid @RequestBody CardCreateDTO cardCreateDTO) {
+    public ResponseEntity<?> createCard(@Valid @RequestBody CardCreateDTO cardCreateDTO) {
 
         Long cardId = cardService.createCard(cardCreateDTO);
 
-        return ResponseEntity.status(201).body(cardId);
+        ResponseDTO<Map<String, Long>> card = ResponseDTO.created("명함이 생성되었습니다.", Map.of("cardId", cardId));
+
+        return ResponseEntity.status(201).body(card);
     }
 
     @GetMapping("/api/cards")
-    public ResponseEntity<List<CardResponseDTO>> getCards(@RequestParam("sparkUserId") Long sparkUserId) {
+    public ResponseEntity<?> getCards() {
 
-        List<CardResponseDTO> cards = cardService.getCards(sparkUserId);
+        List<CardResponseDTO> cards = cardService.getCards(securityUtil.getLoggedInUserId());
 
-        return ResponseEntity.status(200).body(cards);
+        return ResponseEntity.status(200).body(ResponseDTO.ok("사용자 명함 조회 성공", cards));
     }
 
     @GetMapping("/api/cards/{cardId}")
-    public ResponseEntity<CardResponseDTO> getCard(@PathVariable("cardId") Long cardId) {
+    public ResponseEntity<?> getCard(@PathVariable("cardId") Long cardId) {
 
         CardResponseDTO card = cardService.getCard(cardId);
 
-        return ResponseEntity.status(200).body(card);
+        return ResponseEntity.status(200).body(ResponseDTO.ok("명함 단건 조회", card));
     }
 
     @DeleteMapping("/api/cards/{cardId}")
-    public Map<String, Long> deleteCard(@PathVariable("cardId") Long cardId) {
+    public ResponseEntity<?> deleteCard(@PathVariable("cardId") Long cardId) {
 
-        return cardService.deleteCard(cardId);
+        return ResponseEntity.status(200).body(ResponseDTO.ok("명함이 삭제되었습니다.",
+                cardService.deleteCard(cardId)));
+
     }
 
     @PutMapping("/api/cards/{cardId}")
-    public Map<String, Long> modifyCard(@PathVariable("cardId") Long cardId,
+    public ResponseEntity<?> modifyCard(@PathVariable("cardId") Long cardId,
                                         @RequestBody @Valid CardCreateDTO cardCreateDTO) {
 
-        Map<String, Long> response = cardService.modifyCard(cardId, cardCreateDTO);
-        return response;
+
+        return ResponseEntity.status(200).body(ResponseDTO.ok("명함이 수정되었습니다.",
+                cardService.modifyCard(cardId, cardCreateDTO)));
     }
 }

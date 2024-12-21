@@ -1,5 +1,6 @@
 package mutsa.yewon.talksparkbe.domain.sparkUser.dto;
 
+import lombok.Getter;
 import mutsa.yewon.talksparkbe.domain.sparkUser.entity.SparkUser;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -7,6 +8,7 @@ import org.springframework.security.core.userdetails.User;
 
 import java.util.*;
 
+@Getter
 public class SparkUserDTO extends User {
 
     private Long sparkUserId;

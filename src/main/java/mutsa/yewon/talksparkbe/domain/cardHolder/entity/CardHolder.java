@@ -77,7 +77,7 @@ public class CardHolder {
                 .bookMark(false)
                 .build();
 
-        List<String> teammateNames = cards.stream().map(card -> card.getName()).toList();
+        List<String> teammateNames = cards.stream().map(card -> card.getName()).sorted().toList();
 
         cardHolder.addTeammatesName(teammateNames);
 

@@ -102,7 +102,7 @@ public class JWTCheckFilter extends OncePerRequestFilter {
         } catch (Exception e) {
             // 그 외의 일반 예외 처리
             log.error("General exception occurred: " + e.getMessage(), e);
-            writeErrorResponse(response, HttpStatus.BAD_REQUEST, "GENERAL_JWT_ERROR");
+            writeErrorResponse(response, HttpStatus.INTERNAL_SERVER_ERROR, "INTERNAL_SERVER_ERROR");
         }
     }
 

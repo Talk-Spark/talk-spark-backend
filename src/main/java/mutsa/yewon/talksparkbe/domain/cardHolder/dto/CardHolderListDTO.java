@@ -16,6 +16,8 @@ public class CardHolderListDTO {
 
     private Long numOfCards;
 
+    private String searchType;
+
     @Builder.Default
     private List<CardHolderDTO> cardHolders = new ArrayList<>();
 

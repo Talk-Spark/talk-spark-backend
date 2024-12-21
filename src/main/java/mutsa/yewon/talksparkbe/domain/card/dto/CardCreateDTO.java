@@ -7,6 +7,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import mutsa.yewon.talksparkbe.domain.card.entity.Card;
+import mutsa.yewon.talksparkbe.domain.card.entity.CardThema;
 import mutsa.yewon.talksparkbe.domain.sparkUser.entity.SparkUser;
 
 @Data
@@ -44,6 +45,9 @@ public class CardCreateDTO {
     @Schema(description = "TMI", example = "TalkSpark")
     private String tmi;
 
+    @Schema(description = "명함 테마", example = "BLUE")
+    private CardThema cardThema;
+
     public static Card toCard(CardCreateDTO dto, SparkUser user) {
         return Card.builder()
                 .sparkUser(user)
@@ -55,6 +59,7 @@ public class CardCreateDTO {
                 .major(dto.getMajor())
                 .tmi(dto.getTmi())
                 .slogan(dto.getSlogan())
+                .cardThema(dto.getCardThema())
                 .build();
     }
 
