@@ -23,7 +23,7 @@ public class GuestBookRoom {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long guestBookRoomId;
 
-    @OneToMany(mappedBy = "guestBookRoom")
+    @OneToMany(mappedBy = "guestBookRoom", cascade = CascadeType.PERSIST)
     private List<GuestBookRoomSparkUser> guestBookRoomSparkUsers
             = new ArrayList<>();
 
@@ -31,7 +31,7 @@ public class GuestBookRoom {
     @JoinColumn(name = "room_id")
     private Room room;
 
-    @OneToMany(mappedBy = "guestBookRoom")
+    @OneToMany(mappedBy = "guestBookRoom", cascade = CascadeType.PERSIST)
     private List<GuestBook> guestBooks = new ArrayList<>();
 
     @Builder

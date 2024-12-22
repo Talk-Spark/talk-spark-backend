@@ -40,7 +40,7 @@ public class Room {
     @OneToMany(mappedBy = "room")
     private List<RoomParticipate> roomParticipates = new ArrayList<>();
 
-    @OneToOne(mappedBy = "room")
+    @OneToOne(mappedBy = "room",cascade = CascadeType.PERSIST)
     private GuestBookRoom guestBookRoom;
 
     @Builder
@@ -48,7 +48,7 @@ public class Room {
         this.roomName = roomName;
         this.maxPeople = maxPeople;
         this.difficulty = difficulty;
-//        this.guestBookRoom = new GuestBookRoom(this);
+        this.guestBookRoom = new GuestBookRoom(this);
     }
 
     public void addRoomParticipate(RoomParticipate roomParticipate) {

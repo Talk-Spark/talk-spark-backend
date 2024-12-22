@@ -1,5 +1,6 @@
 package mutsa.yewon.talksparkbe.domain.guestBook.repository;
 
+import mutsa.yewon.talksparkbe.domain.card.entity.Card;
 import mutsa.yewon.talksparkbe.domain.guestBook.entity.GuestBook;
 import mutsa.yewon.talksparkbe.domain.guestBook.entity.GuestBookRoom;
 import mutsa.yewon.talksparkbe.domain.sparkUser.entity.SparkUser;
