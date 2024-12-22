@@ -26,7 +26,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping( "/guest-books")
 @RestController
 @RequiredArgsConstructor
-public class GuestBookController {
+public class GuestBookController implements GuestBookControllerDocs {
 
     private final GuestBookService guestBookService;
     private final GuestBookRoomService guestBookRoomService;
@@ -35,7 +35,7 @@ public class GuestBookController {
     //TODO: RuntimeException("User not found") 에러코드로 리펙토링
 
     @PostMapping("/{roomId}")
-    public ResponseEntity<?> PostGuestBook(@PathVariable("roomId") Long roomId,
+    public ResponseEntity<?> postGuestBook(@PathVariable("roomId") Long roomId,
                                            @Valid @RequestBody GuestBookContent content) {
 
         try {
@@ -49,7 +49,7 @@ public class GuestBookController {
     }
 
     @GetMapping("/{roomId}")
-    public ResponseEntity<?> GetGuestBookList(@RequestParam Long sparkUserId,
+    public ResponseEntity<?> getGuestBookList(@RequestParam Long sparkUserId,
                                               @PathVariable("roomId") Long roomId) {
 
         try {
@@ -63,7 +63,7 @@ public class GuestBookController {
     }
 
     @GetMapping
-    public ResponseEntity<?> GetGuestBookRoomList(@RequestParam Long sparkUserId,
+    public ResponseEntity<?> getGuestBookRoomList(@RequestParam Long sparkUserId,
                                                   @RequestParam(required = false) String search,
                                                   @RequestParam(required = false) String sortBy) {
 
@@ -78,7 +78,7 @@ public class GuestBookController {
     }
 
     @DeleteMapping("/{roomId}")
-    public ResponseEntity<?> DeleteGuestBookRoom(@RequestParam Long sparkUserId,
+    public ResponseEntity<?> deleteGuestBookRoom(@RequestParam Long sparkUserId,
                                                  @PathVariable("roomId") Long roomId) {
 
         try {
@@ -104,6 +104,4 @@ public class GuestBookController {
             throw new CustomTalkSparkException(ErrorCode.INVALID_FORMAT);
         }
     }
-
-
 }
