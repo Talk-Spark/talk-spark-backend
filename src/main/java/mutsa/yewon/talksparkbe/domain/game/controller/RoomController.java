@@ -40,15 +40,15 @@ public class RoomController {
         return ResponseEntity.ok(roomService.searchRooms(searchName));
     }
 
-    @PostMapping("/host")
-    public ResponseEntity<?> isHost(@RequestBody HostCheckRequest hostCheckRequest,
+    @GetMapping("/is-host")
+    public ResponseEntity<?> isHost(@RequestParam Long roomId,
                                     @RequestHeader("Authorization") String token) {
         String jwt = token.replace("Bearer ", "");
         Map<String, Object> claims = jwtUtil.validateToken(jwt);
         String kakaoId = (String) claims.get("kakaoId");
         SparkUser sparkUser = sparkUserRepository.findByKakaoId(kakaoId).orElseThrow(() -> new RuntimeException("유저 못찾음"));
 
-        return ResponseEntity.ok(roomService.checkHost(hostCheckRequest.getRoomId(), sparkUser));
+        return ResponseEntity.ok(roomService.checkHost(roomId, sparkUser));
     }
 
     @GetMapping("/all")
