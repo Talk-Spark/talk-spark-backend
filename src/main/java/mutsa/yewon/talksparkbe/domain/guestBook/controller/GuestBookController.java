@@ -18,30 +18,32 @@ import mutsa.yewon.talksparkbe.global.dto.ResponseDTO;
 import mutsa.yewon.talksparkbe.global.exception.CustomTalkSparkException;
 import mutsa.yewon.talksparkbe.global.exception.ErrorCode;
 //import mutsa.yewon.talksparkbe.global.util.JWTUtil;
+import mutsa.yewon.talksparkbe.global.util.SecurityUtil;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 
-@RequestMapping( "/guest-books")
+@RequestMapping( "/api/guest-books")
 @RestController
 @RequiredArgsConstructor
-public class GuestBookController {
+public class GuestBookController implements GuestBookControllerDocs {
 
     private final GuestBookService guestBookService;
     private final GuestBookRoomService guestBookRoomService;
+    private final SecurityUtil securityUtil;
 
 
     //TODO: RuntimeException("User not found") 에러코드로 리펙토링
 
     @PostMapping("/{roomId}")
-    public ResponseEntity<?> PostGuestBook(@PathVariable("roomId") Long roomId,
+    public ResponseEntity<?> postGuestBook(@PathVariable("roomId") Long roomId,
                                            @Valid @RequestBody GuestBookContent content) {
 
         try {
-            GuestBookPostRequestDTO guestBookPostRequestDTO = new GuestBookPostRequestDTO(roomId, content);
+            GuestBookPostRequestDTO guestBookPostRequestDTO = new GuestBookPostRequestDTO(securityUtil.getLoggedInUserId(),roomId, content);
             GuestBook guestBook = guestBookService.createGuestBook(guestBookPostRequestDTO);
-            ResponseDTO<?> responseDTO = ResponseDTO.created("작성되었습니다.");
+            ResponseDTO<?> responseDTO = ResponseDTO.created("방명록 내용이 작성되었습니다.");
             return ResponseEntity.status(201).body(responseDTO);
         } catch (IllegalArgumentException e) {
             throw new CustomTalkSparkException(ErrorCode.INVALID_FORMAT);
@@ -49,11 +51,10 @@ public class GuestBookController {
     }
 
     @GetMapping("/{roomId}")
-    public ResponseEntity<?> GetGuestBookList(@RequestParam Long sparkUserId,
-                                              @PathVariable("roomId") Long roomId) {
+    public ResponseEntity<?> getGuestBookList(@PathVariable("roomId") Long roomId) {
 
         try {
-            GuestBookListRequestDTO guestBookListRequestDTO = new GuestBookListRequestDTO(roomId, sparkUserId);
+            GuestBookListRequestDTO guestBookListRequestDTO = new GuestBookListRequestDTO(roomId, securityUtil.getLoggedInUserId());
             GuestBookListResponse guestBookListResponse = guestBookService.getGuestBookList(guestBookListRequestDTO);
             ResponseDTO<?> responseDTO = ResponseDTO.ok("방명록 내용이 조회되었습니다.", guestBookListResponse);
             return ResponseEntity.status(200).body(responseDTO);
@@ -63,12 +64,11 @@ public class GuestBookController {
     }
 
     @GetMapping
-    public ResponseEntity<?> GetGuestBookRoomList(@RequestParam Long sparkUserId,
-                                                  @RequestParam(required = false) String search,
+    public ResponseEntity<?> getGuestBookRoomList(@RequestParam(required = false) String search,
                                                   @RequestParam(required = false) String sortBy) {
 
         try {
-            GuestBookRoomListResponse guestBookRoomListResponse = guestBookRoomService.getGuestBookRoomList(sparkUserId,search,sortBy);
+            GuestBookRoomListResponse guestBookRoomListResponse = guestBookRoomService.getGuestBookRoomList(securityUtil.getLoggedInUserId(),search,sortBy);
             ResponseDTO<?> responseDTO = ResponseDTO.ok("방명록 방들이 조회되었습니다.", guestBookRoomListResponse);
             return ResponseEntity.status(200).body(responseDTO);
         } catch (IllegalArgumentException e) {
@@ -78,11 +78,10 @@ public class GuestBookController {
     }
 
     @DeleteMapping("/{roomId}")
-    public ResponseEntity<?> DeleteGuestBookRoom(@RequestParam Long sparkUserId,
-                                                 @PathVariable("roomId") Long roomId) {
+    public ResponseEntity<?> deleteGuestBookRoom(@PathVariable("roomId") Long roomId) {
 
         try {
-            guestBookRoomService.deleteGuestBookRoom(sparkUserId, roomId);
+            guestBookRoomService.deleteGuestBookRoom(securityUtil.getLoggedInUserId(), roomId);
             ResponseDTO<?> responseDTO = ResponseDTO.ok("방명록 방이 삭제되었습니다.");
             return ResponseEntity.status(200).body(responseDTO);
         } catch (IllegalArgumentException e) {
@@ -92,12 +91,11 @@ public class GuestBookController {
     }
 
     @PutMapping("/{roomId}")
-    public ResponseEntity<?> UpdateGuestBookRoomFavorites(@RequestParam Long sparkUserId,
-                                                          @PathVariable("roomId") Long roomId,
+    public ResponseEntity<?> UpdateGuestBookRoomFavorites(@PathVariable("roomId") Long roomId,
                                                           @RequestParam("isFavorited") boolean isFavorited){
 
         try {
-            guestBookRoomService.updateGuestBookRoomFavorites(sparkUserId, roomId, isFavorited);
+            guestBookRoomService.updateGuestBookRoomFavorites(securityUtil.getLoggedInUserId(), roomId, isFavorited);
             ResponseDTO<?> responseDTO = ResponseDTO.ok("방명록 방 즐겨찾기가 수정되었습니다.");
             return ResponseEntity.status(200).body(responseDTO);
         } catch (IllegalArgumentException e) {

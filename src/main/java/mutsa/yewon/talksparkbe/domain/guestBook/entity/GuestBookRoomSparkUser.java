@@ -2,6 +2,7 @@ package mutsa.yewon.talksparkbe.domain.guestBook.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import mutsa.yewon.talksparkbe.domain.game.entity.Room;
 import mutsa.yewon.talksparkbe.domain.sparkUser.entity.SparkUser;
 
 @Entity
@@ -14,7 +15,7 @@ public class GuestBookRoomSparkUser {
     private Long guestBookRoomSparkUserId;
 
     @ManyToOne
-    @JoinColumn(name = "guestbook_room_id")
+    @JoinColumn(name = "guest_book_room_id")
     private GuestBookRoom guestBookRoom;
 
     @ManyToOne

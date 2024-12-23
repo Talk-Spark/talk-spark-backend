@@ -1,6 +1,9 @@
 package mutsa.yewon.talksparkbe.domain.guestBook.service;
 
 import lombok.RequiredArgsConstructor;
+import mutsa.yewon.talksparkbe.domain.card.entity.Card;
+import mutsa.yewon.talksparkbe.domain.card.entity.CardThema;
+import mutsa.yewon.talksparkbe.domain.card.repository.CardRepository;
 import mutsa.yewon.talksparkbe.domain.guestBook.dto.guestBook.GuestBookListDTO;
 import mutsa.yewon.talksparkbe.domain.guestBook.dto.guestBook.GuestBookListRequestDTO;
 import mutsa.yewon.talksparkbe.domain.guestBook.dto.guestBook.GuestBookPostRequestDTO;
@@ -30,6 +33,7 @@ public class GuestBookService {
     private final GuestBookRepository guestBookRepository;
     private final GuestBookRoomRepository guestBookRoomRepository;
     private final GuestBookRoomSparkUserRepository guestBookRoomSparkUserRepository;
+    private final CardRepository cardRepository;
 
     //TODO: RuntimeException("User not found")) customException으로 수정
     @Transactional
@@ -80,12 +84,18 @@ public class GuestBookService {
                 .roomName(guestBookRoom.getRoom().getRoomName())
                 .roomDateTime(guestBookRoom.getRoom().getCreatedAt())
                 .isGuestBookFavorited(guestBookRoomSparkUser.getIsGuestBookFavorited())
-                .guestBookData(createGuestBookListResponse(guestBookRoom.getGuestBooks(), sparkUser.getKakaoId()))
+                .guestBookData(createGuestBookListResponse(guestBookRoom.getGuestBookRoomId(),guestBookRoom.getGuestBooks(), sparkUser.getKakaoId()))
                 .build();
 
         }
 
-        public static List<GuestBookListDTO> createGuestBookListResponse(List<GuestBook> guestBooks, String sparkUserKakaoId) {
+        //TODO: Room-Card로 변경하기
+        public List<GuestBookListDTO> createGuestBookListResponse(Long guestBookRoomId, List<GuestBook> guestBooks, String sparkUserKakaoId) {
+//            List<Card> cards = cardRepository.findBySparkUserId(Long.valueOf(sparkUserKakaoId));
+//            Card card = cards.isEmpty() ? null : cards.get(0);
+
+//            GuestBookRoom guestBookRoom = guestBookRoomRepository.findByRoomId(guestBookRoomId);
+//            Card card = guestBookRoomRepository.findCardBySparUser(sparkUserKakaoId);
             return guestBooks.stream()
                     .map(guestBook -> GuestBookListDTO.builder()
                             .guestBookId(guestBook.getGuestBookId())
@@ -93,6 +103,7 @@ public class GuestBookService {
                             .guestBookContent(guestBook.getGuestBookContent())
                             .guestBookDateTime(guestBook.getGuestBookDateTime())
                             .isOwnerGuestBook(guestBook.getSparkUser().getKakaoId().equals(sparkUserKakaoId)) // 작성자 확인
+                            .cardThema(CardThema.valueOf("YELLOW"))
                             .build())
                     .collect(Collectors.toList());
         }
