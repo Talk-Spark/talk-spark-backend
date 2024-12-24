@@ -41,9 +41,9 @@ class CardControllerTest {
 //
 //        sparkUserRepository.save(sparkUser);
 //
-//        cardService.createCard(new CardCreateDTO(Long.parseLong("1"), "박승범", 24, "컴퓨터공학과", "ISTJ", "코딩", "너구리", "코딩하는 너구리", "TalkSpark",CardThema.MINT));
-//        cardService.createCard(new CardCreateDTO(Long.parseLong("1"), "박승범", 24, "컴퓨터공학과", "ISTJ", "코딩", "너구리", "코딩하는 너구리", "TalkSparkIsFun", CardThema.PINK));
-//        cardService.createCard(new CardCreateDTO(Long.parseLong("1"), "박승범", 24, "컴퓨터공학과", "ISTJ", "코딩", "너구리", "코딩은 나의 삶, 나의 안식", "TalkSpark", CardThema.YELLOW));
+//        cardService.createCard(new CardCreateDTO(Long.parseLong("1"), "박승범", 24, "컴퓨터공학과", "ISTJ", "코딩", "너구리", "코딩하는 너구리", "TalkSpark"));
+//        cardService.createCard(new CardCreateDTO(Long.parseLong("1"), "박승범", 24, "컴퓨터공학과", "ISTJ", "코딩", "너구리", "코딩하는 너구리", "TalkSparkIsFun"));
+//        cardService.createCard(new CardCreateDTO(Long.parseLong("1"), "박승범", 24, "컴퓨터공학과", "ISTJ", "코딩", "너구리", "코딩은 나의 삶, 나의 안식", "TalkSpark"));
 //
 //    }
 //
@@ -74,7 +74,7 @@ class CardControllerTest {
 //    @WithMockUser(username = "333335555", roles = {"USER"})
 //    public void modifyCard() {
 //        CardCreateDTO cardCreateDTO =
-//                new CardCreateDTO(Long.parseLong("1"), "박승범", 25, "컴퓨터공학과", "ISTJ", "운동", "너구리", "코딩하는 너구리", "",CardThema.YELLOW);
+//                new CardCreateDTO(Long.parseLong("1"), "박승범", 25, "컴퓨터공학과", "ISTJ", "운동", "너구리", "코딩하는 너구리", "");
 //
 //        Map<String, Long> modifiedCard = cardService.modifyCard(1L, cardCreateDTO);
 //
@@ -98,7 +98,7 @@ class CardControllerTest {
 //    @WithMockUser(username = "333335556", roles = {"USER"})
 //    public void ownerCheck(){
 //        CardCreateDTO cardCreateDTO =
-//                new CardCreateDTO(Long.parseLong("1"), "박승범", 25, "컴퓨터공학과", "ISTJ", "운동", "너구리", "코딩하는 너구리", "", CardThema.BLUE);
+//                new CardCreateDTO(Long.parseLong("1"), "박승범", 25, "컴퓨터공학과", "ISTJ", "운동", "너구리", "코딩하는 너구리", "");
 //
 //        assertThrows(CustomTalkSparkException.class, () -> {
 //            cardService.modifyCard(1L, cardCreateDTO);
