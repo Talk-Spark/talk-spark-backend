@@ -2,7 +2,6 @@ package mutsa.yewon.talksparkbe.domain.card.controller;
 
 import mutsa.yewon.talksparkbe.domain.card.dto.CardCreateDTO;
 import mutsa.yewon.talksparkbe.domain.card.dto.CardResponseDTO;
-import mutsa.yewon.talksparkbe.domain.card.entity.CardThema;
 import mutsa.yewon.talksparkbe.domain.card.service.CardService;
 import mutsa.yewon.talksparkbe.domain.sparkUser.entity.SparkUser;
 import mutsa.yewon.talksparkbe.domain.sparkUser.entity.SparkUserRole;
@@ -50,11 +49,11 @@ class CardControllerTest {
 //    @Test
 //    @DisplayName("명함 생성 성공을 검증한다.")
 //    public void createCard() {
-//        CardCreateDTO cardCreateDTO = new CardCreateDTO(Long.parseLong("1"), "박승범", 24, "컴퓨터공학과", "ISTJ", "코딩", "너구리", "코딩하는 너구리", "TalkSpark",CardThema.BLUE);
+//        CardCreateDTO cardCreateDTO = new CardCreateDTO(Long.parseLong("1"), "박승범", 24, "컴퓨터공학과", "ISTJ", "코딩", "너구리", "코딩하는 너구리", "TalkSpark");
 //        Long cardId = cardService.createCard(cardCreateDTO);
 //
 //        assertNotNull(cardId);
-//        assertEquals(Long.parseLong("4"), cardId);
+//        assertEquals(Long.parseLong("1"), cardId);
 //    }
 //
 //    @Test
