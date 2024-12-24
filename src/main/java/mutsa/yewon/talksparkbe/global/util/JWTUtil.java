@@ -22,7 +22,7 @@ import java.util.Map;
 public class JWTUtil {
 
 
-    @Value("${secret.key}")
+    @Value("${jwt.secretKey}")
     private String jwtKey;
 
     public String generateToken(Map<String, Object> claims, int min) {

@@ -1,5 +1,7 @@
 package mutsa.yewon.talksparkbe.global.config;
 
+import io.swagger.v3.oas.annotations.OpenAPIDefinition;
+import io.swagger.v3.oas.annotations.servers.Server;
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.Operation;
@@ -27,6 +29,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+@OpenAPIDefinition(
+    servers = {
+            @Server(url = "http://localhost:8080", description = "로컬 테스트 서버"),
+    }
+)
 @Configuration
 public class SwaggerConfig {
     @Bean
@@ -45,6 +52,7 @@ public class SwaggerConfig {
                 .addSecurityItem(securityRequirement)
                 .components(components);
     }
+
     private Info apiInfo() {
         return new Info()
                 .title("TalkSpark Backend API") // API의 제목

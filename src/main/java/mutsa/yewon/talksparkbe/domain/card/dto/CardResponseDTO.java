@@ -7,6 +7,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import mutsa.yewon.talksparkbe.domain.card.entity.Card;
+import mutsa.yewon.talksparkbe.domain.card.entity.CardThema;
 
 @Data
 @Builder
@@ -15,7 +16,7 @@ import mutsa.yewon.talksparkbe.domain.card.entity.Card;
 @Schema(title = "명함 조회 데이터")
 public class CardResponseDTO {
 
-    @Schema(description = "사용자의 식별자", example = "1")
+    @Schema(description = "명함 식별자", example = "1")
     private Long id;
 
     @Schema(description = "사용자의 카카오 ID", example = "333345555")
@@ -45,6 +46,12 @@ public class CardResponseDTO {
     @Schema(description = "TMI", example = "TALKSPARK")
     private String tmi;
 
+    @Schema(description = "소유자 식별자", example = "1")
+    private Long ownerId;
+
+    @Schema(description = "명함 색상", example = "BLUE")
+    private CardThema cardThema;
+
     public static CardResponseDTO fromCard(Card card) {
         return CardResponseDTO.builder()
                 .id(card.getId())
@@ -57,6 +64,8 @@ public class CardResponseDTO {
                 .kakaoId(card.getSparkUser().getKakaoId())
                 .major(card.getMajor())
                 .mbti(card.getMbti())
+                .ownerId(card.getSparkUser().getId())
+                .cardThema(card.getCardThema())
                 .build();
     }
 }

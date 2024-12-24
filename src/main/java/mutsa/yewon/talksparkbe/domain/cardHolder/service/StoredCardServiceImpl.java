@@ -93,58 +93,46 @@ public class StoredCardServiceImpl implements StoredCardService {
 
         Long numOfCards = cardHolderRepository.countBySparkUserId(sparkUserId);
 
+        List<CardHolder> cardHolders = new ArrayList<>();
 
-        if(searchType.equals("Default")){
-            List<CardHolder> cardHolders = cardHolderRepository.findBySparkUserId(sparkUserId);
+
+        if(searchType.equals("Alphabet")){
+            cardHolders = cardHolderRepository.getCardHolderByAlphabet(sparkUserId);
 
             if(cardHolders.isEmpty()){
                 throw new CustomTalkSparkException(ErrorCode.CARDHOLDER_NOT_EXIST);
             }
 
-            List<CardHolderDTO> cardHolderDTOS = cardHolders.stream()
-                    .map(CardHolderDTO::entitytoDTO).toList();
-
-            return CardHolderListDTO.builder()
-                    .numOfCards(numOfCards)
-                    .cardHolders(cardHolderDTOS)
-                    .build();
-
         }
 
         else if(searchType.equals("Bookmark")){
-            List<CardHolder> cardHolderList = cardHolderRepository.getCardHolderByBookMark(sparkUserId);
+            cardHolders = cardHolderRepository.getCardHolderByBookMark(sparkUserId);
 
-            if(cardHolderList.isEmpty()){
+            if(cardHolders.isEmpty()){
                 throw new CustomTalkSparkException(ErrorCode.NO_BOOKMARKED_CONTENT);
             }
-
-            List<CardHolderDTO> cardHolderDTOS = cardHolderList.stream()
-                    .map(CardHolderDTO::entitytoDTO).toList();
-
-            return CardHolderListDTO.builder()
-                    .numOfCards(numOfCards)
-                    .cardHolders(cardHolderDTOS)
-                    .build();
-
 
         }
 
         else{
-            List<CardHolder> cardHolderList = cardHolderRepository.getCardHolderByAlphabet(sparkUserId);
 
-            if(cardHolderList.isEmpty()){
+            cardHolders = cardHolderRepository.findBySparkUserId(sparkUserId);
+
+            if(cardHolders.isEmpty()){
                 throw new CustomTalkSparkException(ErrorCode.CARDHOLDER_NOT_EXIST);
             }
 
-            List<CardHolderDTO> cardHolderDTOS = cardHolderList.stream()
-                    .map(CardHolderDTO::entitytoDTO).toList();
-
-            return CardHolderListDTO.builder()
-                    .numOfCards(numOfCards)
-                    .cardHolders(cardHolderDTOS)
-                    .build();
 
         }
+
+        List<CardHolderDTO> cardHolderDTOS = cardHolders.stream()
+                .map(CardHolderDTO::entitytoDTO).toList();
+
+        return CardHolderListDTO.builder()
+                .searchType(searchType)
+                .numOfCards(numOfCards)
+                .cardHolders(cardHolderDTOS)
+                .build();
     }
 
     @Override
@@ -156,7 +144,7 @@ public class StoredCardServiceImpl implements StoredCardService {
 
         cardHolderRepository.save(cardHolder);
 
-        return Map.of("BOOKMARKED CARD", cardHolder.getId());
+        return Map.of("cardHolderId", cardHolder.getId());
     }
 
     @Override
@@ -166,6 +154,6 @@ public class StoredCardServiceImpl implements StoredCardService {
 
         cardHolderRepository.delete(cardHolder);
 
-        return Map.of("DELETE CARDHOLDER", cardHolder.getId());
+        return Map.of("cardHolderId", cardHolder.getId());
     }
 }

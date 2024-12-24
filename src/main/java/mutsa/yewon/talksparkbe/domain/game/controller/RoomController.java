@@ -3,7 +3,6 @@ package mutsa.yewon.talksparkbe.domain.game.controller;
 import lombok.RequiredArgsConstructor;
 import mutsa.yewon.talksparkbe.domain.game.controller.request.HostCheckRequest;
 import mutsa.yewon.talksparkbe.domain.game.controller.request.RoomCreateRequest;
-import mutsa.yewon.talksparkbe.domain.game.controller.request.RoomJoinRequest;
 import mutsa.yewon.talksparkbe.domain.game.service.RoomService;
 import mutsa.yewon.talksparkbe.domain.sparkUser.entity.SparkUser;
 import mutsa.yewon.talksparkbe.domain.sparkUser.repository.SparkUserRepository;
@@ -14,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/rooms")
+@RequestMapping("/api/rooms")
 @RequiredArgsConstructor
 public class RoomController {
 
@@ -37,31 +36,24 @@ public class RoomController {
     }
 
     @GetMapping
-    public ResponseEntity<?> roomList() {
-        return ResponseEntity.ok(roomService.listAllRooms());
+    public ResponseEntity<?> roomSearch(@RequestParam String searchName) {
+        return ResponseEntity.ok(roomService.searchRooms(searchName));
     }
 
-    @PostMapping("/join")
-    public ResponseEntity<?> roomJoin(@RequestBody RoomJoinRequest roomJoinRequest,
-                                      @RequestHeader("Authorization") String token) {
-        String jwt = token.replace("Bearer ", "");
-        Map<String, Object> claims = jwtUtil.validateToken(jwt);
-        String kakaoId = (String) claims.get("kakaoId");
-        SparkUser sparkUser = sparkUserRepository.findByKakaoId(kakaoId).orElseThrow(() -> new RuntimeException("유저 못찾음"));
-
-        roomJoinRequest.setSparkUserId(sparkUser.getId());
-        return ResponseEntity.ok(roomService.joinRoom(roomJoinRequest));
-    }
-
-    @PostMapping("/host")
-    public ResponseEntity<?> isHost(@RequestBody HostCheckRequest hostCheckRequest,
+    @GetMapping("/is-host")
+    public ResponseEntity<?> isHost(@RequestParam Long roomId,
                                     @RequestHeader("Authorization") String token) {
         String jwt = token.replace("Bearer ", "");
         Map<String, Object> claims = jwtUtil.validateToken(jwt);
         String kakaoId = (String) claims.get("kakaoId");
         SparkUser sparkUser = sparkUserRepository.findByKakaoId(kakaoId).orElseThrow(() -> new RuntimeException("유저 못찾음"));
 
-        return ResponseEntity.ok(roomService.checkHost(hostCheckRequest.getRoomId(), sparkUser));
+        return ResponseEntity.ok(roomService.checkHost(roomId, sparkUser));
+    }
+
+    @GetMapping("/all")
+    public ResponseEntity<?> roomList() {
+        return ResponseEntity.ok(roomService.listAllRooms());
     }
 
 }

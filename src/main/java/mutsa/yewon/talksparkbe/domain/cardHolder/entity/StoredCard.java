@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import mutsa.yewon.talksparkbe.domain.card.entity.Card;
+import mutsa.yewon.talksparkbe.domain.card.entity.CardThema;
 import mutsa.yewon.talksparkbe.domain.sparkUser.entity.SparkUser;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -45,6 +46,8 @@ public class StoredCard {
 
     private String tmi;
 
+    private CardThema cardThema;
+
     public static StoredCard cardTostore(CardHolder cardHolder, Card card) {
         StoredCard storedCard = StoredCard.builder()
                 .cardHolder(cardHolder)
@@ -56,6 +59,7 @@ public class StoredCard {
                 .lookAlike(card.getLookAlike())
                 .slogan(card.getSlogan())
                 .tmi(card.getTmi())
+                .cardThema(card.getCardThema())
                 .build();
 
         storedCard.addStoredCard(cardHolder);

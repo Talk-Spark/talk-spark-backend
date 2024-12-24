@@ -11,6 +11,7 @@ import mutsa.yewon.talksparkbe.global.exception.ErrorCode;
 import org.springframework.http.*;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.util.UriComponents;
@@ -20,6 +21,7 @@ import reactor.core.publisher.Mono;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Random;
 
 @RequiredArgsConstructor
 @Log4j2
@@ -32,6 +34,9 @@ public class SparkUserServiceImpl implements SparkUserService {
 
     @Override
     public SparkUserDTO getKakaoUser(String accessToken) {
+
+        log.info(accessToken);
+
         Map<String, String> kakaoData = getKakaoUserNickname(accessToken);
 
         String kakaoId = kakaoData.get("kakaoId");
@@ -55,6 +60,8 @@ public class SparkUserServiceImpl implements SparkUserService {
 
     private Map<String,String> getKakaoUserNickname(String accessToken) {
         String kakaoGetUserURL = "https://kapi.kakao.com/v2/user/me";
+
+        log.info(accessToken);
 
         WebClient webClient = WebClient.builder().build();
 
@@ -102,4 +109,20 @@ public class SparkUserServiceImpl implements SparkUserService {
 
         return buffer.toString();
     }
+
+    @Override
+    @Transactional
+    public SparkUserDTO generateTestUser(String name) {
+        Optional<SparkUser> sparkUser = sparkUserRepository.findByName(name);
+        if(sparkUser.isPresent()) {
+            return SparkUserDTO.from(sparkUser.get());
+        }
+
+        Random random = new Random();
+        int randomNumber = random.nextInt(901) + 100; // 901은 (1000 - 100 + 1)
+        SparkUser createdUser = makeSparkUser(String.valueOf(randomNumber), name);
+        sparkUserRepository.save(createdUser);
+        return SparkUserDTO.from(createdUser);
+    }
+
 }
