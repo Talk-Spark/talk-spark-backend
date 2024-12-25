@@ -39,8 +39,8 @@ public class CardHolderController implements CardHolderControllerDocs {
                 Map.of("cardHolderId", cardHolderId)));
     }
 
-    @GetMapping("/api/storedCard")
-    public ResponseEntity<?> getStoredCard(@RequestParam Long cardHolderId) {
+    @GetMapping("/api/storedCard/{cardHolderId}")
+    public ResponseEntity<?> getStoredCard(@PathVariable Long cardHolderId) {
         List<StoredCardDTO> storedCardDTOS = storedCardService.getCardHolderDTO(cardHolderId);
         return ResponseEntity.status(200).body(ResponseDTO.ok("모든 팀원들의 명함을 조회합니다.", storedCardDTOS));
     }
@@ -55,15 +55,15 @@ public class CardHolderController implements CardHolderControllerDocs {
                 cardHolderListDTOs));
     }
 
-    @PutMapping("/api/storedCard")
-    public ResponseEntity<?> bookMarkCard(@RequestParam Long cardHolderId) {
+    @PutMapping("/api/storedCard/{cardHolderId}")
+    public ResponseEntity<?> bookMarkCard(@PathVariable Long cardHolderId) {
 
         return ResponseEntity.ok(ResponseDTO.ok("보관된 명함을 즐겨찾기 합니다.",
                 storedCardService.bookMarkCard(cardHolderId)));
     }
 
-    @DeleteMapping("/api/storedCard")
-    public ResponseEntity<?> deleteCardHolder(@RequestParam Long cardHolderId){
+    @DeleteMapping("/api/storedCard/{cardHolderId}")
+    public ResponseEntity<?> deleteCardHolder(@PathVariable Long cardHolderId){
         Map<String, Long> response = storedCardService.deleteCardHolder(cardHolderId);
 
         return ResponseEntity.ok(ResponseDTO.ok("보관된 명함을 삭제합니다", response));

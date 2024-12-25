@@ -53,6 +53,8 @@ public class CardHolder {
 
     private boolean bookMark;
 
+    private int numOfTeammates;
+
     public static CardHolder cardToIndCardHolder(String name, SparkUser sparkUser) {
 
         CardHolder cardHolder = CardHolder.builder()
@@ -60,6 +62,7 @@ public class CardHolder {
                 .name(name)
                 .storedStatus(StoredStatus.INDIVIDUAL)
                 .bookMark(false)
+                .numOfTeammates(1)
                 .build();
 
         List<String> name1 = List.of(name);
@@ -74,6 +77,7 @@ public class CardHolder {
                 .sparkUser(sparkUser)
                 .name(teamName)
                 .storedStatus(StoredStatus.TEAM)
+                .numOfTeammates(cards.size())
                 .bookMark(false)
                 .build();
 
