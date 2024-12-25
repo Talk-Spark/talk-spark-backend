@@ -8,6 +8,7 @@ import mutsa.yewon.talksparkbe.domain.sparkUser.entity.SparkUserRole;
 import mutsa.yewon.talksparkbe.domain.sparkUser.repository.SparkUserRepository;
 import mutsa.yewon.talksparkbe.global.exception.CustomTalkSparkException;
 import mutsa.yewon.talksparkbe.global.exception.ErrorCode;
+import mutsa.yewon.talksparkbe.global.util.SecurityUtil;
 import org.springframework.http.*;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -31,6 +32,7 @@ public class SparkUserServiceImpl implements SparkUserService {
     private final SparkUserRepository sparkUserRepository;
 
     private final PasswordEncoder passwordEncoder;
+    private final SecurityUtil securityUtil;
 
     @Override
     public SparkUserDTO getKakaoUser(String accessToken) {
@@ -123,6 +125,20 @@ public class SparkUserServiceImpl implements SparkUserService {
         SparkUser createdUser = makeSparkUser(String.valueOf(randomNumber), name);
         sparkUserRepository.save(createdUser);
         return SparkUserDTO.from(createdUser);
+    }
+
+    @Override
+    @Transactional
+    public Long deleteAccount(Long sparkUserId) {
+
+        sparkUserRepository.findById(sparkUserId)
+                        .orElseThrow(()-> new CustomTalkSparkException(ErrorCode.USER_NOT_EXIST));
+
+
+
+        sparkUserRepository.deleteById(sparkUserId);
+
+        return sparkUserId;
     }
 
 }

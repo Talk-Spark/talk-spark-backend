@@ -10,6 +10,7 @@ public interface SparkUserService {
 
     SparkUserDTO getKakaoUser(String accessToken);
     SparkUserDTO generateTestUser(String name);
+    Long deleteAccount(Long sparkUserId);
 
 //    default SparkUserDTO entityToDTO(SparkUser sparkUser) {
 //        return new SparkUserDTO(sparkUser.getKakaoId(), sparkUser.getName(), sparkUser.getPassword(),
