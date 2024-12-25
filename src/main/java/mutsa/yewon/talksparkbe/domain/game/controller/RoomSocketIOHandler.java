@@ -9,10 +9,15 @@ import mutsa.yewon.talksparkbe.domain.game.controller.request.*;
 import mutsa.yewon.talksparkbe.domain.game.service.dto.CardQuestion;
 import mutsa.yewon.talksparkbe.domain.game.service.GameService;
 import mutsa.yewon.talksparkbe.domain.game.service.RoomService;
+import mutsa.yewon.talksparkbe.domain.game.service.dto.CorrectAnswerDto;
 import mutsa.yewon.talksparkbe.domain.game.service.dto.SwitchSubject;
+import mutsa.yewon.talksparkbe.domain.sparkUser.entity.SparkUser;
+import mutsa.yewon.talksparkbe.domain.sparkUser.repository.SparkUserRepository;
 import mutsa.yewon.talksparkbe.global.exception.CustomTalkSparkException;
+import mutsa.yewon.talksparkbe.global.util.JWTUtil;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
 import java.util.Map;
 
 @Component
@@ -23,6 +28,8 @@ public class RoomSocketIOHandler {
     private final SocketIOServer server;
     private final RoomService roomService;
     private final GameService gameService;
+    private final SparkUserRepository sparkUserRepository;
+    private final JWTUtil jwtUtil;
 
     @PostConstruct
     public void startServer() {
@@ -111,7 +118,13 @@ public class RoomSocketIOHandler {
     public void startGameListeners() {
         server.addEventListener("joinGame", RoomJoinRequest.class, (client, data, ackSender) -> {
             server.getClient(client.getSessionId()).joinRoom(data.getRoomId().toString());
-            client.sendEvent("gameJoined", "게임 참가 완료");
+            String token = data.getAccessToken();
+            String jwt = token.replace("Bearer ", "");
+            Map<String, Object> claims = jwtUtil.validateToken(jwt);
+            String kakaoId = (String) claims.get("kakaoId");
+            SparkUser sparkUser = sparkUserRepository.findByKakaoId(kakaoId).orElseThrow(() -> new RuntimeException("유저 못찾음"));
+
+            client.sendEvent("gameJoined", sparkUser.getId());
         });
 
         server.addEventListener("prepareQuizzes", GameStartRequest.class, (client, data, ackSender) -> {
@@ -159,7 +172,7 @@ public class RoomSocketIOHandler {
     }
 
     private void broadcastSingleQuestionResult(Long roomId) {
-        Map<Long, Boolean> singleQuestionScoreBoard = gameService.getSingleQuestionScoreBoard(roomId);
+        List<CorrectAnswerDto> singleQuestionScoreBoard = gameService.getSingleQuestionScoreBoard(roomId);
         if (!singleQuestionScoreBoard.isEmpty())
             server.getRoomOperations(roomId.toString()).sendEvent("singleQuestionScoreBoard", singleQuestionScoreBoard);
     }

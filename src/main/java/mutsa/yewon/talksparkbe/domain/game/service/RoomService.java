@@ -168,4 +168,7 @@ public class RoomService {
         roomRepository.findById(roomId).orElseThrow().finish();
     }
 
+    public String getRoomName(Long roomId) {
+        return roomRepository.findById(roomId).orElseThrow().getRoomName();
+    }
 }

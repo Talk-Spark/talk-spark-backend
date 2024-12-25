@@ -12,6 +12,9 @@ public class QuestionGenerator {
     private final Random random = new Random();
 
     public List<UserCardQuestions> execute(List<Card> cards, int difficulty) {
+        int numOfQuestions = 0;
+        if (difficulty <= 2) numOfQuestions = difficulty + 1;
+        else if (difficulty == 3) numOfQuestions = 5;
         List<UserCardQuestions> userCardQuestionsList = new ArrayList<>();
 
         // 빈칸 필드를 생성할 키 리스트 (명함의 필드명)
@@ -28,11 +31,11 @@ public class QuestionGenerator {
         }
 
         for (Card c : cards) {
-            List<String> fields = new ArrayList<>(List.of("name", "age", "major", "mbti", "hobby", "lookAlike", "slogan", "tmi"));
+            List<String> fields = new ArrayList<>(List.of("mbti", "hobby", "lookAlike", "selfDescription", "tmi"));
             List<CardQuestion> questions = new ArrayList<>();
 
-            while (questions.size() < difficulty + 1) {
-                int idx = random.nextInt(8); // 0~7
+            while (questions.size() < numOfQuestions) {
+                int idx = random.nextInt(5); // 0~4
 
                 // 뽑힌 그 필드에 대해서 출제가능성 검토.
                 // 일단 이 카드에서 null 아니어야 하고, fieldCount 보고 채워놓은 놈이 사람수만큼 되어야 함. 그리고 이번 반복에서 뽑힌 적 없어야 함.
@@ -40,9 +43,8 @@ public class QuestionGenerator {
                 String fieldName = fields.get(idx);
                 if (!fieldName.equals("x") && getFieldValue(c, fieldName) != null && fieldCount.get(fieldName) >= numOfPeople) {
                     questions.add(generateQuestion(c, fieldName, cards, numOfPeople));
+                    fields.set(idx, "x");
                 }
-
-                fields.set(idx, "x");
             }
             userCardQuestionsList.add(new UserCardQuestions(c.getSparkUser().getId(), questions)); // 어떤 사람의 카드에 대한 질문들 생성 완료
         }
