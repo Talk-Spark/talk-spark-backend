@@ -1,10 +1,15 @@
 package mutsa.yewon.talksparkbe.domain.game.service.util;
 
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import mutsa.yewon.talksparkbe.domain.card.entity.Card;
 import mutsa.yewon.talksparkbe.domain.game.service.dto.CardQuestion;
+import mutsa.yewon.talksparkbe.domain.game.service.dto.CorrectAnswerDto;
 import mutsa.yewon.talksparkbe.domain.game.service.dto.SwitchSubject;
 import mutsa.yewon.talksparkbe.domain.game.service.dto.UserCardQuestions;
+import mutsa.yewon.talksparkbe.domain.sparkUser.entity.SparkUser;
+import mutsa.yewon.talksparkbe.domain.sparkUser.repository.SparkUserRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.*;
 
@@ -20,7 +25,7 @@ public class GameState {
 
     private Long currentSubjectId;
     private final Map<CardQuestion, Integer> answerNums = new HashMap<>(); // 각 문제마다 답 제출한 사람 수
-    private final Map<Long, Boolean> currentQuestionCorrect = new HashMap<>(); // 현재 문제 정답 여부. 유저아이디 : 맞춤
+    private final List<CorrectAnswerDto> currentQuestionCorrect = new ArrayList<>(); // 현재 문제 정답 여부. 유저아이디 : 맞춤
 
     private final Map<Long, Integer> scores = new HashMap<>(); // 유저아이디 : 점수
 
@@ -47,7 +52,7 @@ public class GameState {
         CardQuestion currentQuestion = questions.get(0);
         if (currentQuestion.getCorrectAnswer().equals(answer)) {
             scores.put(sparkUserId, scores.getOrDefault(sparkUserId, 0) + 1);
-            currentQuestionCorrect.put(sparkUserId, Boolean.TRUE);
+            currentQuestionCorrect.add(CorrectAnswerDto.builder().sparkUserId(sparkUserId).isCorrect(Boolean.TRUE).build());
         }
         answerNums.put(currentQuestion, answerNums.get(currentQuestion) + 1);
     }

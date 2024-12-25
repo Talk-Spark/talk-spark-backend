@@ -51,6 +51,11 @@ public class RoomController {
         return ResponseEntity.ok(roomService.checkHost(roomId, sparkUser));
     }
 
+    @GetMapping("/{roomId}/name")
+    public ResponseEntity<?> roomName(@PathVariable Long roomId) {
+        return ResponseEntity.ok(roomService.getRoomName(roomId));
+    }
+
     @GetMapping("/all")
     public ResponseEntity<?> roomList() {
         return ResponseEntity.ok(roomService.listAllRooms());
