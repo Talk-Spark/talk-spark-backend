@@ -7,9 +7,7 @@ import mutsa.yewon.talksparkbe.domain.card.entity.Card;
 import mutsa.yewon.talksparkbe.domain.game.entity.Room;
 import mutsa.yewon.talksparkbe.domain.game.entity.RoomParticipate;
 import mutsa.yewon.talksparkbe.domain.game.repository.RoomRepository;
-import mutsa.yewon.talksparkbe.domain.game.service.dto.CardQuestion;
-import mutsa.yewon.talksparkbe.domain.game.service.dto.SwitchSubject;
-import mutsa.yewon.talksparkbe.domain.game.service.dto.UserCardQuestions;
+import mutsa.yewon.talksparkbe.domain.game.service.dto.*;
 import mutsa.yewon.talksparkbe.domain.game.service.util.GameState;
 import mutsa.yewon.talksparkbe.domain.game.service.util.QuestionGenerator;
 import mutsa.yewon.talksparkbe.domain.sparkUser.entity.SparkUser;
@@ -56,8 +54,8 @@ public class GameService {
     }
 
     @Transactional(readOnly = true)
-    public CardResponseDTO getCurrentCard(Long roomId) {
-        return CardResponseDTO.fromCard(gameStates.get(roomId).getCurrentCard());
+    public CardResponseCustomDTO getCurrentCard(Long roomId) {
+        return CardResponseCustomDTO.fromCard(gameStates.get(roomId).getCurrentCard());
     }
 
     public void submitAnswer(Long roomId, Long sparkUserId, String answer) {
@@ -70,7 +68,7 @@ public class GameService {
         return gameState.getCurrentQuestionAnswerNum().equals(gameState.getRoomPeople());
     }
 
-    public Map<Long, Boolean> getSingleQuestionScoreBoard(Long roomId) {
+    public List<CorrectAnswerDto> getSingleQuestionScoreBoard(Long roomId) {
         GameState gameState = gameStates.get(roomId);
         return gameState.getCurrentQuestionCorrect();
     }
@@ -90,9 +88,9 @@ public class GameService {
         return gameState == null ? Collections.emptyMap() : gameState.getScores();
     }
 
-    public List<CardResponseDTO> getAllRelatedCards(Long roomId) {
+    public List<CardResponseCustomDTO> getAllRelatedCards(Long roomId) {
         GameState gameState = gameStates.get(roomId);
-        return gameState.getCards().stream().map(CardResponseDTO::fromCard).toList();
+        return gameState.getCards().stream().map(CardResponseCustomDTO::fromCard).toList();
     }
 
     @Transactional
