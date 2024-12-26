@@ -65,6 +65,7 @@ public interface GuestBookControllerDocs {
                                                           "roomId": 1,
                                                           "roomName": "멋사멋사",
                                                           "roomDateTime": "2024-12-22T18:32:33.318Z",
+                                                          "roomPeopleCount": 3,
                                                           "guestBookData": [
                                                             {
                                                               "guestBookId": 1,
@@ -97,6 +98,7 @@ public interface GuestBookControllerDocs {
                                                           "roomId": 2,
                                                           "roomName": "멋사멋사2",
                                                           "roomDateTime": "2024-12-22T18:32:33.318Z",
+                                                          "roomPeopleCount": 3,
                                                           "guestBookData": [
                                                             {
                                                               "guestBookId": 1,
