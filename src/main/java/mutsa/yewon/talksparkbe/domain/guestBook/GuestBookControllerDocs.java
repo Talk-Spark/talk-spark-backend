@@ -46,6 +46,7 @@ public interface GuestBookControllerDocs {
                             }))
     })
     ResponseEntity<?> postGuestBook(@PathVariable("roomId") Long roomId,
+                                    @RequestParam(required = false) boolean anonymity,
                                     @Valid @RequestBody GuestBookContent content);
 
     @Operation(summary = "방명록 방 목록 조회", description = "방명록 방들을 검색어와 정렬방식에 따라 목록을 조회하는 API")
@@ -192,6 +193,7 @@ public interface GuestBookControllerDocs {
                                                 }
                                             ],
                                             "guestBookFavorited": true
+                                            "preViewContent" : "재밌었습니다"
                                         }
                                     }
                                             """
@@ -217,5 +219,5 @@ public interface GuestBookControllerDocs {
                                     )
                             }))
     })
-    ResponseEntity<?> UpdateGuestBookRoomFavorites(@PathVariable("roomId") Long roomId, @RequestParam("isFavorited") boolean isFavorited);
+    ResponseEntity<?> UpdateGuestBookRoomFavorites(@PathVariable("roomId") Long roomId);
 }

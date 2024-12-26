@@ -121,12 +121,12 @@ public class GuestBookRoomService {
     }
 
     @Transactional
-    public void updateGuestBookRoomFavorites(Long sparkUserId, Long roomId, boolean isFavorited) {
+    public void updateGuestBookRoomFavorites(Long sparkUserId, Long roomId) {
         GuestBookRoomSparkUser guestBookRoomSparkUser = (GuestBookRoomSparkUser) guestBookRoomSparkUserRepository
                 .findByGuestBookRoomIdAndSparkUserId(roomId, sparkUserId)
                 .orElseThrow(() -> new CustomTalkSparkException(ErrorCode.GUESTBOOK_ROOM_NOT_FOUND));
 
-        guestBookRoomSparkUser.setIsGuestBookFavorited(isFavorited);
+        guestBookRoomSparkUser.setIsGuestBookFavorited(!guestBookRoomSparkUser.getIsGuestBookFavorited());
         guestBookRoomSparkUserRepository.save(guestBookRoomSparkUser);
     }
 
