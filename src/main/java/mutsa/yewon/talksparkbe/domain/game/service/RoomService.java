@@ -171,4 +171,9 @@ public class RoomService {
     public String getRoomName(Long roomId) {
         return roomRepository.findById(roomId).orElseThrow().getRoomName();
     }
+
+    public boolean getIsDuplicateRoomName(String roomName) {
+        return roomRepository.findByRoomName(roomName).isPresent();
+    }
+
 }
