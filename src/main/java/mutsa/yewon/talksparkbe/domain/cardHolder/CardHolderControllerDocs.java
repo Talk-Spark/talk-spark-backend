@@ -80,19 +80,7 @@ public interface CardHolderControllerDocs {
                                         "message": "모든 팀원들의 명함을 조회합니다.",
                                         "data": [
                                             {
-                                                "storedCardId": 9,
-                                                "name": "박승범",
-                                                "age": 24,
-                                                "major": "컴퓨터공학",
-                                                "mbti": "ISTJ",
-                                                "hobby": "코딩",
-                                                "lookAlike": "너구리",
-                                                "slogan": "코딩하는 너구리",
-                                                "tmi": "TalkSparkIsFun!!!",
-                                                "cardThema": "YELLOW"
-                                            },
-                                            {
-                                                "storedCardId": 10,
+                                                "storedCardId": 2,
                                                 "name": "박승범",
                                                 "age": 24,
                                                 "major": "컴퓨터공학과",
@@ -100,8 +88,24 @@ public interface CardHolderControllerDocs {
                                                 "hobby": "코딩",
                                                 "lookAlike": "너구리",
                                                 "slogan": "개발자가 되",
-                                                "tmi": "TalkSpark",
-                                                "cardThema": "MINT"
+                                                "tmi": "TalkSpark!!!",
+                                                "cardThema": "PINK",
+                                                "bookMark": false,
+                                                "cardHolderName": "멋사우주최강"
+                                            },
+                                            {
+                                                "storedCardId": 3,
+                                                "name": "박승범",
+                                                "age": 24,
+                                                "major": "컴퓨터공학과",
+                                                "mbti": "ISTJ",
+                                                "hobby": "코딩",
+                                                "lookAlike": "너구리",
+                                                "slogan": "개발자가 되",
+                                                "tmi": "TalkSpark!!!",
+                                                "cardThema": "MINT",
+                                                "bookMark": false,
+                                                "cardHolderName": "멋사우주최강"
                                             }
                                         ]
                                     }
