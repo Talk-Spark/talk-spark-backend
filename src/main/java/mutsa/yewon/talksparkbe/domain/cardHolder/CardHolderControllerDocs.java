@@ -213,4 +213,38 @@ public interface CardHolderControllerDocs {
                     }))
     })
     ResponseEntity<?> deleteCardHolder(@PathVariable Long cardHolderId);
+
+    @Operation(summary = "명함 검색", description = "팀 또는 사용자 이름을 기준으로 검색하는 API")
+    @ApiErrorCodes({ErrorCode.NO_MATCHING_CARDHOLDER, ErrorCode.JWT_TOKEN_EXPIRED, ErrorCode.TOKEN_REQUIRED, ErrorCode.INTERNAL_SERVER_ERROR})
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "명함 검색 성공",
+            content = @Content(mediaType = "application/json", schema = @Schema(implementation = ResponseDTO.class),examples = {
+                    @ExampleObject(
+                            value = """
+                                    {
+                                        "status": 200,
+                                        "message": "팀 또는 사용자의 이름에 해당하는 명함들입니다.",
+                                        "data": {
+                                            "numOfCards": 1,
+                                            "searchType": "멋사우주최강",
+                                            "cardHolders": [
+                                                {
+                                                    "cardHolderId": 2,
+                                                    "cardHolderName": "멋사우주최강",
+                                                    "numOfTeammates": 2,
+                                                    "teamNames": [
+                                                        "박승범",
+                                                        "박승범"
+                                                    ],
+                                                    "bookMark": false,
+                                                    "storedAt": "2024-12-26T14:53:30.626356"
+                                                }
+                                            ]
+                                        }
+                                    }
+                                    """
+                    )
+            }))
+    })
+    ResponseEntity<?> getCardHoldersByName(@RequestParam String name);
 }
