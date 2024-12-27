@@ -46,6 +46,7 @@ public interface GuestBookControllerDocs {
                             }))
     })
     ResponseEntity<?> postGuestBook(@PathVariable("roomId") Long roomId,
+                                    @RequestParam(required = false) boolean anonymity,
                                     @Valid @RequestBody GuestBookContent content);
 
     @Operation(summary = "방명록 방 목록 조회", description = "방명록 방들을 검색어와 정렬방식에 따라 목록을 조회하는 API")
@@ -60,72 +61,35 @@ public interface GuestBookControllerDocs {
                                                     {
                                                       "status": 200,
                                                       "message": "방명록 방들이 조회되었습니다.",
-                                                      "data": [
-                                                        {
-                                                          "roomId": 1,
-                                                          "roomName": "멋사멋사",
-                                                          "roomDateTime": "2024-12-22T18:32:33.318Z",
-                                                          "guestBookData": [
-                                                            {
-                                                              "guestBookId": 1,
-                                                              "sparkUserName": "김멋사",
-                                                              "guestBookContent": "오늘 정말 재밌었어요!!",
-                                                              "guestBookDateTime": "2024-12-22T18:32:33.319Z",
-                                                              "ownerGuestBook": true,
-                                                              "cardThema": "YELLOW"
-                                                            },
-                                                            {
-                                                              "guestBookId": 2,
-                                                              "sparkUserName": "김멋사2",
-                                                              "guestBookContent": "오늘 정말 재밌었어요!!",
-                                                              "guestBookDateTime": "2024-12-22T18:32:33.319Z",
-                                                              "ownerGuestBook": true,
-                                                              "cardThema": "YELLOW"
-                                                            },
-                                                            {
-                                                              "guestBookId": 3,
-                                                              "sparkUserName": "김멋사3",
-                                                              "guestBookContent": "오늘 정말 재밌었어요!!",
-                                                              "guestBookDateTime": "2024-12-22T18:32:33.319Z",
-                                                              "ownerGuestBook": true,
-                                                              "cardThema": "YELLOW"
-                                                            }
-                                                          ],
-                                                          "guestBookFavorited": true
-                                                        },
-                                                        {
-                                                          "roomId": 2,
-                                                          "roomName": "멋사멋사2",
-                                                          "roomDateTime": "2024-12-22T18:32:33.318Z",
-                                                          "guestBookData": [
-                                                            {
-                                                              "guestBookId": 1,
-                                                              "sparkUserName": "김멋사",
-                                                              "guestBookContent": "오늘 정말 재밌었어요!!",
-                                                              "guestBookDateTime": "2024-12-22T18:32:33.319Z",
-                                                              "ownerGuestBook": true,
-                                                              "cardThema": "YELLOW"
-                                                            },
-                                                            {
-                                                              "guestBookId": 2,
-                                                              "sparkUserName": "김멋사2",
-                                                              "guestBookContent": "오늘 정말 재밌었어요!!",
-                                                              "guestBookDateTime": "2024-12-22T18:32:33.319Z",
-                                                              "ownerGuestBook": true,
-                                                              "cardThema": "YELLOW"
-                                                            },
-                                                            {
-                                                              "guestBookId": 3,
-                                                              "sparkUserName": "김멋사3",
-                                                              "guestBookContent": "오늘 정말 재밌었어요!!",
-                                                              "guestBookDateTime": "2024-12-22T18:32:33.319Z",
-                                                              "ownerGuestBook": true,
-                                                              "cardThema": "YELLOW"
-                                                            }
-                                                          ],
-                                                          "guestBookFavorited": true
-                                                        }
-                                                      ]
+                                                      "data": {
+                                                        "guestBookRoomCount": 1,
+                                                        "guestBookRooms": [
+                                                          {
+                                                            "roomId": 1,
+                                                            "roomName": "멋사",
+                                                            "roomDateTime": "2024-12-26T16:41:17.965908",
+                                                            "roomPeopleCount": 0,
+                                                            "guestBookFavorited": null,
+                                                            "preViewContent": "머찌다 우리팀"
+                                                          },
+                                                          {
+                                                            "roomId": 2,
+                                                            "roomName": "멋사",
+                                                            "roomDateTime": "2024-12-26T16:41:17.965908",
+                                                            "roomPeopleCount": 0,
+                                                            "guestBookFavorited": null,
+                                                            "preViewContent": "머찌다 우리팀"
+                                                          },
+                                                          {
+                                                            "roomId": 3,
+                                                            "roomName": "멋사",
+                                                            "roomDateTime": "2024-12-26T16:41:17.965908",
+                                                            "roomPeopleCount": 0,
+                                                            "guestBookFavorited": null,
+                                                            "preViewContent": "머찌다 우리팀"
+                                                          }
+                                                        ]
+                                                      }
                                                     }
                                                     """
                                     )}
@@ -215,5 +179,5 @@ public interface GuestBookControllerDocs {
                                     )
                             }))
     })
-    ResponseEntity<?> UpdateGuestBookRoomFavorites(@PathVariable("roomId") Long roomId, @RequestParam("isFavorited") boolean isFavorited);
+    ResponseEntity<?> UpdateGuestBookRoomFavorites(@PathVariable("roomId") Long roomId);
 }

@@ -1,6 +1,7 @@
 package mutsa.yewon.talksparkbe.domain.guestBook.repository;
 
 import mutsa.yewon.talksparkbe.domain.card.entity.Card;
+import mutsa.yewon.talksparkbe.domain.game.entity.Room;
 import mutsa.yewon.talksparkbe.domain.guestBook.entity.GuestBook;
 import mutsa.yewon.talksparkbe.domain.guestBook.entity.GuestBookRoom;
 import mutsa.yewon.talksparkbe.domain.sparkUser.entity.SparkUser;
@@ -18,4 +19,6 @@ public interface GuestBookRoomRepository extends JpaRepository<GuestBookRoom, Lo
 
     @Query("select r from GuestBookRoom r join r.guestBookRoomSparkUsers rp where rp.sparkUser.id = :sparkUserId")
     List<GuestBookRoom> findRoomsBySparkUser(Long sparkUserId);
+
+    boolean existsByRoom(Room room);
 }

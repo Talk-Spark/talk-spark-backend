@@ -38,11 +38,12 @@ public class GuestBookController implements GuestBookControllerDocs {
 
     @PostMapping("/{roomId}")
     public ResponseEntity<?> postGuestBook(@PathVariable("roomId") Long roomId,
+                                           @RequestParam(required = false) boolean anonymity,
                                            @Valid @RequestBody GuestBookContent content) {
 
         try {
             GuestBookPostRequestDTO guestBookPostRequestDTO = new GuestBookPostRequestDTO(securityUtil.getLoggedInUserId(),roomId, content);
-            GuestBook guestBook = guestBookService.createGuestBook(guestBookPostRequestDTO);
+            GuestBook guestBook = guestBookService.createGuestBook(guestBookPostRequestDTO, anonymity);
             ResponseDTO<?> responseDTO = ResponseDTO.created("방명록 내용이 작성되었습니다.");
             return ResponseEntity.status(201).body(responseDTO);
         } catch (IllegalArgumentException e) {
@@ -91,11 +92,10 @@ public class GuestBookController implements GuestBookControllerDocs {
     }
 
     @PutMapping("/{roomId}")
-    public ResponseEntity<?> UpdateGuestBookRoomFavorites(@PathVariable("roomId") Long roomId,
-                                                          @RequestParam("isFavorited") boolean isFavorited){
+    public ResponseEntity<?> UpdateGuestBookRoomFavorites(@PathVariable("roomId") Long roomId){
 
         try {
-            guestBookRoomService.updateGuestBookRoomFavorites(securityUtil.getLoggedInUserId(), roomId, isFavorited);
+            guestBookRoomService.updateGuestBookRoomFavorites(securityUtil.getLoggedInUserId(), roomId);
             ResponseDTO<?> responseDTO = ResponseDTO.ok("방명록 방 즐겨찾기가 수정되었습니다.");
             return ResponseEntity.status(200).body(responseDTO);
         } catch (IllegalArgumentException e) {
