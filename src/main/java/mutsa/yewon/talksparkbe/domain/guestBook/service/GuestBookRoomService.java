@@ -72,16 +72,28 @@ public class GuestBookRoomService {
                             .toList();
         }
 
-        List<GuestBookRoomListDTO> guestBookRoomListDTO = guestBookRooms.stream()
-                .map(guestBookRoom -> GuestBookRoomListDTO.builder()
-                        .roomId(guestBookRoom.getRoom().getRoomId())
-                        .roomName(guestBookRoom.getRoom().getRoomName())
-                        .roomDateTime(guestBookRoom.getRoom().getCreatedAt())
-                        .roomPeopleCount((long) guestBookRoom.getRoom().getRoomParticipates().size())
-                        .preViewContent(getLastGuestBookContent(guestBookRoom))
-                        .build())
-                .toList();
+        SparkUser sparkUser = sparkUserRepository.findById(sparkUserId).orElseThrow();
 
+        List<GuestBookRoomListDTO> guestBookRoomListDTO = guestBookRooms.stream()
+                .map(guestBookRoom -> {
+                    // 특정 GuestBookRoom과 SparkUser를 기준으로 GuestBookRoomSparkUser 조회
+                    Optional<GuestBookRoomSparkUser> guestBookRoomSparkUser = guestBookRoomSparkUserRepository
+                            .findByGuestBookRoomIdAndSparkUserId(
+                                    guestBookRoom.getRoom().getRoomId(),
+                                    sparkUser.getId()
+                            );
+
+                    // DTO 생성
+                    return GuestBookRoomListDTO.builder()
+                            .roomId(guestBookRoom.getRoom().getRoomId())
+                            .roomName(guestBookRoom.getRoom().getRoomName())
+                            .roomDateTime(guestBookRoom.getRoom().getCreatedAt())
+                            .roomPeopleCount((long) guestBookRoom.getRoom().getRoomParticipates().size())
+                            .preViewContent(getLastGuestBookContent(guestBookRoom))
+                            .guestBookFavorited(guestBookRoomSparkUser.map(GuestBookRoomSparkUser::getIsGuestBookFavorited).orElse(null))
+                            .build();
+                })
+                .toList();
 
         return GuestBookRoomListResponse.builder()
                 .guestBookRoomCount((long) guestBookRooms.size())
@@ -126,7 +138,10 @@ public class GuestBookRoomService {
                 .findByGuestBookRoomIdAndSparkUserId(roomId, sparkUserId)
                 .orElseThrow(() -> new CustomTalkSparkException(ErrorCode.GUESTBOOK_ROOM_NOT_FOUND));
 
-        guestBookRoomSparkUser.setIsGuestBookFavorited(!guestBookRoomSparkUser.getIsGuestBookFavorited());
+        boolean currentFavoritedStatus = guestBookRoomSparkUser.getIsGuestBookFavorited();
+        guestBookRoomSparkUser.setIsGuestBookFavorited(!currentFavoritedStatus);
+
+        // 변경된 상태 저장
         guestBookRoomSparkUserRepository.save(guestBookRoomSparkUser);
     }
 

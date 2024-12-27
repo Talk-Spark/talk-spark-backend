@@ -5,7 +5,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import mutsa.yewon.talksparkbe.domain.game.entity.Room;
 
 import java.time.LocalDateTime;
 
