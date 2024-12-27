@@ -25,11 +25,14 @@ public class GuestBook {
     @CreatedDate
     private LocalDateTime guestBookDateTime;
 
+    private boolean anonymity;
+
     @Builder
-    public GuestBook(SparkUser sparkUser, String guestBookContent) {
+    public GuestBook(SparkUser sparkUser, String guestBookContent, boolean anonymity) {
         this.sparkUser = sparkUser;
         this.guestBookContent = guestBookContent;
         this.guestBookDateTime = LocalDateTime.now();
+        this.anonymity = anonymity;
     }
 
     @Setter
