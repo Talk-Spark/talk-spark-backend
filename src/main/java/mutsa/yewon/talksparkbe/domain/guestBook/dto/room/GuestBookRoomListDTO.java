@@ -5,7 +5,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import mutsa.yewon.talksparkbe.domain.game.entity.Room;
 
 import java.time.LocalDateTime;
 
@@ -29,7 +28,7 @@ public class GuestBookRoomListDTO {
     private Long roomPeopleCount;
 
     @Schema(description = "즐겨찾기 여부", example = "true")
-    private boolean isGuestBookFavorited;
+    private Boolean guestBookFavorited;
 
     @Schema(description = "마지막 방명록 미리보기", example = "재밌었습니다~!")
     private String preViewContent;

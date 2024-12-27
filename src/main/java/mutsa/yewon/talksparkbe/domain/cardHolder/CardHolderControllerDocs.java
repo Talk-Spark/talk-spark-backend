@@ -16,6 +16,7 @@ import mutsa.yewon.talksparkbe.global.dto.ResponseDTO;
 import mutsa.yewon.talksparkbe.global.exception.ErrorCode;
 import mutsa.yewon.talksparkbe.global.swagger.ApiErrorCodes;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
@@ -108,7 +109,7 @@ public interface CardHolderControllerDocs {
                     )
             }))
     })
-    ResponseEntity<?> getStoredCard(@RequestParam Long cardHolderId);
+    ResponseEntity<?> getStoredCard(@PathVariable Long cardHolderId);
 
     @Operation(summary = "명함 보관함 속 명함 객체들 조회", description = """
             명함 보관함 페이지에서 각 정렬조건에 맞는 명함 객체들을 조회하는 API
@@ -134,6 +135,7 @@ public interface CardHolderControllerDocs {
                                                 {
                                                     "cardHolderId": 8,
                                                     "cardHolderName": "멋사우주최강",
+                                                    "numOfTeammates": 2,
                                                     "teamNames": [
                                                         "박승범",
                                                         "박승범"
@@ -144,6 +146,7 @@ public interface CardHolderControllerDocs {
                                                 {
                                                     "cardHolderId": 7,
                                                     "cardHolderName": "박승범",
+                                                    "numOfTeammates": 1,
                                                     "teamNames": [
                                                         "박승범"
                                                     ],
@@ -153,6 +156,7 @@ public interface CardHolderControllerDocs {
                                                 {
                                                     "cardHolderId": 6,
                                                     "cardHolderName": "박승범",
+                                                    "numOfTeammates": 1,
                                                     "teamNames": [
                                                         "박승범"
                                                     ],
@@ -187,7 +191,7 @@ public interface CardHolderControllerDocs {
                     )
             }))
     })
-    ResponseEntity<?> bookMarkCard(@RequestParam Long cardHolderId);
+    ResponseEntity<?> bookMarkCard(@PathVariable Long cardHolderId);
 
     @Operation(summary = "명함 객체 삭제", description = "명함 객체 삭제")
     @ApiErrorCodes({ErrorCode.JWT_TOKEN_EXPIRED, ErrorCode.TOKEN_REQUIRED, ErrorCode.CARDHOLDER_NOT_EXIST})
@@ -208,5 +212,5 @@ public interface CardHolderControllerDocs {
                             )
                     }))
     })
-    ResponseEntity<?> deleteCardHolder(@RequestParam Long cardHolderId);
+    ResponseEntity<?> deleteCardHolder(@PathVariable Long cardHolderId);
 }

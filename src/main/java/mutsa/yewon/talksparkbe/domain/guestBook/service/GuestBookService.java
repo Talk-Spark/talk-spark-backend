@@ -37,7 +37,11 @@ public class GuestBookService {
 
     //TODO: RuntimeException("User not found")) customException으로 수정
     @Transactional
-    public GuestBook createGuestBook(GuestBookPostRequestDTO guestBookPostRequestDTO) {
+    public GuestBook createGuestBook(GuestBookPostRequestDTO guestBookPostRequestDTO, Boolean anonymity) {
+        if (anonymity == null) {
+            anonymity = false;
+        }
+
         GuestBookRoom guestBookRoom = guestBookRoomRepository
                 .findByRoomId(guestBookPostRequestDTO.getRoomId());
 
@@ -47,6 +51,7 @@ public class GuestBookService {
         GuestBook guestBook = GuestBook.builder()
                 .sparkUser(sparkUser)
                 .guestBookContent(guestBookPostRequestDTO.getContent())
+                .anonymity(anonymity)
                 .build();
         guestBookRepository.save(guestBook);
 
@@ -99,7 +104,7 @@ public class GuestBookService {
             return guestBooks.stream()
                     .map(guestBook -> GuestBookListDTO.builder()
                             .guestBookId(guestBook.getGuestBookId())
-                            .sparkUserName(guestBook.getSparkUser().getName())
+                            .sparkUserName(guestBook.isAnonymity() ? "익명" : guestBook.getSparkUser().getName()) // 익명 처리
                             .guestBookContent(guestBook.getGuestBookContent())
                             .guestBookDateTime(guestBook.getGuestBookDateTime())
                             .isOwnerGuestBook(guestBook.getSparkUser().getKakaoId().equals(sparkUserKakaoId)) // 작성자 확인

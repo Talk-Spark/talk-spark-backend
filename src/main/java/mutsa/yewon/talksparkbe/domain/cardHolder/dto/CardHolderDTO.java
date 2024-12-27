@@ -20,6 +20,8 @@ public class CardHolderDTO {
 
     private String cardHolderName;
 
+    private int numOfTeammates;
+
     @Builder.Default
     private List<String> teamNames = new ArrayList<>();
 
@@ -36,6 +38,7 @@ public class CardHolderDTO {
                 .cardHolderName(cardHolder.getName())
                 .bookMark(cardHolder.isBookMark())
                 .storedAt(cardHolder.getStoredAt())
+                .numOfTeammates(cardHolder.getNumOfTeammates())
                 .build();
 
 //        List<StoredCardDTO> storedCardDTOS = cardHolder.getStoredCards().stream()
