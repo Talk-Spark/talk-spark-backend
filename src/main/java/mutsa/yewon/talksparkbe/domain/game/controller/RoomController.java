@@ -51,6 +51,11 @@ public class RoomController {
         return ResponseEntity.ok(roomService.checkHost(roomId, sparkUser));
     }
 
+    @GetMapping("/is-duplicate")
+    public ResponseEntity<?> isDuplicate(@RequestParam String roomName) {
+        return ResponseEntity.ok(roomService.getIsDuplicateRoomName(roomName));
+    }
+
     @GetMapping("/{roomId}/name")
     public ResponseEntity<?> roomName(@PathVariable Long roomId) {
         return ResponseEntity.ok(roomService.getRoomName(roomId));

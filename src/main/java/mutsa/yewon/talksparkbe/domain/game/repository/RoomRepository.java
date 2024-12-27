@@ -18,5 +18,8 @@ public interface RoomRepository extends JpaRepository<Room, Long> {
 
     List<Room> findByRoomNameContaining(String searchName);
 
+    Optional<Room> findByRoomName(String roomName);
+
     List<Room> findByIsFinishedTrue();
+  
 }
