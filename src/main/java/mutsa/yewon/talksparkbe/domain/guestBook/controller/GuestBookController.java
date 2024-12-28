@@ -36,6 +36,18 @@ public class GuestBookController implements GuestBookControllerDocs {
 
     //TODO: RuntimeException("User not found") 에러코드로 리펙토링
 
+    @PostMapping("/create")
+    public ResponseEntity<?> postGuestBook(@RequestParam(required = true) Long roomId) {
+
+        try {
+            guestBookService.createGuestBookData(roomId);
+            ResponseDTO<?> responseDTO = ResponseDTO.created("방명록 초기 데이터 생성하였습니다.");
+            return ResponseEntity.status(201).body(responseDTO);
+        } catch (IllegalArgumentException e) {
+            throw new CustomTalkSparkException(ErrorCode.INVALID_FORMAT);
+        }
+    }
+
     @PostMapping("/{roomId}")
     public ResponseEntity<?> postGuestBook(@PathVariable("roomId") Long roomId,
                                            @RequestParam(required = false) boolean anonymity,

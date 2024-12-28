@@ -18,6 +18,7 @@ import mutsa.yewon.talksparkbe.global.exception.ErrorCode;
 import mutsa.yewon.talksparkbe.global.swagger.ApiErrorCodes;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
@@ -163,6 +164,7 @@ public interface GuestBookControllerDocs {
     ResponseEntity<?> getGuestBookList(@PathVariable("roomId") Long roomId);
 
     @Operation(summary = "방 방명록 즐겨찾기 추가", description = "방명록 보관함에서 방명록 방 즐겨찾기를 추가하는 API")
+    @ApiErrorCodes({ErrorCode.USER_NOT_EXIST, ErrorCode.JWT_TOKEN_EXPIRED, ErrorCode.TOKEN_REQUIRED, ErrorCode.INVALID_JWT_TOKEN})
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "방명록 방 즐겨찾기 성공",
                     content = @Content(mediaType = "application/json",
@@ -180,4 +182,24 @@ public interface GuestBookControllerDocs {
                             }))
     })
     ResponseEntity<?> UpdateGuestBookRoomFavorites(@PathVariable("roomId") Long roomId);
+
+    @Operation(summary = "방명록 데이터 생성", description = "게임 종료 후 방명록 관련 테이블를 생성하는 API")
+    @ApiErrorCodes({ErrorCode.USER_NOT_EXIST, ErrorCode.JWT_TOKEN_EXPIRED, ErrorCode.TOKEN_REQUIRED, ErrorCode.INVALID_JWT_TOKEN})
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "방명록 데이터 생성 성공",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = ResponseDTO.class),
+                            examples = {
+                                    @ExampleObject(
+                                            value = """
+                                                    {
+                                                        "status": 201,
+                                                        "message": "방명록 초기 데이터 생성하였습니다.",
+                                                        "data": null
+                                                    }
+                                                    """
+                                    )
+                            }))
+    })
+    ResponseEntity<?> postGuestBook(@RequestParam(required = true) Long roomId);
 }
