@@ -41,10 +41,10 @@ public class RoomService {
     private static final String ROOM_COUNT_KEY = "room:participateCount";
 
     @Transactional
-    public Long createRoom(RoomCreateRequest roomCreateRequest) {
+    public Room createRoom(RoomCreateRequest roomCreateRequest) {
         Room room = roomRepository.save(roomCreateRequest.toRoomEntity());
         redisTemplate.opsForHash().put(ROOM_COUNT_KEY, room.getRoomId().toString(), "0");
-        return room.getRoomId();
+        return room;
     }
 
     @Transactional

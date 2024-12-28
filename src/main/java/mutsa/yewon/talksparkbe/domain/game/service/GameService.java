@@ -45,6 +45,13 @@ public class GameService {
 
         GameState gameState = new GameState(selectedCards, questions, room.getRoomParticipates().size()); // 게임 상태를 초기화
         gameStates.put(roomId, gameState); // 특정 방 번호에 게임 상태 할당
+
+        // 각 참가자들마다의 빈칸정보를 만들기
+        for (UserCardQuestions ucq : questions) {
+            Long sparkUserId = ucq.getSparkUserId();
+            List<String> blanks = ucq.getQuestions().stream().map(CardQuestion::getFieldName).toList();
+            gameStates.get(roomId).getCardBlanksDtos().add(CardBlanksDto.of(sparkUserId, blanks));
+        }
     }
 
     public CardQuestion getQuestion(Long roomId) {
@@ -56,6 +63,10 @@ public class GameService {
     @Transactional(readOnly = true)
     public CardResponseCustomDTO getCurrentCard(Long roomId) {
         return CardResponseCustomDTO.fromCard(gameStates.get(roomId).getCurrentCard());
+    }
+
+    public CardBlanksDto getCurrentCardBlanks(Long roomId) {
+        return gameStates.get(roomId).getCurrentCardBlanks();
     }
 
     public void submitAnswer(Long roomId, Long sparkUserId, String answer) {
@@ -101,5 +112,4 @@ public class GameService {
 
         // 명함 보관함 있는 브랜치랑 병합 후 작업
     }
-
 }

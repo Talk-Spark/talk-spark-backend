@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import mutsa.yewon.talksparkbe.domain.game.controller.request.HostCheckRequest;
 import mutsa.yewon.talksparkbe.domain.game.controller.request.RoomCreateRequest;
 import mutsa.yewon.talksparkbe.domain.game.service.RoomService;
+import mutsa.yewon.talksparkbe.domain.game.service.dto.httpResponse.RoomCreateResponse;
 import mutsa.yewon.talksparkbe.domain.sparkUser.entity.SparkUser;
 import mutsa.yewon.talksparkbe.domain.sparkUser.repository.SparkUserRepository;
 import mutsa.yewon.talksparkbe.global.util.JWTUtil;
@@ -32,7 +33,9 @@ public class RoomController {
 
         roomCreateRequest.setHostId(sparkUser.getId());
 
-        return ResponseEntity.ok(roomService.createRoom(roomCreateRequest));
+        return ResponseEntity.ok(
+                RoomCreateResponse.from(roomService.createRoom(roomCreateRequest))
+        );
     }
 
     @GetMapping

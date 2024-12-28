@@ -6,6 +6,7 @@ import jakarta.annotation.PreDestroy;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import mutsa.yewon.talksparkbe.domain.game.controller.request.*;
+import mutsa.yewon.talksparkbe.domain.game.service.dto.CardBlanksDto;
 import mutsa.yewon.talksparkbe.domain.game.service.dto.CardQuestion;
 import mutsa.yewon.talksparkbe.domain.game.service.GameService;
 import mutsa.yewon.talksparkbe.domain.game.service.RoomService;
@@ -168,7 +169,7 @@ public class RoomSocketIOHandler {
     // 질문 브로드캐스트 메서드
     private void broadcastQuestion(Long roomId) {
         CardQuestion question = gameService.getQuestion(roomId);
-        server.getRoomOperations(roomId.toString()).sendEvent("question", gameService.getCurrentCard(roomId), question);
+        server.getRoomOperations(roomId.toString()).sendEvent("question", gameService.getCurrentCard(roomId), gameService.getCurrentCardBlanks(roomId), question);
     }
 
     private void broadcastSingleQuestionResult(Long roomId) {
