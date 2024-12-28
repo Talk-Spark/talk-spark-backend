@@ -3,10 +3,7 @@ package mutsa.yewon.talksparkbe.domain.game.service.util;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import mutsa.yewon.talksparkbe.domain.card.entity.Card;
-import mutsa.yewon.talksparkbe.domain.game.service.dto.CardQuestion;
-import mutsa.yewon.talksparkbe.domain.game.service.dto.CorrectAnswerDto;
-import mutsa.yewon.talksparkbe.domain.game.service.dto.SwitchSubject;
-import mutsa.yewon.talksparkbe.domain.game.service.dto.UserCardQuestions;
+import mutsa.yewon.talksparkbe.domain.game.service.dto.*;
 import mutsa.yewon.talksparkbe.domain.sparkUser.entity.SparkUser;
 import mutsa.yewon.talksparkbe.domain.sparkUser.repository.SparkUserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,6 +25,8 @@ public class GameState {
     private final List<CorrectAnswerDto> currentQuestionCorrect = new ArrayList<>(); // 현재 문제 정답 여부. 유저아이디 : 맞춤
 
     private final Map<Long, Integer> scores = new HashMap<>(); // 유저아이디 : 점수
+
+    private final List<CardBlanksDto> cardBlanksDtos = new ArrayList<>();
 
     public GameState(List<Card> cards, List<UserCardQuestions> userCardQuestions, Integer roomPeople) {
         this.cards = cards;
@@ -84,4 +83,13 @@ public class GameState {
         return null;
     }
 
+    public CardBlanksDto getCurrentCardBlanks() {
+        Long sparkUserId = getCurrentQuestion().getCardOwnerId();
+
+        for (CardBlanksDto cbd : cardBlanksDtos) {
+            if (cbd.getSparkUserId().equals(sparkUserId)) return cbd;
+        }
+
+        return null;
+    }
 }
