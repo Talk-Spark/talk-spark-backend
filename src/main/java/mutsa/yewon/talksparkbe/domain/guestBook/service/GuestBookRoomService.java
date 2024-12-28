@@ -113,10 +113,7 @@ public class GuestBookRoomService {
 
     @Transactional
     public void deleteGuestBookRoom(Long sparkUserId, Long roomId) {
-        Room room = roomRepository.findById(roomId)
-                .orElseThrow(() -> new CustomTalkSparkException(ErrorCode.ROOM_NOT_FOUND));
-
-        GuestBookRoom guestBookRoom = room.getGuestBookRoom();
+        GuestBookRoom guestBookRoom = guestBookRoomRepository.findByRoomId(roomId);
 
         GuestBookRoomSparkUser sparkUserToDelete = guestBookRoom.getGuestBookRoomSparkUsers().stream()
                 .filter(deleteSparkUser -> deleteSparkUser.getSparkUser().getId().equals(sparkUserId))
