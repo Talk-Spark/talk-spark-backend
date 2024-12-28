@@ -6,7 +6,6 @@ import jakarta.annotation.PreDestroy;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import mutsa.yewon.talksparkbe.domain.game.controller.request.*;
-import mutsa.yewon.talksparkbe.domain.game.service.dto.CardBlanksDto;
 import mutsa.yewon.talksparkbe.domain.game.service.dto.CardQuestion;
 import mutsa.yewon.talksparkbe.domain.game.service.GameService;
 import mutsa.yewon.talksparkbe.domain.game.service.RoomService;
@@ -61,9 +60,10 @@ public class RoomSocketIOHandler {
     }
 
     @PostConstruct
-    public void startListeners() {
+    public void startRoomListeners() {
         server.addEventListener("joinRoom", RoomJoinRequest.class, (client, data, ackSender) -> {
             try {
+                System.out.println("joinRoom 받음. " + data.toString());
                 roomService.joinRoom(data);
                 server.getClient(client.getSessionId()).joinRoom(data.getRoomId().toString());
                 server.getRoomOperations(data.getRoomId().toString()).sendEvent("roomUpdate", roomService.getParticipantList(data.getRoomId()));
@@ -78,6 +78,7 @@ public class RoomSocketIOHandler {
 
         server.addEventListener("leaveRoom", RoomJoinRequest.class, (client, data, ackSender) -> {
             try {
+                System.out.println("leaveRoom 받음. " + data.toString());
                 System.out.println("data 에서 액세스토큰 = " + data.getAccessToken());
                 roomService.leaveRoom(data);
                 server.getClient(client.getSessionId()).leaveRoom(data.getRoomId().toString());
@@ -91,6 +92,7 @@ public class RoomSocketIOHandler {
 
         server.addEventListener("startGame", RoomJoinRequest.class, (client, data, ackSender) -> {
             try {
+                System.out.println("startGame 받음. " + data.toString());
                 Long roomId = data.getRoomId();
                 roomService.changeStarted(roomId);
                 server.getRoomOperations(roomId.toString()).sendEvent("startGame", "게임이 시작됩니다.");
@@ -99,7 +101,6 @@ public class RoomSocketIOHandler {
                 client.sendEvent("startGameError", "게임 시작 중 오류가 발생했습니다.");
             }
         });
-
 
         /* ================ 테스트할 때만 썼다가 안쓰는거 ================ */
 //        server.addEventListener("createRoom", RoomCreateRequest.class, (client, data, ackSender) -> {
@@ -118,6 +119,7 @@ public class RoomSocketIOHandler {
     @PostConstruct
     public void startGameListeners() {
         server.addEventListener("joinGame", RoomJoinRequest.class, (client, data, ackSender) -> {
+            System.out.println("joinGame 받음. " + data.toString());
             server.getClient(client.getSessionId()).joinRoom(data.getRoomId().toString());
             String token = data.getAccessToken();
             String jwt = token.replace("Bearer ", "");
@@ -129,14 +131,17 @@ public class RoomSocketIOHandler {
         });
 
         server.addEventListener("prepareQuizzes", GameStartRequest.class, (client, data, ackSender) -> {
+            System.out.println("prepareQuizzes 받음. " + data.toString());
             gameService.startGame(data.getRoomId());
         });
 
         server.addEventListener("getQuestion", QuestionRequest.class, (client, data, ackSender) -> {
+            System.out.println("getQuestion 받음. " + data.toString());
             broadcastQuestion(data.getRoomId());
         });
 
         server.addEventListener("submitSelection", AnswerSubmitRequest.class, (client, data, ackSender) -> {
+            System.out.println("submitSelection 받음. " + data.toString());
             Long roomId = data.getRoomId();
             Long sparkUserId = data.getSparkUserId();
             String answer = data.getAnswer();
@@ -148,6 +153,7 @@ public class RoomSocketIOHandler {
         });
 
         server.addEventListener("next", QuestionRequest.class, (client, data, ackSender) -> {
+            System.out.println("next 받음. " + data.toString());
             Long roomId = data.getRoomId();
 
             SwitchSubject switchSubject = checkSubjectChanged(roomId);
@@ -160,6 +166,7 @@ public class RoomSocketIOHandler {
         });
 
         server.addEventListener("getEnd", QuestionRequest.class, (client, data, ackSender) -> {
+            System.out.println("getEnd 받음. " + data.toString());
             server.getRoomOperations(data.getRoomId().toString()).sendEvent("scores", gameService.getScores(data.getRoomId()), gameService.getAllRelatedCards(data.getRoomId()));
             gameService.insertCardCopies(data.getRoomId());
             roomService.changeFinished(data.getRoomId());
