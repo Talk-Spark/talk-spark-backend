@@ -18,7 +18,7 @@ public class QuestionGenerator {
         List<UserCardQuestions> userCardQuestionsList = new ArrayList<>();
 
         // 빈칸 필드를 생성할 키 리스트 (명함의 필드명)
-        List<String> keys = List.of("major", "mbti", "hobby", "lookAlike", "slogan", "tmi");
+        List<String> keys = List.of("major", "mbti", "hobby", "lookAlike", "selfDescription", "tmi");
         Map<String, Integer> fieldCount = new HashMap<>();
         int numOfPeople = cards.size();
 
@@ -34,20 +34,19 @@ public class QuestionGenerator {
             List<String> fields = new ArrayList<>(List.of("major", "mbti", "hobby", "lookAlike", "selfDescription", "tmi"));
             List<CardQuestion> questions = new ArrayList<>();
 
-            while (questions.size() < numOfQuestions) {
-                int idx = random.nextInt(6); // 0~5
+            fields.removeIf(field -> getFieldValue(c, field) == null || fieldCount.get(field) < numOfPeople);
+            System.out.println("fields = " + fields);
+            Collections.shuffle(fields);
+            System.out.println("fields = " + fields);
 
-                // 뽑힌 그 필드에 대해서 출제가능성 검토.
-                // 일단 이 카드에서 null 아니어야 하고, fieldCount 보고 채워놓은 놈이 사람수만큼 되어야 함. 그리고 이번 반복에서 뽑힌 적 없어야 함.
-                // 이렇게 모든 카드마다 난이도만큼의 문제를 생성하기
-                String fieldName = fields.get(idx);
-                if (!fieldName.equals("x") && getFieldValue(c, fieldName) != null && fieldCount.get(fieldName) >= numOfPeople) {
-                    questions.add(generateQuestion(c, fieldName, cards, numOfPeople));
-                    fields.set(idx, "x");
-                }
+            for (int i=0;i<numOfQuestions;i++) {
+                questions.add(generateQuestion(c, fields.get(i), cards, numOfPeople));
             }
+            System.out.println("generateQuestion이 끝남");
+
             userCardQuestionsList.add(new UserCardQuestions(c.getSparkUser().getId(), questions)); // 어떤 사람의 카드에 대한 질문들 생성 완료
         }
+        System.out.println("모든 for문 끝");
 
         userCardQuestionsList.sort(Comparator.comparing(UserCardQuestions::getSparkUserId)); // 유저아이디 오름차순. 그래서 같은 유저아이디의 문제가 쫙 나옴.
         return userCardQuestionsList;
@@ -56,6 +55,7 @@ public class QuestionGenerator {
     private CardQuestion generateQuestion(Card c, String fieldName, List<Card> cards, int numOfPeople) {
         String correctAnswer = getFieldValue(c, fieldName);
         List<String> options = generateOptions(fieldName, correctAnswer, cards, numOfPeople);
+        System.out.println("generateOptions 끝남");
         return new CardQuestion(c.getId(), c.getSparkUser().getId(), fieldName, correctAnswer, options);
     }
 
@@ -69,7 +69,7 @@ public class QuestionGenerator {
                 case "mbti" -> card.getMbti();
                 case "hobby" -> card.getHobby();
                 case "lookAlike" -> card.getLookAlike();
-                case "slogan" -> card.getSlogan();
+                case "selfDescription" -> card.getSlogan();
                 case "tmi" -> card.getTmi();
                 default -> null;
             };
@@ -82,12 +82,14 @@ public class QuestionGenerator {
     // 보기 생성: 다른 참가자의 해당 필드 값 + 정답
     private List<String> generateOptions(String fieldName, String correctAnswer, List<Card> cards, int numOfPeople) {
         int maxOptionNum = Math.min(4, numOfPeople);
+        System.out.println("maxOptionNum = " + maxOptionNum);
         List<String> options = new ArrayList<>();
         options.add(correctAnswer);
+        List<String> canBeOptions = new ArrayList<>(cards.stream().map(c -> getFieldValue(c, fieldName)).toList());
+        canBeOptions.remove(correctAnswer);
         while (options.size() < maxOptionNum) {
-            List<String> canBeOptions = cards.stream().map(c -> getFieldValue(c, fieldName)).toList();
-            String candidate = canBeOptions.get(random.nextInt(canBeOptions.size()));
-            if (!options.contains(candidate)) options.add(candidate);
+            options.add(canBeOptions.get(0));
+            canBeOptions.remove(0);
         }
 
         Collections.shuffle(options); // 보기 순서 섞기
