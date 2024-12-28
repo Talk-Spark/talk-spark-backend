@@ -42,6 +42,7 @@ public class CardHolder {
 
     @Builder.Default
     @OneToMany(mappedBy = "cardHolder", cascade = CascadeType.ALL)
+    @BatchSize(size = 8)
     private List<StoredCard> storedCards = new ArrayList<>(); // 개별 명함인 경우 1개, 팀별 명함 모음인 경우 팀원 수 만큼
 
     @CreatedDate

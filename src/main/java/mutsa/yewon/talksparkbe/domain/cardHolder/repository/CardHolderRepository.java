@@ -18,5 +18,8 @@ public interface CardHolderRepository extends JpaRepository<CardHolder, Long> {
     @Query("select c from CardHolder c where c.sparkUser.id = :sparkUserId and c.bookMark = true")
     List<CardHolder> getCardHolderByBookMark(@Param("sparkUserId") Long sparkUserId);
 
-    Long countBySparkUserId(Long sparkUserId);
+    int countBySparkUserId(Long sparkUserId);
+
+    @Query("select c from CardHolder c where c.name = :name")
+    List<CardHolder> getCardHoldersByName(@Param("name") String name);
 }

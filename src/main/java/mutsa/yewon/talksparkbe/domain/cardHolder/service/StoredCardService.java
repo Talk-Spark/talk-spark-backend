@@ -18,4 +18,5 @@ public interface StoredCardService {
     CardHolderListDTO getCardHolderDTOs(String searchType, Long sparkUserId);
     Map<String, Long> bookMarkCard(Long cardHolderId);
     Map<String, Long> deleteCardHolder(Long cardHolderId);
+    CardHolderListDTO getCardHolderByName(String searchType);
 }

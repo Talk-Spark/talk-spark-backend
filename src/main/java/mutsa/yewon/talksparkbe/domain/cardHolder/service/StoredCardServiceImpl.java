@@ -77,21 +77,27 @@ public class StoredCardServiceImpl implements StoredCardService {
     @Override
     public List<StoredCardDTO> getCardHolderDTO(Long cardHolderId) {
 
-        List<StoredCard> storedCards = storedCardRepository.findByCardHolderId(cardHolderId);
+        CardHolder cardHolder = cardHolderRepository.findById(cardHolderId)
+                .orElseThrow(() -> new CustomTalkSparkException(ErrorCode.CARDHOLDER_NOT_EXIST));
+
+
+
+//        List<StoredCard> storedCards = storedCardRepository.findByCardHolderId(cardHolderId);
+
+        List<StoredCard> storedCards = cardHolder.getStoredCards();
 
         if (storedCards.isEmpty()) {
             throw new CustomTalkSparkException(ErrorCode.CARD_NOT_EXIST);
         }
 
         return storedCards.stream()
-                .map(StoredCardDTO::entityToDTO).toList();
-
+                .map(storedCard -> StoredCardDTO.entityToDTO(storedCard, cardHolder)).toList();
     }
 
     @Override
     public CardHolderListDTO getCardHolderDTOs(String searchType, Long sparkUserId) {
 
-        Long numOfCards = cardHolderRepository.countBySparkUserId(sparkUserId);
+        int numOfCards = cardHolderRepository.countBySparkUserId(sparkUserId);
 
         List<CardHolder> cardHolders = new ArrayList<>();
 
@@ -155,5 +161,23 @@ public class StoredCardServiceImpl implements StoredCardService {
         cardHolderRepository.delete(cardHolder);
 
         return Map.of("cardHolderId", cardHolder.getId());
+    }
+
+    @Override
+    public CardHolderListDTO getCardHolderByName(String searchType) {
+        List<CardHolder> cardHolders = cardHolderRepository.getCardHoldersByName(searchType);
+
+        if(cardHolders.isEmpty()){
+            throw new CustomTalkSparkException(ErrorCode.NO_MATCHING_CARDHOLDER);
+        }
+
+        List<CardHolderDTO> cardHolderDTOS = cardHolders.stream()
+                .map(CardHolderDTO::entitytoDTO).toList();
+
+        return CardHolderListDTO.builder()
+                .searchType(searchType)
+                .numOfCards(cardHolderDTOS.size())
+                .cardHolders(cardHolderDTOS)
+                .build();
     }
 }

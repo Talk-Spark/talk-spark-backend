@@ -68,4 +68,11 @@ public class CardHolderController implements CardHolderControllerDocs {
 
         return ResponseEntity.ok(ResponseDTO.ok("보관된 명함을 삭제합니다", response));
     }
+
+    @GetMapping("/api/storedCards/search")
+    public ResponseEntity<?> getCardHoldersByName(@RequestParam String name) {
+        CardHolderListDTO cardHolderByName = storedCardService.getCardHolderByName(name);
+
+        return ResponseEntity.ok(ResponseDTO.ok("팀 또는 사용자의 이름에 해당하는 명함들입니다.", cardHolderByName));
+    }
 }
