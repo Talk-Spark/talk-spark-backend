@@ -14,9 +14,11 @@ public class RoomListResponse {
     private int maxPeople;
 
     @Builder
-    private RoomListResponse(Long roomId, String roomName, int maxPeople) {
+    private RoomListResponse(Long roomId, String roomName, String hostName, int currentPeople, int maxPeople) {
         this.roomId = roomId;
         this.roomName = roomName;
+        this.hostName = hostName;
+        this.currentPeople = currentPeople;
         this.maxPeople = maxPeople;
     }
 
