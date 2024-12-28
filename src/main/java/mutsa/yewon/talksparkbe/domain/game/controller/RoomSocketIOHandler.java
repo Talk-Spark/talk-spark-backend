@@ -102,15 +102,15 @@ public class RoomSocketIOHandler {
 
 
         /* ================ 테스트할 때만 썼다가 안쓰는거 ================ */
-        server.addEventListener("createRoom", RoomCreateRequest.class, (client, data, ackSender) -> {
-            Long roomId = roomService.createRoom(data);
-            client.sendEvent("roomCreated", roomId); // 생성된 방 ID 반환
-        });
-
-        server.addEventListener("getRooms", Void.class, (client, data, ackSender) -> {
-            System.out.println("방 목록 줘야겠다");
-            client.sendEvent("roomList", roomService.listAllRooms());
-        });
+//        server.addEventListener("createRoom", RoomCreateRequest.class, (client, data, ackSender) -> {
+//            Long roomId = roomService.createRoom(data);
+//            client.sendEvent("roomCreated", roomId); // 생성된 방 ID 반환
+//        });
+//
+//        server.addEventListener("getRooms", Void.class, (client, data, ackSender) -> {
+//            System.out.println("방 목록 줘야겠다");
+//            client.sendEvent("roomList", roomService.listAllRooms());
+//        });
     }
 
     /* ================ 게임 관련 ================ */
