@@ -26,6 +26,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Objects;
+import java.util.Random;
 import java.util.stream.Collectors;
 
 
@@ -117,26 +119,26 @@ public class GuestBookService {
                 .roomName(guestBookRoom.getRoom().getRoomName())
                 .roomDateTime(guestBookRoom.getRoom().getCreatedAt())
                 .isGuestBookFavorited(guestBookRoomSparkUser.getIsGuestBookFavorited())
-                .guestBookData(createGuestBookListResponse(guestBookRoom.getGuestBookRoomId(),guestBookRoom.getGuestBooks(), sparkUser.getKakaoId()))
+                .guestBookData(createGuestBookListResponse(guestBookRoom.getGuestBookRoomId(),guestBookRoom.getGuestBooks(), sparkUser.getId()))
                 .build();
 
         }
 
         //TODO: Room-Card로 변경하기
-        public List<GuestBookListDTO> createGuestBookListResponse(Long guestBookRoomId, List<GuestBook> guestBooks, String sparkUserKakaoId) {
-//            List<Card> cards = cardRepository.findBySparkUserId(Long.valueOf(sparkUserKakaoId));
-//            Card card = cards.isEmpty() ? null : cards.get(0);
+        public List<GuestBookListDTO> createGuestBookListResponse(Long guestBookRoomId, List<GuestBook> guestBooks, Long sparkUserId) {
+            List<Card> cards = cardRepository.findBySparkUserId(sparkUserId);
+            Card card = cards.isEmpty() ? null : cards.get(0);
 
-//            GuestBookRoom guestBookRoom = guestBookRoomRepository.findByRoomId(guestBookRoomId);
-//            Card card = guestBookRoomRepository.findCardBySparUser(sparkUserKakaoId);
             return guestBooks.stream()
                     .map(guestBook -> GuestBookListDTO.builder()
                             .guestBookId(guestBook.getGuestBookId())
                             .sparkUserName(guestBook.isAnonymity() ? "익명" : guestBook.getSparkUser().getName()) // 익명 처리
                             .guestBookContent(guestBook.getGuestBookContent())
                             .guestBookDateTime(guestBook.getGuestBookDateTime())
-                            .isOwnerGuestBook(guestBook.getSparkUser().getKakaoId().equals(sparkUserKakaoId)) // 작성자 확인
-                            .cardThema(CardThema.valueOf("YELLOW"))
+                            .isOwnerGuestBook(guestBook.getSparkUser().getId().equals(sparkUserId)) // 작성자 확인
+                            .cardThema(guestBook.isAnonymity() ?
+                                    CardThema.values()[new Random().nextInt(CardThema.values().length)]:
+                                    Objects.requireNonNull(card).getCardThema())
                             .build())
                     .collect(Collectors.toList());
         }
