@@ -5,6 +5,7 @@ import mutsa.yewon.talksparkbe.domain.game.controller.request.RoomCreateRequest;
 import mutsa.yewon.talksparkbe.domain.game.entity.QuestionTip;
 import mutsa.yewon.talksparkbe.domain.game.service.RoomService;
 import mutsa.yewon.talksparkbe.domain.game.service.dto.httpResponse.RoomCreateResponse;
+import mutsa.yewon.talksparkbe.domain.game.service.dto.httpResponse.RoomDetailsResponse;
 import mutsa.yewon.talksparkbe.domain.game.service.dto.httpResponse.RoomListResponse;
 import mutsa.yewon.talksparkbe.domain.sparkUser.entity.SparkUser;
 import mutsa.yewon.talksparkbe.domain.sparkUser.repository.SparkUserRepository;
@@ -36,6 +37,11 @@ public class RoomController {
     @GetMapping
     public ResponseEntity<List<RoomListResponse>> roomSearch(@RequestParam String searchName) {
         return ResponseEntity.ok(roomService.searchRooms(searchName));
+    }
+
+    @GetMapping("/{roomId}")
+    public ResponseEntity<RoomDetailsResponse> roomDetails(@PathVariable Long roomId) {
+        return ResponseEntity.ok(roomService.getRoomDetails(roomId));
     }
 
     @GetMapping("/is-host")

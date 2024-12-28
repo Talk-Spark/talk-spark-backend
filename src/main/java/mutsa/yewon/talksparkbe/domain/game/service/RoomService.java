@@ -7,6 +7,7 @@ import mutsa.yewon.talksparkbe.domain.game.entity.Room;
 import mutsa.yewon.talksparkbe.domain.game.entity.RoomParticipate;
 import mutsa.yewon.talksparkbe.domain.game.repository.RoomParticipateRepository;
 import mutsa.yewon.talksparkbe.domain.game.repository.RoomRepository;
+import mutsa.yewon.talksparkbe.domain.game.service.dto.httpResponse.RoomDetailsResponse;
 import mutsa.yewon.talksparkbe.domain.game.service.dto.httpResponse.RoomListResponse;
 import mutsa.yewon.talksparkbe.domain.game.service.dto.httpResponse.RoomParticipantResponse;
 import mutsa.yewon.talksparkbe.domain.sparkUser.entity.SparkUser;
@@ -191,4 +192,13 @@ public class RoomService {
         return roomRepository.findByRoomName(roomName).isPresent();
     }
 
+    public RoomDetailsResponse getRoomDetails(Long roomId) {
+        Room room = roomRepository.findById(roomId).orElseThrow();
+        return RoomDetailsResponse.builder()
+                .roomId(room.getRoomId())
+                .roomName(room.getRoomName())
+                .difficulty(room.getDifficulty())
+                .maxPeople(room.getMaxPeople())
+                .build();
+    }
 }
