@@ -6,7 +6,6 @@ import jakarta.annotation.PreDestroy;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import mutsa.yewon.talksparkbe.domain.game.controller.request.*;
-import mutsa.yewon.talksparkbe.domain.game.service.dto.CardBlanksDto;
 import mutsa.yewon.talksparkbe.domain.game.service.dto.CardQuestion;
 import mutsa.yewon.talksparkbe.domain.game.service.GameService;
 import mutsa.yewon.talksparkbe.domain.game.service.RoomService;
@@ -61,7 +60,7 @@ public class RoomSocketIOHandler {
     }
 
     @PostConstruct
-    public void startListeners() {
+    public void startRoomListeners() {
         server.addEventListener("joinRoom", RoomJoinRequest.class, (client, data, ackSender) -> {
             try {
                 roomService.joinRoom(data);
@@ -99,7 +98,6 @@ public class RoomSocketIOHandler {
                 client.sendEvent("startGameError", "게임 시작 중 오류가 발생했습니다.");
             }
         });
-
 
         /* ================ 테스트할 때만 썼다가 안쓰는거 ================ */
 //        server.addEventListener("createRoom", RoomCreateRequest.class, (client, data, ackSender) -> {

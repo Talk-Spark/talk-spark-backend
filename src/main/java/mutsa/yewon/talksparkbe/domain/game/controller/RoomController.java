@@ -1,17 +1,18 @@
 package mutsa.yewon.talksparkbe.domain.game.controller;
 
 import lombok.RequiredArgsConstructor;
-import mutsa.yewon.talksparkbe.domain.game.controller.request.HostCheckRequest;
 import mutsa.yewon.talksparkbe.domain.game.controller.request.RoomCreateRequest;
 import mutsa.yewon.talksparkbe.domain.game.entity.QuestionTip;
 import mutsa.yewon.talksparkbe.domain.game.service.RoomService;
 import mutsa.yewon.talksparkbe.domain.game.service.dto.httpResponse.RoomCreateResponse;
+import mutsa.yewon.talksparkbe.domain.game.service.dto.httpResponse.RoomListResponse;
 import mutsa.yewon.talksparkbe.domain.sparkUser.entity.SparkUser;
 import mutsa.yewon.talksparkbe.domain.sparkUser.repository.SparkUserRepository;
 import mutsa.yewon.talksparkbe.global.util.JWTUtil;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -23,29 +24,20 @@ public class RoomController {
     private final SparkUserRepository sparkUserRepository;
     private final JWTUtil jwtUtil;
 
-    // TODO: 인증헤더로 유저 얻어오는거 SecurityUtil 메서드 만들어서 그걸로 바꾸기
     @PostMapping
-    public ResponseEntity<?> roomCreate(@RequestBody RoomCreateRequest roomCreateRequest,
-                                        @RequestHeader("Authorization") String token) {
-        String jwt = token.replace("Bearer ", "");
-        Map<String, Object> claims = jwtUtil.validateToken(jwt);
-        String kakaoId = (String) claims.get("kakaoId");
-        SparkUser sparkUser = sparkUserRepository.findByKakaoId(kakaoId).orElseThrow(() -> new RuntimeException("유저 못찾음"));
-
-        // roomCreateRequest.setHostId(sparkUser.getId());
-
+    public ResponseEntity<RoomCreateResponse> roomCreate(@RequestBody RoomCreateRequest roomCreateRequest) {
         return ResponseEntity.ok(
                 RoomCreateResponse.from(roomService.createRoom(roomCreateRequest))
         );
     }
 
     @GetMapping
-    public ResponseEntity<?> roomSearch(@RequestParam String searchName) {
+    public ResponseEntity<List<RoomListResponse>> roomSearch(@RequestParam String searchName) {
         return ResponseEntity.ok(roomService.searchRooms(searchName));
     }
 
     @GetMapping("/is-host")
-    public ResponseEntity<?> isHost(@RequestParam Long roomId,
+    public ResponseEntity<Boolean> isHost(@RequestParam Long roomId,
                                     @RequestHeader("Authorization") String token) {
         String jwt = token.replace("Bearer ", "");
         Map<String, Object> claims = jwtUtil.validateToken(jwt);
@@ -56,23 +48,23 @@ public class RoomController {
     }
 
     @GetMapping("/is-duplicate")
-    public ResponseEntity<?> isDuplicate(@RequestParam String roomName) {
+    public ResponseEntity<Boolean> isDuplicate(@RequestParam String roomName) {
         return ResponseEntity.ok(roomService.getIsDuplicateRoomName(roomName));
     }
 
-    @GetMapping("/{roomId}/name")
-    public ResponseEntity<?> roomName(@PathVariable Long roomId) {
-        return ResponseEntity.ok(roomService.getRoomName(roomId));
-    }
-
-    @GetMapping("/all")
-    public ResponseEntity<?> roomList() {
-        return ResponseEntity.ok(roomService.listAllRooms());
-    }
-
     @GetMapping("/question-tip")
-    public ResponseEntity<?> questionTip(@RequestParam String field) {
+    public ResponseEntity<String> questionTip(@RequestParam String field) {
         return ResponseEntity.ok(QuestionTip.valueOf(field).getTipContent());
     }
+
+//    @GetMapping("/{roomId}/name")
+//    public ResponseEntity<?> roomName(@PathVariable Long roomId) {
+//        return ResponseEntity.ok(roomService.getRoomName(roomId));
+//    }
+//
+//    @GetMapping("/all")
+//    public ResponseEntity<?> roomList() {
+//        return ResponseEntity.ok(roomService.listAllRooms());
+//    }
 
 }
