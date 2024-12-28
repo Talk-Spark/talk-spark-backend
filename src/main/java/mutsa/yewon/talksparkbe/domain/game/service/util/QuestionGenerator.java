@@ -18,7 +18,7 @@ public class QuestionGenerator {
         List<UserCardQuestions> userCardQuestionsList = new ArrayList<>();
 
         // 빈칸 필드를 생성할 키 리스트 (명함의 필드명)
-        List<String> keys = List.of("name", "age", "major", "mbti", "hobby", "lookAlike", "slogan", "tmi");
+        List<String> keys = List.of("major", "mbti", "hobby", "lookAlike", "slogan", "tmi");
         Map<String, Integer> fieldCount = new HashMap<>();
         int numOfPeople = cards.size();
 
@@ -31,11 +31,11 @@ public class QuestionGenerator {
         }
 
         for (Card c : cards) {
-            List<String> fields = new ArrayList<>(List.of("mbti", "hobby", "lookAlike", "selfDescription", "tmi"));
+            List<String> fields = new ArrayList<>(List.of("major", "mbti", "hobby", "lookAlike", "selfDescription", "tmi"));
             List<CardQuestion> questions = new ArrayList<>();
 
             while (questions.size() < numOfQuestions) {
-                int idx = random.nextInt(5); // 0~4
+                int idx = random.nextInt(6); // 0~5
 
                 // 뽑힌 그 필드에 대해서 출제가능성 검토.
                 // 일단 이 카드에서 null 아니어야 하고, fieldCount 보고 채워놓은 놈이 사람수만큼 되어야 함. 그리고 이번 반복에서 뽑힌 적 없어야 함.

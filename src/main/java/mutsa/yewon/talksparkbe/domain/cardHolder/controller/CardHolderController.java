@@ -2,10 +2,7 @@ package mutsa.yewon.talksparkbe.domain.cardHolder.controller;
 
 import lombok.RequiredArgsConstructor;
 import mutsa.yewon.talksparkbe.domain.cardHolder.CardHolderControllerDocs;
-import mutsa.yewon.talksparkbe.domain.cardHolder.dto.IndCardHolderCreateDTO;
-import mutsa.yewon.talksparkbe.domain.cardHolder.dto.TeamCardHolderCreateDTO;
-import mutsa.yewon.talksparkbe.domain.cardHolder.dto.CardHolderListDTO;
-import mutsa.yewon.talksparkbe.domain.cardHolder.dto.StoredCardDTO;
+import mutsa.yewon.talksparkbe.domain.cardHolder.dto.*;
 import mutsa.yewon.talksparkbe.domain.cardHolder.service.StoredCardService;
 import mutsa.yewon.talksparkbe.domain.sparkUser.dto.SparkUserDTO;
 import mutsa.yewon.talksparkbe.global.dto.ResponseDTO;
@@ -74,5 +71,14 @@ public class CardHolderController implements CardHolderControllerDocs {
         CardHolderListDTO cardHolderByName = storedCardService.getCardHolderByName(name);
 
         return ResponseEntity.ok(ResponseDTO.ok("팀 또는 사용자의 이름에 해당하는 명함들입니다.", cardHolderByName));
+    }
+
+    @GetMapping("/api/storedCards/main")
+    public ResponseDTO<?> getMainPageCards(){
+        Long loggedInUserId = securityUtil.getLoggedInUserId();
+
+        List<MainPageCardHolderDTO> mainPageCards = storedCardService.getMainPageCards(loggedInUserId);
+
+        return ResponseDTO.ok("메인 페이지에 사용될 보관된 명함들 입니다.", mainPageCards);
     }
 }

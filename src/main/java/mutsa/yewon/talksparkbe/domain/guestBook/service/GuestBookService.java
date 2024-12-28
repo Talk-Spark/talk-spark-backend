@@ -4,6 +4,9 @@ import lombok.RequiredArgsConstructor;
 import mutsa.yewon.talksparkbe.domain.card.entity.Card;
 import mutsa.yewon.talksparkbe.domain.card.entity.CardThema;
 import mutsa.yewon.talksparkbe.domain.card.repository.CardRepository;
+import mutsa.yewon.talksparkbe.domain.game.entity.Room;
+import mutsa.yewon.talksparkbe.domain.game.entity.RoomParticipate;
+import mutsa.yewon.talksparkbe.domain.game.repository.RoomRepository;
 import mutsa.yewon.talksparkbe.domain.guestBook.dto.guestBook.GuestBookListDTO;
 import mutsa.yewon.talksparkbe.domain.guestBook.dto.guestBook.GuestBookListRequestDTO;
 import mutsa.yewon.talksparkbe.domain.guestBook.dto.guestBook.GuestBookPostRequestDTO;
@@ -18,6 +21,7 @@ import mutsa.yewon.talksparkbe.domain.sparkUser.entity.SparkUser;
 import mutsa.yewon.talksparkbe.domain.sparkUser.repository.SparkUserRepository;
 import mutsa.yewon.talksparkbe.global.exception.CustomTalkSparkException;
 import mutsa.yewon.talksparkbe.global.exception.ErrorCode;
+import mutsa.yewon.talksparkbe.global.util.SecurityUtil;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -34,8 +38,32 @@ public class GuestBookService {
     private final GuestBookRoomRepository guestBookRoomRepository;
     private final GuestBookRoomSparkUserRepository guestBookRoomSparkUserRepository;
     private final CardRepository cardRepository;
+    private final RoomRepository roomRepository;
+    private final SecurityUtil securityUtil;
 
     //TODO: RuntimeException("User not found")) customException으로 수정
+    @Transactional
+    public void createGuestBookData(Long roomId) {
+        SparkUser sparkUser = sparkUserRepository.findById(securityUtil.getLoggedInUserId()).orElseThrow(()
+                -> new CustomTalkSparkException(ErrorCode.USER_NOT_EXIST));
+
+        Room room = roomRepository.findById(roomId).orElseThrow(()
+                -> new CustomTalkSparkException(ErrorCode.ROOM_NOT_FOUND));
+
+        GuestBookRoom guestBookRoom = GuestBookRoom.builder()
+                .room(room)
+                .build();
+        guestBookRoomRepository.save(guestBookRoom);
+
+        for(RoomParticipate roomParticipate : room.getRoomParticipates()) {
+            GuestBookRoomSparkUser guestBookRoomSparkUser = GuestBookRoomSparkUser.builder()
+                    .guestBookRoom(guestBookRoom)
+                    .sparkUser(sparkUser)
+                    .build();
+            guestBookRoomSparkUserRepository.save(guestBookRoomSparkUser);
+        }
+        return;
+    }
     @Transactional
     public GuestBook createGuestBook(GuestBookPostRequestDTO guestBookPostRequestDTO, Boolean anonymity) {
         if (anonymity == null) {

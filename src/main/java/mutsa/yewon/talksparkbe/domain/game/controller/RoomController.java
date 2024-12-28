@@ -3,6 +3,7 @@ package mutsa.yewon.talksparkbe.domain.game.controller;
 import lombok.RequiredArgsConstructor;
 import mutsa.yewon.talksparkbe.domain.game.controller.request.HostCheckRequest;
 import mutsa.yewon.talksparkbe.domain.game.controller.request.RoomCreateRequest;
+import mutsa.yewon.talksparkbe.domain.game.entity.QuestionTip;
 import mutsa.yewon.talksparkbe.domain.game.service.RoomService;
 import mutsa.yewon.talksparkbe.domain.game.service.dto.httpResponse.RoomCreateResponse;
 import mutsa.yewon.talksparkbe.domain.sparkUser.entity.SparkUser;
@@ -31,7 +32,7 @@ public class RoomController {
         String kakaoId = (String) claims.get("kakaoId");
         SparkUser sparkUser = sparkUserRepository.findByKakaoId(kakaoId).orElseThrow(() -> new RuntimeException("유저 못찾음"));
 
-        roomCreateRequest.setHostId(sparkUser.getId());
+        // roomCreateRequest.setHostId(sparkUser.getId());
 
         return ResponseEntity.ok(
                 RoomCreateResponse.from(roomService.createRoom(roomCreateRequest))
@@ -67,6 +68,11 @@ public class RoomController {
     @GetMapping("/all")
     public ResponseEntity<?> roomList() {
         return ResponseEntity.ok(roomService.listAllRooms());
+    }
+
+    @GetMapping("/question-tip")
+    public ResponseEntity<?> questionTip(@RequestParam String field) {
+        return ResponseEntity.ok(QuestionTip.valueOf(field).getTipContent());
     }
 
 }

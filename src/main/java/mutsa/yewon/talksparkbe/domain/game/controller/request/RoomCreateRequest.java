@@ -12,7 +12,7 @@ public class RoomCreateRequest {
 
     private int difficulty;
 
-    private Long hostId; // TODO: 임시용. 삭제 혹은 변경 예정
+    // private Long hostId; // 임시용
 
     public Room toRoomEntity() {
         return Room.builder()
