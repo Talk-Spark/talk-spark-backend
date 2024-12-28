@@ -81,7 +81,6 @@ public class StoredCardServiceImpl implements StoredCardService {
                 .orElseThrow(() -> new CustomTalkSparkException(ErrorCode.CARDHOLDER_NOT_EXIST));
 
 
-
 //        List<StoredCard> storedCards = storedCardRepository.findByCardHolderId(cardHolderId);
 
         List<StoredCard> storedCards = cardHolder.getStoredCards();
@@ -102,29 +101,25 @@ public class StoredCardServiceImpl implements StoredCardService {
         List<CardHolder> cardHolders = new ArrayList<>();
 
 
-        if(searchType.equals("Alphabet")){
+        if (searchType.equals("Alphabet")) {
             cardHolders = cardHolderRepository.getCardHolderByAlphabet(sparkUserId);
 
-            if(cardHolders.isEmpty()){
+            if (cardHolders.isEmpty()) {
                 throw new CustomTalkSparkException(ErrorCode.CARDHOLDER_NOT_EXIST);
             }
 
-        }
-
-        else if(searchType.equals("Bookmark")){
+        } else if (searchType.equals("Bookmark")) {
             cardHolders = cardHolderRepository.getCardHolderByBookMark(sparkUserId);
 
-            if(cardHolders.isEmpty()){
+            if (cardHolders.isEmpty()) {
                 throw new CustomTalkSparkException(ErrorCode.NO_BOOKMARKED_CONTENT);
             }
 
-        }
-
-        else{
+        } else {
 
             cardHolders = cardHolderRepository.findBySparkUserId(sparkUserId);
 
-            if(cardHolders.isEmpty()){
+            if (cardHolders.isEmpty()) {
                 throw new CustomTalkSparkException(ErrorCode.CARDHOLDER_NOT_EXIST);
             }
 
@@ -167,7 +162,7 @@ public class StoredCardServiceImpl implements StoredCardService {
     public CardHolderListDTO getCardHolderByName(String searchType) {
         List<CardHolder> cardHolders = cardHolderRepository.getCardHoldersByName(searchType);
 
-        if(cardHolders.isEmpty()){
+        if (cardHolders.isEmpty()) {
             throw new CustomTalkSparkException(ErrorCode.NO_MATCHING_CARDHOLDER);
         }
 
@@ -180,4 +175,18 @@ public class StoredCardServiceImpl implements StoredCardService {
                 .cardHolders(cardHolderDTOS)
                 .build();
     }
+
+    @Override
+    public List<MainPageCardHolderDTO> getMainPageCards(Long sparkUserId) {
+        List<CardHolder> cardHolders = cardHolderRepository.findBySparkUserId(sparkUserId);
+
+        if (cardHolders.isEmpty()) {
+            throw new CustomTalkSparkException(ErrorCode.CARDHOLDER_NOT_EXIST);
+        }
+
+        return cardHolders.stream()
+                .map(MainPageCardHolderDTO::entityToDTO).toList();
+    }
+
+
 }
