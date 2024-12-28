@@ -14,7 +14,7 @@ import java.util.List;
 @NoArgsConstructor
 public class CardHolderListDTO {
 
-    private Long numOfCards;
+    private int numOfCards;
 
     private String searchType;
 

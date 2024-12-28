@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import mutsa.yewon.talksparkbe.domain.card.entity.CardThema;
+import mutsa.yewon.talksparkbe.domain.cardHolder.entity.CardHolder;
 import mutsa.yewon.talksparkbe.domain.cardHolder.entity.StoredCard;
 
 @Data
@@ -33,7 +34,11 @@ public class StoredCardDTO {
 
     private CardThema cardThema;
 
-    public static StoredCardDTO entityToDTO(StoredCard storedCard) {
+    private boolean bookMark;
+
+    private String cardHolderName;
+
+    public static StoredCardDTO entityToDTO(StoredCard storedCard, CardHolder cardHolder) {
         return StoredCardDTO.builder()
                 .storedCardId(storedCard.getId())
                 .name(storedCard.getName())
@@ -45,6 +50,8 @@ public class StoredCardDTO {
                 .slogan(storedCard.getSlogan())
                 .tmi(storedCard.getTmi())
                 .cardThema(storedCard.getCardThema())
+                .bookMark(cardHolder.isBookMark())
+                .cardHolderName(cardHolder.getName())
                 .build();
     }
 }

@@ -6,6 +6,7 @@ import jakarta.annotation.PreDestroy;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import mutsa.yewon.talksparkbe.domain.game.controller.request.*;
+import mutsa.yewon.talksparkbe.domain.game.service.dto.CardBlanksDto;
 import mutsa.yewon.talksparkbe.domain.game.service.dto.CardQuestion;
 import mutsa.yewon.talksparkbe.domain.game.service.GameService;
 import mutsa.yewon.talksparkbe.domain.game.service.RoomService;
@@ -101,15 +102,15 @@ public class RoomSocketIOHandler {
 
 
         /* ================ 테스트할 때만 썼다가 안쓰는거 ================ */
-        server.addEventListener("createRoom", RoomCreateRequest.class, (client, data, ackSender) -> {
-            Long roomId = roomService.createRoom(data);
-            client.sendEvent("roomCreated", roomId); // 생성된 방 ID 반환
-        });
-
-        server.addEventListener("getRooms", Void.class, (client, data, ackSender) -> {
-            System.out.println("방 목록 줘야겠다");
-            client.sendEvent("roomList", roomService.listAllRooms());
-        });
+//        server.addEventListener("createRoom", RoomCreateRequest.class, (client, data, ackSender) -> {
+//            Long roomId = roomService.createRoom(data);
+//            client.sendEvent("roomCreated", roomId); // 생성된 방 ID 반환
+//        });
+//
+//        server.addEventListener("getRooms", Void.class, (client, data, ackSender) -> {
+//            System.out.println("방 목록 줘야겠다");
+//            client.sendEvent("roomList", roomService.listAllRooms());
+//        });
     }
 
     /* ================ 게임 관련 ================ */
@@ -168,7 +169,7 @@ public class RoomSocketIOHandler {
     // 질문 브로드캐스트 메서드
     private void broadcastQuestion(Long roomId) {
         CardQuestion question = gameService.getQuestion(roomId);
-        server.getRoomOperations(roomId.toString()).sendEvent("question", gameService.getCurrentCard(roomId), question);
+        server.getRoomOperations(roomId.toString()).sendEvent("question", gameService.getCurrentCard(roomId), gameService.getCurrentCardBlanks(roomId), question);
     }
 
     private void broadcastSingleQuestionResult(Long roomId) {
