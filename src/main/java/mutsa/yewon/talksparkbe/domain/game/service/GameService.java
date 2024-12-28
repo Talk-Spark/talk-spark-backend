@@ -4,6 +4,8 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import mutsa.yewon.talksparkbe.domain.card.dto.CardResponseDTO;
 import mutsa.yewon.talksparkbe.domain.card.entity.Card;
+import mutsa.yewon.talksparkbe.domain.cardHolder.dto.TeamCardHolderCreateDTO;
+import mutsa.yewon.talksparkbe.domain.cardHolder.service.StoredCardService;
 import mutsa.yewon.talksparkbe.domain.game.entity.Room;
 import mutsa.yewon.talksparkbe.domain.game.entity.RoomParticipate;
 import mutsa.yewon.talksparkbe.domain.game.repository.RoomRepository;
@@ -29,6 +31,7 @@ public class GameService {
 
     private final RoomRepository roomRepository;
     private final QuestionGenerator questionGenerator;
+    private final StoredCardService storedCardService;
 
     @Transactional(readOnly = true)
     public void startGame(Long roomId) {
@@ -107,9 +110,17 @@ public class GameService {
     @Transactional
     public void insertCardCopies(Long roomId) {
         GameState gameState = gameStates.get(roomId);
-        gameState.getParticipantIds();
-        gameState.getCards();
+        Room room = roomRepository.findById(roomId).orElseThrow();
+        List<Long> participantIds = gameState.getParticipantIds();// 참가자들 아이디
+        List<Card> cards = gameState.getCards(); // 참가됐던 카드들
 
         // 명함 보관함 있는 브랜치랑 병합 후 작업
+        for (Long participantId : participantIds) {
+            List<Long> addingCardIds = new ArrayList<>();
+            for (Card c : cards) {
+                if (!c.getSparkUser().getId().equals(participantId)) addingCardIds.add(c.getId());
+            }
+            storedCardService.storeTeamCard(TeamCardHolderCreateDTO.of(participantId, room.getRoomName(), addingCardIds));
+        }
     }
 }
