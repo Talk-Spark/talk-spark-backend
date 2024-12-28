@@ -9,6 +9,7 @@ import mutsa.yewon.talksparkbe.domain.game.service.dto.httpResponse.RoomListResp
 import mutsa.yewon.talksparkbe.domain.sparkUser.entity.SparkUser;
 import mutsa.yewon.talksparkbe.domain.sparkUser.repository.SparkUserRepository;
 import mutsa.yewon.talksparkbe.global.util.JWTUtil;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -26,9 +27,10 @@ public class RoomController {
 
     @PostMapping
     public ResponseEntity<RoomCreateResponse> roomCreate(@RequestBody RoomCreateRequest roomCreateRequest) {
-        return ResponseEntity.ok(
-                RoomCreateResponse.from(roomService.createRoom(roomCreateRequest))
-        );
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(
+                        RoomCreateResponse.from(roomService.createRoom(roomCreateRequest))
+                );
     }
 
     @GetMapping
