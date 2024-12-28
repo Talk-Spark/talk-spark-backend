@@ -86,9 +86,24 @@ public class RoomService {
     }
 
     public List<RoomListResponse> searchRooms(String searchName) {
-        return roomRepository.findByRoomNameContaining(searchName).stream()
-                .map(RoomListResponse::from)
-                .toList();
+        List<RoomListResponse> response = new ArrayList<>();
+        List<Room> rooms = roomRepository.findByRoomNameContaining(searchName);
+        for (Room room : rooms) {
+            String hostName = "";
+            List<RoomParticipate> roomParticipates = roomParticipateRepository.findByRoomIdWithSparkUser(room.getRoomId());
+            int participantsNum = roomParticipates.size();
+            for (RoomParticipate rp : roomParticipates) {
+                if (rp.isOwner()) hostName = rp.getSparkUser().getName();
+            }
+            response.add(RoomListResponse.builder()
+                    .roomId(room.getRoomId())
+                    .roomName(room.getRoomName())
+                    .hostName(hostName)
+                    .currentPeople(participantsNum)
+                    .maxPeople(room.getMaxPeople())
+                    .build());
+        }
+        return response;
     }
 
     @Transactional
