@@ -16,6 +16,7 @@ public class RoomParticipantResponse {
     private RoomParticipantResponse(Long sparkUserId, String name, String color, boolean isOwner) {
         this.sparkUserId = sparkUserId;
         this.name = name;
+        this.color = color;
         this.isOwner = isOwner;
     }
 
