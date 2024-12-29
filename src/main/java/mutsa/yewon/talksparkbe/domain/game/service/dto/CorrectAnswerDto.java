@@ -2,15 +2,18 @@ package mutsa.yewon.talksparkbe.domain.game.service.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Getter;
+import lombok.Data;
+import lombok.Setter;
 
-@Getter
+@Data
 @AllArgsConstructor
 @Builder
+@Setter
 public class CorrectAnswerDto {
 
     private Long sparkUserId;
     private String name;
     private boolean isCorrect;
+    private String color;
 
 }
