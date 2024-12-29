@@ -16,6 +16,7 @@ public enum ErrorCode {
     MUST_MAKE_CARD_FIRST(HttpStatus.NOT_FOUND, "현재 사용자님의 명함이 아직 만들어지지 않았습니다."),
     CARD_NOT_EXIST(HttpStatus.NOT_FOUND,"해당하는 명함이 존재하지 않습니다."),
     LOCK_TIMEOUT(HttpStatus.SERVICE_UNAVAILABLE, "락 획득 대기 시간이 초과되었습니다. 잠시 후 다시 시도해주세요."),
+    ROOM_NAME_DUPLICATE(HttpStatus.CONFLICT, "방 중복 이름 존재."),
     ROOM_FULL(HttpStatus.FORBIDDEN, "방이 꽉 찼습니다."),
     ROOM_JOIN_DUPLICATE(HttpStatus.CONFLICT, "중복 입장 오류"),
     ROOM_JOIN_INTERRUPTED(HttpStatus.SERVICE_UNAVAILABLE, "방 입장 처리가 강제로 중단되었습니다. 잠시 후 다시 시도해주세요."),
