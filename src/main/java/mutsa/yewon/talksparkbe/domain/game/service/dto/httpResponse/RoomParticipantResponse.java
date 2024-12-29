@@ -9,10 +9,11 @@ public class RoomParticipantResponse {
 
     private Long sparkUserId;
     private String name;
+    private String color;
     private boolean isOwner;
 
     @Builder
-    private RoomParticipantResponse(Long sparkUserId, String name, boolean isOwner) {
+    private RoomParticipantResponse(Long sparkUserId, String name, String color, boolean isOwner) {
         this.sparkUserId = sparkUserId;
         this.name = name;
         this.isOwner = isOwner;
@@ -22,6 +23,7 @@ public class RoomParticipantResponse {
         return RoomParticipantResponse.builder()
                 .sparkUserId(roomParticipate.getSparkUser().getId())
                 .name(roomParticipate.getSparkUser().getName())
+                .color(roomParticipate.getSparkUser().getCards().get(0).getCardThema().name())
                 .isOwner(roomParticipate.isOwner())
                 .build();
     }

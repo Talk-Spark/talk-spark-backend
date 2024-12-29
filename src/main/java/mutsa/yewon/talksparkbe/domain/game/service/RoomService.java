@@ -161,13 +161,14 @@ public class RoomService {
         return currentCount < room.getMaxPeople();
     }
     private void addParticipateToRoom(Room room, SparkUser sparkUser, boolean isHost) {
+        if (roomParticipateRepository.findByRoomAndSparkUser(room, sparkUser).isPresent()) throw new CustomTalkSparkException(ErrorCode.ROOM_JOIN_DUPLICATE);
         RoomParticipate roomParticipate = RoomParticipate.builder().room(room).sparkUser(sparkUser).isOwner(isHost).build();
         roomParticipateRepository.save(roomParticipate);
         room.assignRoomParticipate(roomParticipate);
         redisTemplate.opsForHash().increment(ROOM_COUNT_KEY, room.getRoomId().toString(), 1);
     }
     private void removeParticipateToRoom(Room room, SparkUser sparkUser) {
-        RoomParticipate roomParticipate = roomParticipateRepository.findByRoomAndSparkUser(room, sparkUser);
+        RoomParticipate roomParticipate = roomParticipateRepository.findByRoomAndSparkUser(room, sparkUser).orElseThrow();
         roomParticipateRepository.delete(roomParticipate);
         redisTemplate.opsForHash().increment(ROOM_COUNT_KEY, room.getRoomId().toString(), -1);
     }

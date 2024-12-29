@@ -17,6 +17,7 @@ public enum ErrorCode {
     CARD_NOT_EXIST(HttpStatus.NOT_FOUND,"해당하는 명함이 존재하지 않습니다."),
     LOCK_TIMEOUT(HttpStatus.SERVICE_UNAVAILABLE, "락 획득 대기 시간이 초과되었습니다. 잠시 후 다시 시도해주세요."),
     ROOM_FULL(HttpStatus.FORBIDDEN, "방이 꽉 찼습니다."),
+    ROOM_JOIN_DUPLICATE(HttpStatus.CONFLICT, "중복 입장 오류"),
     ROOM_JOIN_INTERRUPTED(HttpStatus.SERVICE_UNAVAILABLE, "방 입장 처리가 강제로 중단되었습니다. 잠시 후 다시 시도해주세요."),
     ROOM_NOT_FOUND(HttpStatus.NOT_FOUND, "방을 찾지 못했습니다."),
     NOT_YOUR_CARD(HttpStatus.UNAUTHORIZED, "본인의 명함만 수정,삭제가 가능합니다."),
