@@ -187,7 +187,8 @@ public class RoomSocketIOHandler {
     // 질문 브로드캐스트 메서드
     private void broadcastQuestion(Long roomId) {
         CardQuestion question = gameService.getQuestion(roomId);
-        server.getRoomOperations(roomId.toString()).sendEvent("question", gameService.getCurrentCard(roomId), gameService.getCurrentCardBlanks(roomId), question);
+        String roomName = roomService.getRoomName(roomId);
+        server.getRoomOperations(roomId.toString()).sendEvent("question", gameService.getCurrentCard(roomId), gameService.getCurrentCardBlanks(roomId), question, roomName);
     }
 
     private void broadcastSingleQuestionResult(Long roomId) {
