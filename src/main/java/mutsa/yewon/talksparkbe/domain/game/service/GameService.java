@@ -123,4 +123,13 @@ public class GameService {
             storedCardService.storeTeamCard(TeamCardHolderCreateDTO.of(participantId, room.getRoomName(), addingCardIds));
         }
     }
+
+    public String explainStatus(Long roomId) {
+        GameState gameState = gameStates.get(roomId);
+        List<CorrectAnswerDto> currentQuestionCorrect = gameState.getCurrentQuestionCorrect();
+        Map<Long, Integer> scores = gameState.getScores();
+        List<CardQuestion> questions = gameState.getQuestions();
+
+        return currentQuestionCorrect.toString() + "\n" + scores.toString() + "\n" + questions.toString();
+    }
 }
