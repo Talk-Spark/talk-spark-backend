@@ -17,6 +17,7 @@ import mutsa.yewon.talksparkbe.domain.sparkUser.repository.SparkUserRepository;
 import mutsa.yewon.talksparkbe.global.exception.CustomTalkSparkException;
 import mutsa.yewon.talksparkbe.global.util.JWTUtil;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Map;
@@ -181,7 +182,8 @@ public class RoomSocketIOHandler {
         server.getRoomOperations(roomId.toString()).sendEvent("question", gameService.getCurrentCard(roomId), gameService.getCurrentCardBlanks(roomId), question, roomName);
     }
 
-    private void broadcastSingleQuestionResult(Long roomId) {
+    @Transactional
+    public void broadcastSingleQuestionResult(Long roomId) {
         List<CorrectAnswerDto> singleQuestionScoreBoard = gameService.getSingleQuestionScoreBoard(roomId);
         singleQuestionScoreBoard.forEach(it -> {
             it.setName(sparkUserRepository.findById(it.getSparkUserId()).orElseThrow().getName());
