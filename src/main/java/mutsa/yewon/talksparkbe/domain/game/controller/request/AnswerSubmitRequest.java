@@ -1,8 +1,8 @@
 package mutsa.yewon.talksparkbe.domain.game.controller.request;
 
-import lombok.Getter;
+import lombok.Data;
 
-@Getter
+@Data
 public class AnswerSubmitRequest {
     private Long roomId;
     private Long sparkUserId;
