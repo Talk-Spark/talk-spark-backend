@@ -52,7 +52,8 @@ public class JWTCheckFilter extends OncePerRequestFilter {
                 "/api/test-user",
                 "/api/rooms",
                 "/api/rooms/is-duplicate",
-                "/api/rooms/question-tip"
+                "/api/rooms/question-tip",
+                "/test"
         };
 
         return Arrays.stream(excludePath).anyMatch(requestURI::startsWith);
