@@ -121,6 +121,7 @@ public class RoomSocketIOHandler {
         server.addEventListener("joinGame", RoomJoinRequest.class, (client, data, ackSender) -> {
             System.out.println("joinGame 받음. " + data.toString());
             server.getClient(client.getSessionId()).joinRoom(data.getRoomId().toString());
+
             String token = data.getAccessToken();
             String jwt = token.replace("Bearer ", "");
             Map<String, Object> claims = jwtUtil.validateToken(jwt);
