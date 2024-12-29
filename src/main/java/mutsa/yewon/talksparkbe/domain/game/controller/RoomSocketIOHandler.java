@@ -43,6 +43,10 @@ public class RoomSocketIOHandler {
             client.sendEvent("response", "Hello, client!");
         });
 
+        server.addDisconnectListener(client -> {
+            client.sendEvent("disconnecting", "당신은 이제 연결이 끊깁니다.");
+        });
+
         server.start();
     }
 
