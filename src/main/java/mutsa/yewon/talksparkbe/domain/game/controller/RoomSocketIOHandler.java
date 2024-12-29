@@ -35,6 +35,7 @@ public class RoomSocketIOHandler {
     public void startServer() {
         server.addConnectListener(client -> {
             System.out.println("Client connected: " + client.getSessionId());
+            client.sendEvent("connectAck", "당신은 서버와 연결되었습니다.");
         });
 
         server.addEventListener("message", String.class, (client, data, ackSender) -> {
