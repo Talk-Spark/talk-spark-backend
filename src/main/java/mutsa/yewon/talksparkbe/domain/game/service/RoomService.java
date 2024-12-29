@@ -43,6 +43,8 @@ public class RoomService {
 
     @Transactional
     public Room createRoom(RoomCreateRequest roomCreateRequest) {
+        if (roomRepository.findByRoomName(roomCreateRequest.getRoomName()).isPresent())
+            throw new CustomTalkSparkException(ErrorCode.ROOM_NAME_DUPLICATE);
         Room room = roomRepository.save(roomCreateRequest.toRoomEntity());
         redisTemplate.opsForHash().put(ROOM_COUNT_KEY, room.getRoomId().toString(), "0");
         return room;
