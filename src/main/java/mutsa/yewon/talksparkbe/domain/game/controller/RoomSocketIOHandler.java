@@ -155,6 +155,7 @@ public class RoomSocketIOHandler {
             gameService.submitAnswer(roomId, sparkUserId, answer);
             if (gameService.allPeopleSubmitted(roomId)) {
                 broadcastSingleQuestionResult(roomId);
+                gameService.updateBlanks(roomId);
             }
             System.out.println(gameService.explainStatus(roomId));
         });
@@ -163,13 +164,16 @@ public class RoomSocketIOHandler {
             System.out.println("next 받음. " + data.toString());
             Long roomId = data.getRoomId();
 
-            SwitchSubject switchSubject = checkSubjectChanged(roomId);
+            SwitchSubject switchSubject = gameService.isSwitchingSubject(roomId);
             if (switchSubject.equals(SwitchSubject.END)) {
                 server.getRoomOperations(roomId.toString()).sendEvent("lastResult", gameService.getCurrentCard(roomId));
             } else if (switchSubject.equals(SwitchSubject.TRUE)) {
                 server.getRoomOperations(roomId.toString()).sendEvent("singleResult", gameService.getCurrentCard(roomId));
                 gameService.loadNextQuestion(roomId);
-            } else gameService.loadNextQuestion(roomId);
+            } else {
+                gameService.loadNextQuestion(roomId);
+                broadcastQuestion(roomId);
+            }
         });
 
         server.addEventListener("getEnd", QuestionRequest.class, (client, data, ackSender) -> {
@@ -190,10 +194,6 @@ public class RoomSocketIOHandler {
         List<CorrectAnswerDto> singleQuestionScoreBoard = gameService.getSingleQuestionScoreBoard(roomId);
         if (!singleQuestionScoreBoard.isEmpty())
             server.getRoomOperations(roomId.toString()).sendEvent("singleQuestionScoreBoard", singleQuestionScoreBoard);
-    }
-
-    private SwitchSubject checkSubjectChanged(Long roomId) {
-        return gameService.isSwitchingSubject(roomId);
     }
 
 }
