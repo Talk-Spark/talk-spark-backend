@@ -5,6 +5,7 @@ import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import mutsa.yewon.talksparkbe.domain.card.entity.CardThema;
 import mutsa.yewon.talksparkbe.domain.game.controller.request.*;
 import mutsa.yewon.talksparkbe.domain.game.service.dto.CardQuestion;
 import mutsa.yewon.talksparkbe.domain.game.service.GameService;
@@ -182,6 +183,13 @@ public class RoomSocketIOHandler {
 
     private void broadcastSingleQuestionResult(Long roomId) {
         List<CorrectAnswerDto> singleQuestionScoreBoard = gameService.getSingleQuestionScoreBoard(roomId);
+        singleQuestionScoreBoard.forEach(it -> {
+            it.setName(sparkUserRepository.findById(it.getSparkUserId()).orElseThrow().getName());
+        });
+        singleQuestionScoreBoard.forEach(it -> {
+            CardThema cardThema = sparkUserRepository.findById(it.getSparkUserId()).orElseThrow().getCards().get(0).getCardThema();
+            it.setColor(cardThema.name());
+        });
         if (!singleQuestionScoreBoard.isEmpty())
             server.getRoomOperations(roomId.toString()).sendEvent("singleQuestionScoreBoard", singleQuestionScoreBoard);
     }
