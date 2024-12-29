@@ -132,4 +132,13 @@ public class GameService {
 
         return currentQuestionCorrect.toString() + "\n" + scores.toString() + "\n" + questions.toString();
     }
+
+    public void updateBlanks(Long roomId) {
+        GameState gameState = gameStates.get(roomId);
+        String fieldName = gameState.getCurrentQuestion().getFieldName();
+        Long cardOwnerId = gameState.getCurrentQuestion().getCardOwnerId();
+        gameState.getCardBlanksDtos().stream()
+                .filter(cbd -> cbd.getSparkUserId().equals(cardOwnerId)).findFirst()
+                .ifPresent(cbd -> cbd.getBlanks().remove(fieldName));
+    }
 }

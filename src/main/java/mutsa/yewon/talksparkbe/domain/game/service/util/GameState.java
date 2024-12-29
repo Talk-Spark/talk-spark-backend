@@ -14,18 +14,13 @@ import java.util.*;
 public class GameState {
 
     private final List<Long> participantIds = new ArrayList<>();
-
     private final List<Card> cards;
     private final List<CardQuestion> questions;
-
     private final Integer roomPeople;
-
     private Long currentSubjectId;
     private final Map<CardQuestion, Integer> answerNums = new HashMap<>(); // 각 문제마다 답 제출한 사람 수
     private final List<CorrectAnswerDto> currentQuestionCorrect = new ArrayList<>(); // 현재 문제 정답 여부. 유저아이디 : 맞춤
-
     private final Map<Long, Integer> scores = new HashMap<>(); // 유저아이디 : 점수
-
     private final List<CardBlanksDto> cardBlanksDtos = new ArrayList<>();
 
     public GameState(List<Card> cards, List<UserCardQuestions> userCardQuestions, Integer roomPeople) {
@@ -76,20 +71,11 @@ public class GameState {
 
     public Card getCurrentCard() {
         Long cardId = getCurrentQuestion().getCardId();
-
-        for (Card c : cards) {
-            if (c.getId().equals(cardId)) return c;
-        }
-        return null;
+        return cards.stream().filter(c -> c.getId().equals(cardId)).findFirst().orElse(null);
     }
 
     public CardBlanksDto getCurrentCardBlanks() {
         Long sparkUserId = getCurrentQuestion().getCardOwnerId();
-
-        for (CardBlanksDto cbd : cardBlanksDtos) {
-            if (cbd.getSparkUserId().equals(sparkUserId)) return cbd;
-        }
-
-        return null;
+        return cardBlanksDtos.stream().filter(cbd -> cbd.getSparkUserId().equals(sparkUserId)).findFirst().orElse(null);
     }
 }

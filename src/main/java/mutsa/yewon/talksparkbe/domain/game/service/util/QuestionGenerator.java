@@ -9,7 +9,6 @@ import java.util.*;
 
 @Component
 public class QuestionGenerator {
-    private final Random random = new Random();
 
     public List<UserCardQuestions> execute(List<Card> cards, int difficulty) {
         int numOfQuestions = 0;
@@ -18,7 +17,7 @@ public class QuestionGenerator {
         List<UserCardQuestions> userCardQuestionsList = new ArrayList<>();
 
         // 빈칸 필드를 생성할 키 리스트 (명함의 필드명)
-        List<String> keys = List.of("major", "mbti", "hobby", "lookAlike", "selfDescription", "tmi");
+        List<String> keys = List.of("mbti", "hobby", "lookAlike", "selfDescription", "tmi");
         Map<String, Integer> fieldCount = new HashMap<>();
         int numOfPeople = cards.size();
 
@@ -31,7 +30,7 @@ public class QuestionGenerator {
         }
 
         for (Card c : cards) {
-            List<String> fields = new ArrayList<>(List.of("major", "mbti", "hobby", "lookAlike", "selfDescription", "tmi"));
+            List<String> fields = new ArrayList<>(List.of("mbti", "hobby", "lookAlike", "selfDescription", "tmi"));
             List<CardQuestion> questions = new ArrayList<>();
 
             fields.removeIf(field -> getFieldValue(c, field) == null || fieldCount.get(field) < numOfPeople);
@@ -65,7 +64,6 @@ public class QuestionGenerator {
             return switch (fieldName) {
                 case "name" -> card.getName();
                 case "age" -> card.getAge() != null ? card.getAge().toString() : null;
-                case "major" -> card.getMajor();
                 case "mbti" -> card.getMbti();
                 case "hobby" -> card.getHobby();
                 case "lookAlike" -> card.getLookAlike();
