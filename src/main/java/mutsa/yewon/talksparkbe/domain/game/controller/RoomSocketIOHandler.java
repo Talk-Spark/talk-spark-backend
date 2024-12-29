@@ -156,6 +156,7 @@ public class RoomSocketIOHandler {
             if (gameService.allPeopleSubmitted(roomId)) {
                 broadcastSingleQuestionResult(roomId);
             }
+            System.out.println(gameService.explainStatus(roomId));
         });
 
         server.addEventListener("next", QuestionRequest.class, (client, data, ackSender) -> {
