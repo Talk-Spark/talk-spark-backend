@@ -23,6 +23,6 @@ public interface RoomParticipateRepository extends JpaRepository<RoomParticipate
             "where rp.room.roomId = :roomId and rp.isOwner = true ")
     Optional<RoomParticipate> findByRoomIdWithOwner(Long roomId);
 
-    RoomParticipate findByRoomAndSparkUser(Room room, SparkUser sparkUser);
+    Optional<RoomParticipate> findByRoomAndSparkUser(Room room, SparkUser sparkUser);
 
 }
