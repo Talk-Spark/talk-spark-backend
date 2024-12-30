@@ -113,6 +113,7 @@ public class RoomSocketIOHandler {
     /* ================ 게임 관련 ================ */
 
     @PostConstruct
+    @Transactional
     public void startGameListeners() {
         server.addEventListener("joinGame", RoomJoinRequest.class, (client, data, ackSender) -> {
             System.out.println("joinGame 받음. " + data.toString());
@@ -182,7 +183,7 @@ public class RoomSocketIOHandler {
         server.getRoomOperations(roomId.toString()).sendEvent("question", gameService.getCurrentCard(roomId), gameService.getCurrentCardBlanks(roomId), question, roomName);
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public void broadcastSingleQuestionResult(Long roomId) {
         List<CorrectAnswerDto> singleQuestionScoreBoard = gameService.getSingleQuestionScoreBoard(roomId);
         singleQuestionScoreBoard.forEach(it -> {
