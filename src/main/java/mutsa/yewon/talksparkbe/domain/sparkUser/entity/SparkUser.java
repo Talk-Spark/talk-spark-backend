@@ -3,6 +3,7 @@ package mutsa.yewon.talksparkbe.domain.sparkUser.entity;
 import jakarta.persistence.*;
 import lombok.*;
 import mutsa.yewon.talksparkbe.domain.card.entity.Card;
+import mutsa.yewon.talksparkbe.domain.cardHolder.entity.CardHolder;
 import mutsa.yewon.talksparkbe.domain.cardHolder.entity.StoredCard;
 import mutsa.yewon.talksparkbe.domain.guestBook.entity.GuestBookRoomSparkUser;
 
@@ -29,6 +30,9 @@ public class SparkUser {
 
     @OneToMany(mappedBy = "sparkUser", cascade = CascadeType.ALL)
     private List<Card> cards;
+
+    @OneToMany(mappedBy = "sparkUser", cascade = CascadeType.ALL)
+    private List<CardHolder> cardHolders;
 
     @Builder.Default
     @ElementCollection(fetch = FetchType.LAZY)
