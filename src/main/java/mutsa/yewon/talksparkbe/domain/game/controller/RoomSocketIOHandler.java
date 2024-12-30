@@ -190,7 +190,7 @@ public class RoomSocketIOHandler {
             it.setName(sparkUserRepository.findById(it.getSparkUserId()).orElseThrow().getName());
         });
         singleQuestionScoreBoard.forEach(it -> {
-            CardThema cardThema = sparkUserRepository.findById(it.getSparkUserId()).orElseThrow().getCards().get(0).getCardThema();
+            CardThema cardThema = sparkUserRepository.findByIdWithCards(it.getSparkUserId()).orElseThrow().getCards().get(0).getCardThema();
             it.setColor(cardThema.name());
         });
         if (!singleQuestionScoreBoard.isEmpty())
