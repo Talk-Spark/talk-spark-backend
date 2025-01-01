@@ -37,7 +37,6 @@ public class CardHolder {
 
     @ElementCollection
     @Builder.Default
-    @BatchSize(size = 8)
     private List<String> teammates = new ArrayList<>(); // 개별 명함인 경우 사용자 이름 저장, 팀별 명함 모음이면 팀원들 이름 모두 저장
 
     @Builder.Default
@@ -58,40 +57,37 @@ public class CardHolder {
 
     public static CardHolder cardToIndCardHolder(String name, SparkUser sparkUser) {
 
-        CardHolder cardHolder = CardHolder.builder()
+        return CardHolder.builder()
                 .sparkUser(sparkUser)
                 .name(name)
                 .storedStatus(StoredStatus.INDIVIDUAL)
                 .bookMark(false)
                 .numOfTeammates(1)
+                .teammates(List.of(name))
                 .build();
 
-        List<String> name1 = List.of(name);
 
-        cardHolder.addTeammatesName(name1);
-
-        return cardHolder;
     }
 
     public static CardHolder cardToTeamCardHolder(String teamName, SparkUser sparkUser, List<Card> cards) {
-        CardHolder cardHolder = CardHolder.builder()
+
+        List<String> teammateNames = cards.stream().map(Card::getName).sorted().toList();
+
+        return CardHolder.builder()
                 .sparkUser(sparkUser)
                 .name(teamName)
                 .storedStatus(StoredStatus.TEAM)
                 .numOfTeammates(cards.size())
+                .teammates(teammateNames)
                 .bookMark(false)
                 .build();
 
-        List<String> teammateNames = cards.stream().map(card -> card.getName()).sorted().toList();
 
-        cardHolder.addTeammatesName(teammateNames);
-
-        return cardHolder;
     }
 
-    private void addTeammatesName(List<String> teammatesNames){
-        this.teammates.addAll(teammatesNames);
-    }
+//    private void addTeammatesName(List<String> teammatesNames){
+//        this.teammates.addAll(teammatesNames);
+//    }
 
     public void bookMarkCard(){
         this.bookMark = !this.bookMark;

@@ -30,8 +30,6 @@ public class StoredCardServiceImpl implements StoredCardService {
 
     private final SparkUserRepository sparkUserRepository;
 
-    private final StoredCardRepository storedCardRepository;
-
 
     @Override
     public Long storeIndCard(IndCardHolderCreateDTO indCardHolderCreateDTO) {
@@ -81,7 +79,6 @@ public class StoredCardServiceImpl implements StoredCardService {
                 .orElseThrow(() -> new CustomTalkSparkException(ErrorCode.CARDHOLDER_NOT_EXIST));
 
 
-//        List<StoredCard> storedCards = storedCardRepository.findByCardHolderId(cardHolderId);
 
         List<StoredCard> storedCards = cardHolder.getStoredCards();
 
