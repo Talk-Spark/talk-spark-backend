@@ -33,7 +33,6 @@ public class RoomSocketIOHandler {
     private final GameService gameService;
     private final SparkUserRepository sparkUserRepository;
     private final JWTUtil jwtUtil;
-    private final SecurityUtil securityUtil;
 
     @PostConstruct
     public void startServer() {
