@@ -18,28 +18,44 @@ public class QuestionGenerator {
 
         // 빈칸 필드를 생성할 키 리스트 (명함의 필드명)
         List<String> keys = List.of("mbti", "hobby", "lookAlike", "selfDescription", "tmi");
+
+        Map<String, Set<String>> listOfOptions = new HashMap<>();
+
         Map<String, Integer> fieldCount = new HashMap<>();
         int numOfPeople = cards.size();
 
         // 각 필드마다, 이 필드를 채워놓은 놈이 사람수만큼은 되어야 문제로 출제 가능
         for (String k : keys) {
-            int count = 0;
-            for (Card c : cards)
-                if (getFieldValue(c, k) != null) count++;
-            fieldCount.put(k, count); // 각 필드를 채워놓은 놈의 숫자 맵
+
+            Set<String> options = new HashSet<>();
+
+            for (Card c : cards){
+                String fieldValue = getFieldValue(c, k);
+
+                if (fieldValue != null){
+                    options.add(fieldValue);
+                }
+            }
+            listOfOptions.put(k, options);
+            fieldCount.put(k, options.size()); // 각 필드를 채워놓은 놈의 숫자 맵
         }
 
         for (Card c : cards) {
             List<String> fields = new ArrayList<>(List.of("mbti", "hobby", "lookAlike", "selfDescription", "tmi"));
             List<CardQuestion> questions = new ArrayList<>();
 
-            fields.removeIf(field -> getFieldValue(c, field) == null || fieldCount.get(field) < numOfPeople);
+            if(numOfPeople <= 4){
+                fields.removeIf(field -> fieldCount.get(field) < numOfPeople);
+            }
+            else{
+                fields.removeIf(field -> getFieldValue(c, field) == null || fieldCount.get(field) < 4);
+            }
             System.out.println("fields = " + fields);
             Collections.shuffle(fields);
             System.out.println("fields = " + fields);
 
             for (int i=0;i<numOfQuestions;i++) {
-                questions.add(generateQuestion(c, fields.get(i), cards, numOfPeople));
+                questions.add(generateQuestion(c, fields.get(i), listOfOptions.get(fields.get(i)), numOfPeople));
             }
             System.out.println("generateQuestion이 끝남");
 
@@ -51,9 +67,9 @@ public class QuestionGenerator {
         return userCardQuestionsList;
     }
 
-    private CardQuestion generateQuestion(Card c, String fieldName, List<Card> cards, int numOfPeople) {
+    private CardQuestion generateQuestion(Card c, String fieldName, Set<String> cardData, int numOfPeople) {
         String correctAnswer = getFieldValue(c, fieldName);
-        List<String> options = generateOptions(fieldName, correctAnswer, cards, numOfPeople);
+        List<String> options = generateOptions(fieldName, correctAnswer, cardData, numOfPeople);
         System.out.println("generateOptions 끝남");
         return new CardQuestion(c.getId(), c.getSparkUser().getId(), fieldName, correctAnswer, options);
     }
@@ -78,19 +94,45 @@ public class QuestionGenerator {
     }
 
     // 보기 생성: 다른 참가자의 해당 필드 값 + 정답
-    private List<String> generateOptions(String fieldName, String correctAnswer, List<Card> cards, int numOfPeople) {
+    private List<String> generateOptions(String fieldName, String correctAnswer, Set<String> cardData, int numOfPeople) {
         int maxOptionNum = Math.min(4, numOfPeople);
-        System.out.println("maxOptionNum = " + maxOptionNum);
-        List<String> options = new ArrayList<>();
-        options.add(correctAnswer);
-        List<String> canBeOptions = new ArrayList<>(cards.stream().map(c -> getFieldValue(c, fieldName)).toList());
-        canBeOptions.remove(correctAnswer);
-        while (options.size() < maxOptionNum) {
-            options.add(canBeOptions.get(0));
-            canBeOptions.remove(0);
+
+        if(maxOptionNum < 4){
+            return new ArrayList<>(cardData);
         }
 
+        List<String> canBeOptions = new ArrayList<>(cardData);
+
+
+
+        canBeOptions.remove(correctAnswer);
+
+        List<String> options = getOptionsByCombi(canBeOptions, 3);
+
+
+
+        options.add(correctAnswer);
         Collections.shuffle(options); // 보기 순서 섞기
+
+        return options;
+    }
+
+    private List<String> getOptionsByCombi(List<String> candidates, int count){
+        if (count > candidates.size()) {
+            throw new RuntimeException("요청된 갯수는 Set의 크기보다 클 수 없습니다.");
+        }
+
+
+        List<String> options = new ArrayList<>();
+
+        Random random = new Random();
+
+        while(options.size() < count){
+            int index = random.nextInt(candidates.size());
+
+            options.add(candidates.get(index));
+        }
+
         return options;
     }
 
