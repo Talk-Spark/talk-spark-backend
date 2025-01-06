@@ -179,6 +179,7 @@ public class RoomService {
         return count != null ? Integer.parseInt(count) : 0;
     }
 
+    @Transactional
     public void changeStarted(Long roomId) {
         roomRepository.findById(roomId).orElseThrow().start();
     }

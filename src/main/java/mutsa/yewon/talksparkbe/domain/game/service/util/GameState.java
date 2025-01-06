@@ -34,7 +34,6 @@ public class GameState {
     }
 
     public CardQuestion getCurrentQuestion() {
-        currentSubjectId = questions.get(0).getCardOwnerId();
         return questions.get(0);
     }
 
@@ -46,7 +45,8 @@ public class GameState {
         CardQuestion currentQuestion = questions.get(0);
         if (currentQuestion.getCorrectAnswer().equals(answer)) {
             scores.put(sparkUserId, scores.getOrDefault(sparkUserId, 0) + 1);
-            currentQuestionCorrect.add(CorrectAnswerDto.builder().sparkUserId(sparkUserId).isCorrect(Boolean.TRUE).build());
+            currentQuestionCorrect.add(CorrectAnswerDto.builder().
+                    sparkUserId(sparkUserId).isCorrect(Boolean.TRUE).build());
         }
         answerNums.put(currentQuestion, answerNums.get(currentQuestion) + 1);
     }
@@ -65,6 +65,8 @@ public class GameState {
     public SwitchSubject isSwitchingSubject() {
         if (questions.size() < 2) return SwitchSubject.END;
         else if (!questions.get(1).getCardOwnerId().equals(currentSubjectId)) {
+
+            currentSubjectId = questions.get(1).getCardOwnerId();
             return SwitchSubject.TRUE;
         } else return SwitchSubject.FALSE;
     }

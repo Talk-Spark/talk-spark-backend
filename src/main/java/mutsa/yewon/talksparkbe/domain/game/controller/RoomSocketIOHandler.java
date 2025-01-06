@@ -5,7 +5,9 @@ import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import mutsa.yewon.talksparkbe.domain.card.entity.Card;
 import mutsa.yewon.talksparkbe.domain.card.entity.CardThema;
+import mutsa.yewon.talksparkbe.domain.card.repository.CardRepository;
 import mutsa.yewon.talksparkbe.domain.game.controller.request.*;
 import mutsa.yewon.talksparkbe.domain.game.service.dto.CardQuestion;
 import mutsa.yewon.talksparkbe.domain.game.service.GameService;
@@ -32,6 +34,7 @@ public class RoomSocketIOHandler {
     private final GameService gameService;
     private final SparkUserRepository sparkUserRepository;
     private final JWTUtil jwtUtil;
+    private final CardRepository cardRepository;
 
     @PostConstruct
     public void startServer() {
@@ -48,7 +51,6 @@ public class RoomSocketIOHandler {
         server.addDisconnectListener(client -> {
             client.sendEvent("disconnecting", "당신은 이제 연결이 끊깁니다.");
         });
-
         server.start();
     }
 
@@ -161,7 +163,6 @@ public class RoomSocketIOHandler {
                 server.getRoomOperations(roomId.toString()).sendEvent("lastResult", gameService.getCurrentCard(roomId));
             } else if (switchSubject.equals(SwitchSubject.TRUE)) {
                 server.getRoomOperations(roomId.toString()).sendEvent("singleResult", gameService.getCurrentCard(roomId));
-                gameService.loadNextQuestion(roomId);
             } else {
                 gameService.loadNextQuestion(roomId);
                 broadcastQuestion(roomId);
@@ -180,19 +181,19 @@ public class RoomSocketIOHandler {
     private void broadcastQuestion(Long roomId) {
         CardQuestion question = gameService.getQuestion(roomId);
         String roomName = roomService.getRoomName(roomId);
-        server.getRoomOperations(roomId.toString()).sendEvent("question", gameService.getCurrentCard(roomId), gameService.getCurrentCardBlanks(roomId), question, roomName);
+        server.getRoomOperations(roomId.toString()).sendEvent("question",
+                gameService.getCurrentCard(roomId), gameService.getCurrentCardBlanks(roomId), question, roomName);
     }
 
     @Transactional(readOnly = true)
     public void broadcastSingleQuestionResult(Long roomId) {
         List<CorrectAnswerDto> singleQuestionScoreBoard = gameService.getSingleQuestionScoreBoard(roomId);
-        singleQuestionScoreBoard.forEach(it -> {
-            it.setName(sparkUserRepository.findById(it.getSparkUserId()).orElseThrow().getName());
-        });
-        singleQuestionScoreBoard.forEach(it -> {
-            CardThema cardThema = sparkUserRepository.findByIdWithCards(it.getSparkUserId()).orElseThrow().getCards().get(0).getCardThema();
-            it.setColor(cardThema.name());
-        });
+        singleQuestionScoreBoard
+                .forEach(it -> {
+                    List<Card> cardList = cardRepository.findBySparkUserId(it.getSparkUserId());
+                    it.setName(cardList.get(0).getName());
+                    it.setColor(cardList.get(0).getCardThema());
+                });
         if (!singleQuestionScoreBoard.isEmpty())
             server.getRoomOperations(roomId.toString()).sendEvent("singleQuestionScoreBoard", singleQuestionScoreBoard);
     }

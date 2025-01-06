@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.Setter;
+import mutsa.yewon.talksparkbe.domain.card.entity.CardThema;
 
 @Data
 @AllArgsConstructor
@@ -14,6 +15,6 @@ public class CorrectAnswerDto {
     private Long sparkUserId;
     private String name;
     private boolean isCorrect;
-    private String color;
+    private CardThema color;
 
 }
