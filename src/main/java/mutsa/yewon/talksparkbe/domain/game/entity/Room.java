@@ -1,10 +1,7 @@
 package mutsa.yewon.talksparkbe.domain.game.entity;
 
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import mutsa.yewon.talksparkbe.domain.guestBook.entity.GuestBook;
 import mutsa.yewon.talksparkbe.domain.guestBook.entity.GuestBookRoom;
 import org.springframework.data.annotation.CreatedDate;
@@ -16,6 +13,7 @@ import java.util.*;
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
+@Setter
 @EntityListeners(AuditingEntityListener.class)
 public class Room {
 

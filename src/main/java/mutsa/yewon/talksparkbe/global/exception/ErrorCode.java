@@ -28,7 +28,8 @@ public enum ErrorCode {
     GUESTBOOK_ROOM_NOT_FOUND(HttpStatus.NOT_FOUND, "방명록 방을 찾지 못했습니다."),
     CARDHOLDER_NOT_EXIST(HttpStatus.NOT_FOUND, "해당하는 명함은 저장된 이력이 없습니다."),
     NO_BOOKMARKED_CONTENT(HttpStatus.NOT_FOUND, "즐겨찾기 된 명함이 없습니다."),
-    NO_MATCHING_CARDHOLDER(HttpStatus.NOT_FOUND, "해당하는 이름의 명함이 존재하지 않습니다.");
+    NO_MATCHING_CARDHOLDER(HttpStatus.NOT_FOUND, "해당하는 이름의 명함이 존재하지 않습니다."),
+    NOT_ROOM_USER(HttpStatus.NOT_FOUND, "해당 방의 참여자가 아닙니다.");
 
 
 
