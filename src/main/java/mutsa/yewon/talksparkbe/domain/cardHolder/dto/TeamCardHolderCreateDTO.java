@@ -27,6 +27,7 @@ public class TeamCardHolderCreateDTO {
 
     public static TeamCardHolderCreateDTO of(Long sparkUserId, String teamName, List<Long> cardIds) {
         return TeamCardHolderCreateDTO.builder()
+                .sparkUserId(sparkUserId)
                 .storeType("TEAM")
                 .teamName(teamName)
                 .cardIds(cardIds)

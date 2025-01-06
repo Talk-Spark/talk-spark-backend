@@ -108,20 +108,20 @@ public class GameService {
     }
 
     @Transactional
-    public void insertCardCopies(Long roomId) {
+    public void insertCardCopies(Long roomId, Long sparkUserId) {
         GameState gameState = gameStates.get(roomId);
         Room room = roomRepository.findById(roomId).orElseThrow();
         List<Long> participantIds = gameState.getParticipantIds();// 참가자들 아이디
         List<Card> cards = gameState.getCards(); // 참가됐던 카드들
+        List<Long> addingCardIds = new ArrayList<>();
 
         // 명함 보관함 있는 브랜치랑 병합 후 작업
         for (Long participantId : participantIds) {
-            List<Long> addingCardIds = new ArrayList<>();
             for (Card c : cards) {
                 if (!c.getSparkUser().getId().equals(participantId)) addingCardIds.add(c.getId());
             }
-            storedCardService.storeTeamCard(TeamCardHolderCreateDTO.of(participantId, room.getRoomName(), addingCardIds));
         }
+        storedCardService.storeTeamCard(TeamCardHolderCreateDTO.of(sparkUserId, room.getRoomName(), addingCardIds));
     }
 
     public String explainStatus(Long roomId) {

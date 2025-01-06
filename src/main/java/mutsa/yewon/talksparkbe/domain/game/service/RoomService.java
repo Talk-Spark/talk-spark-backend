@@ -20,10 +20,12 @@ import org.redisson.api.RedissonClient;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import mutsa.yewon.talksparkbe.global.util.SecurityUtil;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 @Service
@@ -36,6 +38,7 @@ public class RoomService {
     private final RoomParticipateRepository roomParticipateRepository;
     private final RedissonClient redissonClient;
     private final StringRedisTemplate redisTemplate;
+    private final SecurityUtil securityUtil;
 
     private final JWTUtil jwtUtil;
 
@@ -46,6 +49,7 @@ public class RoomService {
         if (roomRepository.findByRoomName(roomCreateRequest.getRoomName()).isPresent())
             throw new CustomTalkSparkException(ErrorCode.ROOM_NAME_DUPLICATE);
         Room room = roomRepository.save(roomCreateRequest.toRoomEntity());
+
         redisTemplate.opsForHash().put(ROOM_COUNT_KEY, room.getRoomId().toString(), "0");
         return room;
     }

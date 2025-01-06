@@ -18,6 +18,7 @@ import mutsa.yewon.talksparkbe.global.exception.CustomTalkSparkException;
 import mutsa.yewon.talksparkbe.global.util.JWTUtil;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+import mutsa.yewon.talksparkbe.global.util.SecurityUtil;
 
 import java.util.List;
 import java.util.Map;
@@ -32,6 +33,7 @@ public class RoomSocketIOHandler {
     private final GameService gameService;
     private final SparkUserRepository sparkUserRepository;
     private final JWTUtil jwtUtil;
+    private final SecurityUtil securityUtil;
 
     @PostConstruct
     public void startServer() {
@@ -168,10 +170,13 @@ public class RoomSocketIOHandler {
             }
         });
 
-        server.addEventListener("getEnd", QuestionRequest.class, (client, data, ackSender) -> {
+        server.addEventListener("getEnd", EndRequest.class, (client, data, ackSender) -> {
             System.out.println("getEnd 받음. " + data.toString());
+            System.out.println("getEnd RoomId " + data.getRoomId().toString());
+            Long sparkUserId = data.getSparkUserId();
+            System.out.println("Room Operations: " + server.getRoomOperations(data.getRoomId().toString()));
             server.getRoomOperations(data.getRoomId().toString()).sendEvent("scores", gameService.getScores(data.getRoomId()), gameService.getAllRelatedCards(data.getRoomId()));
-            gameService.insertCardCopies(data.getRoomId());
+            gameService.insertCardCopies(data.getRoomId(), sparkUserId);
             roomService.changeFinished(data.getRoomId());
         });
     }

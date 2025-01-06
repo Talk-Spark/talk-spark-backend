@@ -43,7 +43,6 @@ public class GuestBookService {
     private final RoomRepository roomRepository;
     private final SecurityUtil securityUtil;
 
-    //TODO: RuntimeException("User not found")) customException으로 수정
     @Transactional
     public void createGuestBookData(Long roomId) {
         SparkUser sparkUser = sparkUserRepository.findById(securityUtil.getLoggedInUserId()).orElseThrow(()
