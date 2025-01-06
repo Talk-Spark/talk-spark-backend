@@ -2,6 +2,8 @@ package mutsa.yewon.talksparkbe.domain.guestBook.controller;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import mutsa.yewon.talksparkbe.domain.game.entity.Room;
+import mutsa.yewon.talksparkbe.domain.game.repository.RoomRepository;
 import mutsa.yewon.talksparkbe.domain.guestBook.GuestBookControllerDocs;
 import mutsa.yewon.talksparkbe.domain.guestBook.dto.guestBook.GuestBookContent;
 import mutsa.yewon.talksparkbe.domain.guestBook.dto.guestBook.GuestBookListRequestDTO;
@@ -29,6 +31,7 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class GuestBookController implements GuestBookControllerDocs {
 
+    private final RoomRepository roomRepository;
     private final GuestBookService guestBookService;
     private final GuestBookRoomService guestBookRoomService;
     private final SecurityUtil securityUtil;
@@ -40,6 +43,13 @@ public class GuestBookController implements GuestBookControllerDocs {
     public ResponseEntity<?> postGuestBook(@RequestParam(required = true) Long roomId) {
 
         try {
+            Room room = roomRepository.findById(roomId).orElseThrow(
+                    () -> new CustomTalkSparkException(ErrorCode.ROOM_NOT_FOUND));
+            // 방명록 초기 데이터를 생성할 때는 항상 room의 게임이 끝나있어야 함.
+            if(!room.isFinished()) {
+                room.setFinished(true);
+                roomRepository.save(room);
+            }
             guestBookService.createGuestBookData(roomId);
             ResponseDTO<?> responseDTO = ResponseDTO.created("방명록 초기 데이터 생성하였습니다.");
             return ResponseEntity.status(201).body(responseDTO);

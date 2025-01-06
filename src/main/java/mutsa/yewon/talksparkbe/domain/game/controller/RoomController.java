@@ -64,7 +64,8 @@ public class RoomController {
 
     @GetMapping("/question-tip")
     public ResponseEntity<String> questionTip(@RequestParam String field) {
-        return ResponseEntity.ok(QuestionTip.valueOf(field).getTipContent());
+        String randomQuestions = String.join("\n", QuestionTip.valueOf(field).getRandomQuestions());
+        return ResponseEntity.ok(randomQuestions);
     }
 
 //    @GetMapping("/{roomId}/name")
