@@ -4,6 +4,7 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Data;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Data
@@ -16,7 +17,7 @@ public class CardBlanksDto {
     public static CardBlanksDto of(Long sparkUserId, List<String> blanks) {
         return CardBlanksDto.builder()
                 .sparkUserId(sparkUserId)
-                .blanks(blanks)
+                .blanks(new ArrayList<>(blanks))
                 .build();
     }
 
