@@ -69,7 +69,7 @@ public class QuestionGenerator {
 
     private CardQuestion generateQuestion(Card c, String fieldName, Set<String> cardData, int numOfPeople) {
         String correctAnswer = getFieldValue(c, fieldName);
-        List<String> options = generateOptions(fieldName, correctAnswer, cardData, numOfPeople);
+        List<String> options = generateOptions(correctAnswer, cardData, numOfPeople);
         System.out.println("generateOptions 끝남");
         return new CardQuestion(c.getId(), c.getSparkUser().getId(), fieldName, correctAnswer, options);
     }
@@ -94,7 +94,7 @@ public class QuestionGenerator {
     }
 
     // 보기 생성: 다른 참가자의 해당 필드 값 + 정답
-    private List<String> generateOptions(String fieldName, String correctAnswer, Set<String> cardData, int numOfPeople) {
+    private List<String> generateOptions(String correctAnswer, Set<String> cardData, int numOfPeople) {
         int maxOptionNum = Math.min(4, numOfPeople);
 
         if(maxOptionNum < 4){
@@ -121,7 +121,6 @@ public class QuestionGenerator {
         if (count > candidates.size()) {
             throw new RuntimeException("요청된 갯수는 Set의 크기보다 클 수 없습니다.");
         }
-
 
         List<String> options = new ArrayList<>();
 

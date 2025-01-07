@@ -192,12 +192,12 @@ public class RoomSocketIOHandler {
     @Transactional(readOnly = true)
     public void broadcastSingleQuestionResult(Long roomId) {
         List<CorrectAnswerDto> singleQuestionScoreBoard = gameService.getSingleQuestionScoreBoard(roomId);
-        singleQuestionScoreBoard
-                .forEach(it -> {
-                    List<Card> cardList = cardRepository.findBySparkUserId(it.getSparkUserId());
-                    it.setName(cardList.get(0).getName());
-                    it.setColor(cardList.get(0).getCardThema());
-                });
+//        singleQuestionScoreBoard
+//                .forEach(it -> {
+//                    List<Card> cardList = cardRepository.findBySparkUserId(it.getSparkUserId());
+//                    it.setName(cardList.get(0).getName());
+//                    it.setColor(cardList.get(0).getCardThema());
+//                });
         if (!singleQuestionScoreBoard.isEmpty())
             server.getRoomOperations(roomId.toString()).sendEvent("singleQuestionScoreBoard", singleQuestionScoreBoard);
     }

@@ -44,9 +44,23 @@ public class GameState {
     public void recordScore(Long sparkUserId, String answer) {
         CardQuestion currentQuestion = questions.get(0);
         if (currentQuestion.getCorrectAnswer().equals(answer)) {
+
             scores.put(sparkUserId, scores.getOrDefault(sparkUserId, 0) + 1);
-            currentQuestionCorrect.add(CorrectAnswerDto.builder().
-                    sparkUserId(sparkUserId).isCorrect(Boolean.TRUE).build());
+
+            Card card = cards.stream()
+                    .filter(c -> c.getSparkUser().getId().equals(sparkUserId)).findFirst()
+                    .orElseThrow();
+
+            currentQuestionCorrect.add(CorrectAnswerDto.builder()
+                    .sparkUserId(sparkUserId)
+                    .isCorrect(Boolean.TRUE)
+                    .name(card.getName())
+                    .color(card.getCardThema())
+                    .build());
+
+//            scores.put(sparkUserId, scores.getOrDefault(sparkUserId, 0) + 1);
+//            currentQuestionCorrect.add(CorrectAnswerDto.builder().
+//                    sparkUserId(sparkUserId).isCorrect(Boolean.TRUE).build());
         }
         answerNums.put(currentQuestion, answerNums.get(currentQuestion) + 1);
     }
