@@ -1,10 +1,11 @@
 package mutsa.yewon.talksparkbe.domain.game.service.dto;
 
+import lombok.Data;
 import lombok.Getter;
 
 import java.util.List;
 
-@Getter
+@Data
 public class CardQuestion {
     private Long cardId;
     private Long cardOwnerId;
