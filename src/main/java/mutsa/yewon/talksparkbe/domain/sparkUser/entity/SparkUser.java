@@ -5,6 +5,7 @@ import lombok.*;
 import mutsa.yewon.talksparkbe.domain.card.entity.Card;
 import mutsa.yewon.talksparkbe.domain.cardHolder.entity.CardHolder;
 import mutsa.yewon.talksparkbe.domain.cardHolder.entity.StoredCard;
+import mutsa.yewon.talksparkbe.domain.game.entity.RoomParticipate;
 import mutsa.yewon.talksparkbe.domain.guestBook.entity.GuestBookRoomSparkUser;
 
 import java.util.ArrayList;
@@ -34,6 +35,9 @@ public class SparkUser {
     @OneToMany(mappedBy = "sparkUser", cascade = CascadeType.ALL)
     private List<CardHolder> cardHolders;
 
+    @OneToMany(mappedBy = "sparkUser", cascade = CascadeType.ALL)
+    private List<RoomParticipate> roomParticipates;
+
     @Builder.Default
     @ElementCollection(fetch = FetchType.LAZY)
     private List<SparkUserRole> roles = new ArrayList<>();
@@ -46,7 +50,7 @@ public class SparkUser {
         roles.clear();
     }
 
-    @OneToMany(mappedBy = "sparkUser")
+    @OneToMany(mappedBy = "sparkUser", cascade = CascadeType.ALL)
     private List<GuestBookRoomSparkUser> guestBookRoomSparkUsers = new ArrayList<>();
 
 }
