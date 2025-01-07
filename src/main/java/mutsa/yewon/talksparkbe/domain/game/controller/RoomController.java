@@ -13,6 +13,7 @@ import mutsa.yewon.talksparkbe.global.util.JWTUtil;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import mutsa.yewon.talksparkbe.global.util.SecurityUtil;
 
 import java.util.List;
 import java.util.Map;
@@ -25,6 +26,7 @@ public class RoomController {
     private final RoomService roomService;
     private final SparkUserRepository sparkUserRepository;
     private final JWTUtil jwtUtil;
+    private final SecurityUtil securityUtil;
 
     @PostMapping
     public ResponseEntity<RoomCreateResponse> roomCreate(@RequestBody RoomCreateRequest roomCreateRequest) {
@@ -46,7 +48,7 @@ public class RoomController {
 
     @GetMapping("/is-host")
     public ResponseEntity<Boolean> isHost(@RequestParam Long roomId,
-                                    @RequestHeader("Authorization") String token) {
+                                          @RequestHeader("Authorization") String token) {
         String jwt = token.replace("Bearer ", "");
         Map<String, Object> claims = jwtUtil.validateToken(jwt);
         String kakaoId = (String) claims.get("kakaoId");
@@ -62,7 +64,8 @@ public class RoomController {
 
     @GetMapping("/question-tip")
     public ResponseEntity<String> questionTip(@RequestParam String field) {
-        return ResponseEntity.ok(QuestionTip.valueOf(field).getTipContent());
+        String randomQuestions = String.join("\n", QuestionTip.valueOf(field).getRandomQuestions());
+        return ResponseEntity.ok(randomQuestions);
     }
 
 //    @GetMapping("/{roomId}/name")

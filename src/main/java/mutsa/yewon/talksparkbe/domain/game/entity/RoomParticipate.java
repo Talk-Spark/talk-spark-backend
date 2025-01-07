@@ -1,15 +1,13 @@
 package mutsa.yewon.talksparkbe.domain.game.entity;
 
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import mutsa.yewon.talksparkbe.domain.sparkUser.entity.SparkUser;
 
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
+@Setter
 public class RoomParticipate {
 
     @Id
