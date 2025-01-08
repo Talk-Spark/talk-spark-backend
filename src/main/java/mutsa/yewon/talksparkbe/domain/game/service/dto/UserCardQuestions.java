@@ -1,11 +1,12 @@
 package mutsa.yewon.talksparkbe.domain.game.service.dto;
 
 import lombok.AllArgsConstructor;
+import lombok.Data;
 import lombok.Getter;
 
 import java.util.List;
 
-@Getter
+@Data
 @AllArgsConstructor
 public class UserCardQuestions {
     private Long sparkUserId; // 참가자 ID

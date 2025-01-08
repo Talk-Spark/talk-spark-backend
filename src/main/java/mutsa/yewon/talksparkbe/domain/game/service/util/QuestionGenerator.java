@@ -1,5 +1,6 @@
 package mutsa.yewon.talksparkbe.domain.game.service.util;
 
+import lombok.extern.log4j.Log4j2;
 import mutsa.yewon.talksparkbe.domain.card.entity.Card;
 import mutsa.yewon.talksparkbe.domain.game.service.dto.CardQuestion;
 import mutsa.yewon.talksparkbe.domain.game.service.dto.UserCardQuestions;
@@ -8,6 +9,7 @@ import org.springframework.stereotype.Component;
 import java.util.*;
 
 @Component
+@Log4j2
 public class QuestionGenerator {
 
     public List<UserCardQuestions> execute(List<Card> cards, int difficulty) {
@@ -64,6 +66,9 @@ public class QuestionGenerator {
         System.out.println("모든 for문 끝");
 
         userCardQuestionsList.sort(Comparator.comparing(UserCardQuestions::getSparkUserId)); // 유저아이디 오름차순. 그래서 같은 유저아이디의 문제가 쫙 나옴.
+
+        log.info(userCardQuestionsList);
+
         return userCardQuestionsList;
     }
 
