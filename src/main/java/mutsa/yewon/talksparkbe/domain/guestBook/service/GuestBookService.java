@@ -87,13 +87,13 @@ public class GuestBookService {
         guestBookRoom.addGuestBooks(guestBook);
 
 
-        if(guestBookRoomSparkUserRepository
-                .findByGuestBookRoomIdAndSparkUserId(guestBookRoom.getGuestBookRoomId(), sparkUser.getId())
-                .isEmpty()) {
-            GuestBookRoomSparkUser guestBookRoomSparkUser = new GuestBookRoomSparkUser(guestBookRoom, sparkUser);
-            guestBookRoomSparkUserRepository.save(guestBookRoomSparkUser);
-            guestBookRoom.getGuestBookRoomSparkUsers().add(guestBookRoomSparkUser);
-        }
+//        if(guestBookRoomSparkUserRepository
+//                .findByGuestBookRoomIdAndSparkUserId(guestBookRoom.getGuestBookRoomId(), sparkUser.getId())
+//                .isEmpty()) {
+//            GuestBookRoomSparkUser guestBookRoomSparkUser = new GuestBookRoomSparkUser(guestBookRoom, sparkUser);
+//            guestBookRoomSparkUserRepository.save(guestBookRoomSparkUser);
+//            guestBookRoom.getGuestBookRoomSparkUsers().add(guestBookRoomSparkUser);
+//        }
 
         return guestBook;
     }
