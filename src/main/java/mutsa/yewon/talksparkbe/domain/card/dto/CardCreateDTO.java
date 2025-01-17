@@ -49,7 +49,7 @@ public class CardCreateDTO {
     private CardThema cardThema;
 
     public static Card toCard(CardCreateDTO dto, SparkUser user) {
-        return Card.builder()
+        Card card = Card.builder()
                 .sparkUser(user)
                 .age(dto.getAge())
                 .hobby(dto.getHobby())
@@ -61,6 +61,10 @@ public class CardCreateDTO {
                 .slogan(dto.getSlogan())
                 .cardThema(dto.getCardThema())
                 .build();
+
+        card.addCard(user);
+
+        return card;
     }
 
 }

@@ -32,7 +32,9 @@ public class CardServiceImpl implements CardService {
                 .orElseThrow(() -> new CustomTalkSparkException(ErrorCode.USER_NOT_EXIST));
 
         Card card = CardCreateDTO.toCard(cardCreateDTO, sparkUser);
+
         cardRepository.save(card);
+
         return card.getId();
     }
 
@@ -45,10 +47,8 @@ public class CardServiceImpl implements CardService {
             throw new CustomTalkSparkException(ErrorCode.MUST_MAKE_CARD_FIRST);
         }
 
-        List<CardResponseDTO> cardResponseDTOList = cardList.stream()
+        return cardList.stream()
                 .map(CardResponseDTO::fromCard).toList();
-
-        return cardResponseDTOList;
     }
 
     @Override

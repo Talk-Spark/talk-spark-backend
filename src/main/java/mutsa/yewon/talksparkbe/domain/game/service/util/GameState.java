@@ -79,7 +79,6 @@ public class GameState {
     public SwitchSubject isSwitchingSubject() {
         if (questions.size() < 2) return SwitchSubject.END;
         else if (!questions.get(1).getCardOwnerId().equals(currentSubjectId)) {
-
             currentSubjectId = questions.get(1).getCardOwnerId();
             return SwitchSubject.TRUE;
         } else return SwitchSubject.FALSE;

@@ -14,11 +14,11 @@ public class RoomParticipate {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long roomParticipateId;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "spark_user_id")
     private SparkUser sparkUser;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "room_id")
     private Room room;
 
@@ -33,6 +33,11 @@ public class RoomParticipate {
 
     public void assignRoom(Room room) {
         this.room = room;
+    }
+
+    public void addSparkUser(SparkUser sparkUser) {
+        this.sparkUser = sparkUser;
+        sparkUser.getRoomParticipates().add(this);
     }
 
 }

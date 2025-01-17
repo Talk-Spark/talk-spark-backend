@@ -46,6 +46,11 @@ public class Card {
     @JoinColumn(name = "spark_user_id")
     private SparkUser sparkUser;
 
+    public void addCard(SparkUser sparkUser) {
+        this.sparkUser = sparkUser;
+        sparkUser.getCards().add(this);
+    }
+
     public void update(CardCreateDTO cardCreateDTO) {
         this.name = cardCreateDTO.getName();
         this.age = cardCreateDTO.getAge();

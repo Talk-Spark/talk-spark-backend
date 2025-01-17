@@ -1,10 +1,7 @@
 package mutsa.yewon.talksparkbe.domain.cardHolder.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import mutsa.yewon.talksparkbe.domain.card.entity.Card;
 import mutsa.yewon.talksparkbe.domain.game.entity.Room;
 import mutsa.yewon.talksparkbe.domain.sparkUser.entity.SparkUser;
@@ -31,6 +28,7 @@ public class CardHolder {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "spark_user_id")
+    @Setter
     private SparkUser sparkUser;
 
     private String name; // 개별 명함이면 사용자 이름, 팀별 명함 모음이면 팀 이름으로 저장
@@ -70,6 +68,9 @@ public class CardHolder {
 
         cardHolder.addTeammatesName(name1);
 
+        cardHolder.addSparkUser(sparkUser);
+
+
         return cardHolder;
     }
 
@@ -84,13 +85,21 @@ public class CardHolder {
 
         List<String> teammateNames = cards.stream().map(card -> card.getName()).sorted().toList();
 
+
         cardHolder.addTeammatesName(teammateNames);
+
+        cardHolder.addSparkUser(sparkUser);
 
         return cardHolder;
     }
 
     private void addTeammatesName(List<String> teammatesNames){
         this.teammates.addAll(teammatesNames);
+    }
+
+    public void addSparkUser(SparkUser sparkUser){
+        this.sparkUser = sparkUser;
+        sparkUser.getCardHolders().add(this);
     }
 
     public void bookMarkCard(){

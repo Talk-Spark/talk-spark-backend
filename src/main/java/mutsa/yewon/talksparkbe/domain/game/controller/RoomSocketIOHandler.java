@@ -156,14 +156,18 @@ public class RoomSocketIOHandler {
         });
 
         server.addEventListener("next", QuestionRequest.class, (client, data, ackSender) -> {
+
             System.out.println("next 받음. " + data.toString());
             Long roomId = data.getRoomId();
 
             SwitchSubject switchSubject = gameService.isSwitchingSubject(roomId);
+
             if (switchSubject.equals(SwitchSubject.END)) {
-                server.getRoomOperations(roomId.toString()).sendEvent("lastResult", gameService.getCurrentCard(roomId));
+                server.getRoomOperations(roomId.toString()).sendEvent("lastResult",
+                        gameService.getCurrentCard(roomId));
             } else if (switchSubject.equals(SwitchSubject.TRUE)) {
-                server.getRoomOperations(roomId.toString()).sendEvent("singleResult", gameService.getCurrentCard(roomId));
+                server.getRoomOperations(roomId.toString()).sendEvent("singleResult",
+                        gameService.getCurrentCard(roomId));
             } else {
                 gameService.loadNextQuestion(roomId);
                 broadcastQuestion(roomId);
