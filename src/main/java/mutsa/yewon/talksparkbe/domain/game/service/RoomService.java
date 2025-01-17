@@ -45,10 +45,16 @@ public class RoomService {
     private static final String ROOM_COUNT_KEY = "room:participateCount";
 
     @Transactional
-    public Room createRoom(RoomCreateRequest roomCreateRequest) {
+    public Room createRoom(RoomCreateRequest roomCreateRequest, Long sparkUserId) {
         if (roomRepository.findByRoomName(roomCreateRequest.getRoomName()).isPresent())
             throw new CustomTalkSparkException(ErrorCode.ROOM_NAME_DUPLICATE);
-        Room room = roomRepository.save(roomCreateRequest.toRoomEntity());
+        Room room = Room.builder()
+                .roomName(roomCreateRequest.getRoomName())
+                .difficulty(roomCreateRequest.getDifficulty())
+                .maxPeople(roomCreateRequest.getMaxPeople())
+                .hostId(sparkUserId)
+                .build();
+        room = roomRepository.save(room);
 
         redisTemplate.opsForHash().put(ROOM_COUNT_KEY, room.getRoomId().toString(), "0");
         return room;
@@ -68,9 +74,10 @@ public class RoomService {
 
         try {
             if (lock.tryLock(5, 10, TimeUnit.SECONDS)) { // 최대 대기 시간 5초, 락 보유 시간 10초로 설정
-                if (!canJoin(room)) throw new CustomTalkSparkException(ErrorCode.ROOM_FULL);
+                if (!canJoin(room, sparkUser)) throw new CustomTalkSparkException(ErrorCode.ROOM_FULL);
                 else {
-                    addParticipateToRoom(room, sparkUser, roomJoinRequest.getIsHost());
+                    boolean isHost = room.getHostId().equals(sparkUser.getId());
+                    addParticipateToRoom(room, sparkUser, isHost);
                     return true;
                 }
             } else throw new CustomTalkSparkException(ErrorCode.LOCK_TIMEOUT); // 락을 획득하지 못한 경우 (대기 시간 초과)
@@ -128,7 +135,7 @@ public class RoomService {
 
         try {
             if (lock.tryLock(5, 10, TimeUnit.SECONDS)) {
-                if (!canJoin(room)) throw new CustomTalkSparkException(ErrorCode.ROOM_FULL);
+                if (!canJoin(room,sparkUser)) throw new CustomTalkSparkException(ErrorCode.ROOM_FULL);
                 else {
                     removeParticipateToRoom(room, sparkUser);
                     return true;
@@ -162,12 +169,15 @@ public class RoomService {
         return roomListResponses;
     }
 
-    private boolean canJoin(Room room) {
+    private boolean canJoin(Room room, SparkUser sparkUser) {
+        if (roomParticipateRepository.findByRoomAndSparkUser(room, sparkUser).isPresent()) {
+            redisTemplate.opsForHash().increment(ROOM_COUNT_KEY, room.getRoomId().toString(), -1);
+        }
         int currentCount = getParticipateCount(room.getRoomId());
         return currentCount < room.getMaxPeople();
     }
     private void addParticipateToRoom(Room room, SparkUser sparkUser, boolean isHost) {
-        if (roomParticipateRepository.findByRoomAndSparkUser(room, sparkUser).isPresent()) throw new CustomTalkSparkException(ErrorCode.ROOM_JOIN_DUPLICATE);
+        if (roomParticipateRepository.findByRoomAndSparkUser(room, sparkUser).isPresent()) removeParticipateToRoom(room, sparkUser);
         RoomParticipate roomParticipate = RoomParticipate.builder().room(room).sparkUser(sparkUser).isOwner(isHost).build();
         roomParticipateRepository.save(roomParticipate);
         room.assignRoomParticipate(roomParticipate);
