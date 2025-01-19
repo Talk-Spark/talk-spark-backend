@@ -70,6 +70,9 @@ public class StoredCardServiceImpl implements StoredCardService {
         for (Card card : cards) {
             StoredCard.cardTostore(cardHolder, card);
         }
+
+        sparkUser.addCardHolder(cardHolder);
+
         cardHolderRepository.save(cardHolder);
         return cardHolder.getId();
     }

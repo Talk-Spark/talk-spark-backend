@@ -1,6 +1,7 @@
 package mutsa.yewon.talksparkbe.domain.game.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 import mutsa.yewon.talksparkbe.domain.game.controller.request.RoomCreateRequest;
 import mutsa.yewon.talksparkbe.domain.game.controller.request.RoomJoinRequest;
 import mutsa.yewon.talksparkbe.domain.game.entity.Room;
@@ -31,6 +32,7 @@ import java.util.concurrent.TimeUnit;
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
+@Log4j2
 public class RoomService {
 
     private final SparkUserRepository sparkUserRepository;
