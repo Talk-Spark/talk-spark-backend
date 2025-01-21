@@ -33,6 +33,7 @@ import java.util.stream.Collectors;
     servers = {
             @Server(url = "http://localhost:8080", description = "로컬 테스트 서버"),
             @Server(url = "https://talkspark-dev-api.p-e.kr", description = "배포된 개발 서버"),
+            @Server(url = "https://talkspark.site", description = "배포된 메인 서버"),
     }
 )
 @Configuration

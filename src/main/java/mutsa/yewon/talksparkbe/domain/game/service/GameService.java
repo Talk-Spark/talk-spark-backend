@@ -49,6 +49,8 @@ public class GameService {
         GameState gameState = new GameState(selectedCards, questions, room.getRoomParticipates().size()); // 게임 상태를 초기화
         gameStates.put(roomId, gameState); // 특정 방 번호에 게임 상태 할당
 
+
+
         // 각 참가자들마다의 빈칸정보를 만들기
         for (UserCardQuestions ucq : questions) {
             Long sparkUserId = ucq.getSparkUserId();

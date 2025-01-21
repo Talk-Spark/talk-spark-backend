@@ -62,6 +62,9 @@ dependencies {
 
     //socketIO
     implementation 'com.corundumstudio.socketio:netty-socketio:1.7.17'
+
+    testCompileOnly 'org.projectlombok:lombok'
+    testAnnotationProcessor 'org.projectlombok:lombok'
 }
 
 tasks.named('test') {
