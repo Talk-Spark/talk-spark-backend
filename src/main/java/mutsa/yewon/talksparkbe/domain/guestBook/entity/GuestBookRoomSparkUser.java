@@ -14,14 +14,13 @@ public class GuestBookRoomSparkUser {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long guestBookRoomSparkUserId;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "guest_book_room_id")
     private GuestBookRoom guestBookRoom;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "spark_user_id")
     private SparkUser sparkUser;
-
 
     @Column(nullable = false)
     private Boolean isGuestBookFavorited;

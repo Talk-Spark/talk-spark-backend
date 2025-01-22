@@ -1,0 +1,66 @@
+name: Java CI with Gradle
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@af1da67850ed9a4cedd57bfd976089dd991e2582 # v4.0.0
+
+      - name: Grant for gradlew
+        run: chmod +x ./gradlew
+        shell: bash
+
+      - name: Generate secret yaml file
+        run: |
+          mkdir -p ./src/main/resources/config
+          echo "${{ secrets.MAIN_SECRET_YAML }}" > ./src/main/resources/config/secret.yaml
+
+      - name: Gradle Build
+        run: ./gradlew build
+
+      - name: Docker build
+        run: |
+          JAR_FILE=$(find ./build/libs -name "TalkSpark-BE-0.0.1-SNAPSHOT.jar" | head -n 1)
+          if [ -z "$JAR_FILE" ]; then
+            echo "JAR file not found! Ensure ./gradlew build executed successfully."
+            exit 1
+          fi
+          echo "Using JAR file: $JAR_FILE"
+          
+          docker login -u ${{ secrets.SB_DOCKERHUB_USERNAME }} -p ${{ secrets.SB_DOCKERHUB_PASSWORD }}
+          docker build --build-arg JAR_FILE=$JAR_FILE -t ${{ secrets.SB_DOCKERHUB_USERNAME }}/talkspark-dev:latest .
+          docker push ${{ secrets.SB_DOCKERHUB_USERNAME }}/talkspark-dev:latest
+
+      - name: Copy docker-compose.yml to EC2
+        run: |
+          echo "${{ secrets.MAIN_EC2_PRIVATE_KEY }}" > private_key.pem
+          chmod 600 private_key.pem
+          scp -i private_key.pem -o StrictHostKeyChecking=no docker-compose.yml ${{ secrets.MAIN_SSH_USER }}@${{ secrets.MAIN_SSH_KNOWN_HOSTS }}:/home/ubuntu/
+
+      - name: Deploy
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.MAIN_SSH_KNOWN_HOSTS }}
+          username: ${{secrets.MAIN_SSH_USER}}
+          key: ${{ secrets.MAIN_EC2_PRIVATE_KEY }}
+          script: |
+            sudo docker pull ${{ secrets.SB_DOCKERHUB_USERNAME }}/talkspark-dev:latest
+            sudo docker compose up -d
+            timeout 60s sudo docker compose logs -f
+            sudo docker compose ps
+            sudo docker image prune -f

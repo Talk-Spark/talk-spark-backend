@@ -29,6 +29,8 @@ public class Room {
 
     private int difficulty;
 
+    private Long hostId;
+
     private boolean isStarted = false;
     private boolean isFinished = false;
 
@@ -42,10 +44,11 @@ public class Room {
     private GuestBookRoom guestBookRoom;
 
     @Builder
-    private Room(String roomName, int maxPeople, int difficulty) {
+    private Room(String roomName, int maxPeople, int difficulty, Long hostId) {
         this.roomName = roomName;
         this.maxPeople = maxPeople;
         this.difficulty = difficulty;
+        this.hostId = hostId;
     }
 
     public void addRoomParticipate(RoomParticipate roomParticipate) {

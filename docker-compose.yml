@@ -3,7 +3,7 @@ services:
     build:
       context: . # Dockerfile 이 있는 위치
       dockerfile: Dockerfile
-    image: mw0677/talkspark-dev:latest
+    image: psb3707/talkspark-dev:latest
     container_name: spring-boot-container
     ports:
       - "8080:8080"

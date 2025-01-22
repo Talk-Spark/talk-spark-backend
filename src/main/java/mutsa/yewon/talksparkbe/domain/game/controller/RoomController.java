@@ -29,10 +29,16 @@ public class RoomController {
     private final SecurityUtil securityUtil;
 
     @PostMapping
-    public ResponseEntity<RoomCreateResponse> roomCreate(@RequestBody RoomCreateRequest roomCreateRequest) {
+    public ResponseEntity<RoomCreateResponse> roomCreate(@RequestBody RoomCreateRequest roomCreateRequest,
+                                                         @RequestHeader("Authorization") String token) {
+        String jwt = token.replace("Bearer ", "");
+        Map<String, Object> claims = jwtUtil.validateToken(jwt);
+        String kakaoId = (String) claims.get("kakaoId");
+        SparkUser sparkUser = sparkUserRepository.findByKakaoId(kakaoId).orElseThrow(() -> new RuntimeException("유저 못찾음"));
+
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(
-                        RoomCreateResponse.from(roomService.createRoom(roomCreateRequest))
+                        RoomCreateResponse.from(roomService.createRoom(roomCreateRequest, sparkUser.getId()))
                 );
     }
 
