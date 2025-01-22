@@ -47,4 +47,4 @@ out/
 **/.DS_Store
 **/._.DS_Store
 
-/src/test/java/mutsa/yewon/talksparkbe/domain/guestBook/service/**
+/src/test/java/mutsa/yewon/talksparkbe/domain/game/service/**
