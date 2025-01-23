@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>카카오 로그인</title>
+    <style>
+        .login-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            background-color: #f5f6f7;
+        }
+        .kakao-btn {
+            background-color: #FEE500;
+            border: none;
+            border-radius: 6px;
+            padding: 12px 24px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            font-size: 16px;
+            font-weight: bold;
+            color: #000000;
+            text-decoration: none;
+        }
+        .kakao-btn img {
+            margin-right: 8px;
+            width: 24px;
+            height: 24px;
+        }
+        .token-info {
+            margin-top: 20px;
+            padding: 20px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            max-width: 500px;
+            width: 90%;
+            text-align: center;
+        }
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #3498db;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 10px;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+    <script>
+        window.onload = function() {
+            const jwtAccessToken = document.getElementById('jwtAccessToken').textContent;
+            if (jwtAccessToken) {
+                // JWT 토큰을 localStorage에 저장
+                localStorage.setItem('accessToken', jwtAccessToken);
+                localStorage.setItem('refreshToken', document.getElementById('jwtRefreshToken').textContent);
+
+                // Authorization 헤더를 설정하고 /views/rooms로 리다이렉트하는 함수
+                function redirectWithAuth() {
+                    const xhr = new XMLHttpRequest();
+                    xhr.open('GET', '/views/rooms', true);
+                    xhr.setRequestHeader('Authorization', 'Bearer ' + jwtAccessToken);
+                    xhr.onreadystatechange = function() {
+                        if (xhr.readyState === 4) {
+                            if (xhr.status === 200) {
+                                // 성공적으로 응답을 받으면 페이지 내용을 교체
+                                document.documentElement.innerHTML = xhr.responseText;
+                                // URL도 업데이트
+                                history.pushState({}, '', '/views/rooms');
+                            } else {
+                                console.error('Redirect failed:', xhr.status);
+                            }
+                        }
+                    };
+                    xhr.send();
+                }
+
+                // 잠시 후 리다이렉트 실행
+                setTimeout(redirectWithAuth, 1500);
+            }
+        }
+    </script>
+</head>
+<body>
+<div class="login-container">
+    <!-- 로그인 버튼 -->
+    <th:block th:unless="${jwtAccessToken}">
+        <a th:href="@{${kakaoLoginUrl}}" class="kakao-btn">
+            <img src="https://developers.kakao.com/assets/img/about/logos/kakao/kakaolink_btn_small.png"
+                 alt="카카오 로그인"/>
+            카카오 로그인
+        </a>
+    </th:block>
+
+    <!-- 토큰 저장 및 리다이렉트 메시지 -->
+    <th:block th:if="${jwtAccessToken}">
+        <div class="token-info">
+            <div class="loading"></div>
+            <p>로그인 성공! 채팅방 목록으로 이동합니다...</p>
+        </div>
+        <!-- 토큰은 화면에 보이지 않게 숨겨둠 -->
+        <pre id="jwtAccessToken" th:text="${jwtAccessToken}" style="display: none;"></pre>
+        <pre id="jwtRefreshToken" th:text="${jwtRefreshToken}" style="display: none;"></pre>
+    </th:block>
+</div>
+</body>
+</html>

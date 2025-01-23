@@ -1,0 +1,51 @@
+services:
+  spring-boot-app:
+    build:
+      context: . # Dockerfile 이 있는 위치
+      dockerfile: Dockerfile
+    image: psb3707/talkspark-dev:latest
+    container_name: spring-boot-container
+    ports:
+      - "8080:8080"
+      - "9090:9090"
+    depends_on:
+      - redis_container
+
+  redis_container:
+    image: redis:latest
+    # 컨테이너명
+    container_name: redis-container
+    # 접근 포트 설정(컨테이너 외부:컨테이너 내부)
+    ports:
+      - "6379:6379"
+    volumes:
+      - ./redis/data:/data
+      - ./redis/conf/redis.conf:/usr/local/conf/redis.conf
+    # 컨테이너에 docker label을 이용해서 메타데이터 추가
+    labels:
+      - "name=redis"
+      - "mode=standalone"
+    # 컨테이너 종료시 재시작 여부 설정
+    restart: always
+    command: redis-server /usr/local/conf/redis.conf
+
+  ## nginx
+  nginx:
+    image: nginx:1.15-alpine
+    restart: unless-stopped
+    volumes:
+      - ./data/nginx:/etc/nginx/conf.d
+      - ./data/certbot/conf:/etc/letsencrypt
+      - ./data/certbot/www:/var/www/certbot
+    ports:
+      - "80:80"
+      - "443:443"
+    command: "/bin/sh -c 'while :; do sleep 6h & wait $${!}; nginx -s reload; done & nginx -g \"daemon off;\"'"
+
+  certbot:
+    image: certbot/certbot
+    restart: unless-stopped
+    volumes:
+      - ./data/certbot/conf:/etc/letsencrypt
+      - ./data/certbot/www:/var/www/certbot
+    entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
