@@ -8,10 +8,12 @@ import mutsa.yewon.talksparkbe.domain.cardHolder.dto.TeamCardHolderCreateDTO;
 import mutsa.yewon.talksparkbe.domain.cardHolder.service.StoredCardService;
 import mutsa.yewon.talksparkbe.domain.game.entity.Room;
 import mutsa.yewon.talksparkbe.domain.game.entity.RoomParticipate;
+import mutsa.yewon.talksparkbe.domain.game.repository.RoomParticipateRepository;
 import mutsa.yewon.talksparkbe.domain.game.repository.RoomRepository;
 import mutsa.yewon.talksparkbe.domain.game.service.dto.*;
 import mutsa.yewon.talksparkbe.domain.game.service.util.GameState;
 import mutsa.yewon.talksparkbe.domain.game.service.util.QuestionGenerator;
+import mutsa.yewon.talksparkbe.domain.game.service.util.RoomState;
 import mutsa.yewon.talksparkbe.domain.sparkUser.entity.SparkUser;
 import mutsa.yewon.talksparkbe.global.exception.CustomTalkSparkException;
 import mutsa.yewon.talksparkbe.global.exception.ErrorCode;
@@ -30,13 +32,18 @@ public class GameService {
     private final Map<Long, GameState> gameStates = new HashMap<>();
 
     private final RoomRepository roomRepository;
+    private final RoomParticipateRepository roomParticipateRepository;
     private final QuestionGenerator questionGenerator;
     private final StoredCardService storedCardService;
+    private final RoomState roomState;
 
     @Transactional(readOnly = true)
     public void startGame(Long roomId) {
         Room room = roomRepository.findById(roomId)
                 .orElseThrow(() -> new CustomTalkSparkException(ErrorCode.ROOM_NOT_FOUND));
+
+        System.out.println(roomState.getParticipantsByRoomId(roomId));
+        roomState.clearParticipantsByRoomId(roomId);
 
         List<Card> selectedCards = room.getRoomParticipates().stream()
                 .map(RoomParticipate::getSparkUser)
