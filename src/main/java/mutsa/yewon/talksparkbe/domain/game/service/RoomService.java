@@ -11,6 +11,7 @@ import mutsa.yewon.talksparkbe.domain.game.repository.RoomRepository;
 import mutsa.yewon.talksparkbe.domain.game.service.dto.httpResponse.RoomDetailsResponse;
 import mutsa.yewon.talksparkbe.domain.game.service.dto.httpResponse.RoomListResponse;
 import mutsa.yewon.talksparkbe.domain.game.service.dto.httpResponse.RoomParticipantResponse;
+import mutsa.yewon.talksparkbe.domain.game.service.util.RoomState;
 import mutsa.yewon.talksparkbe.domain.sparkUser.entity.SparkUser;
 import mutsa.yewon.talksparkbe.domain.sparkUser.repository.SparkUserRepository;
 import mutsa.yewon.talksparkbe.global.exception.CustomTalkSparkException;
@@ -41,6 +42,7 @@ public class RoomService {
     private final RedissonClient redissonClient;
     private final StringRedisTemplate redisTemplate;
     private final SecurityUtil securityUtil;
+    private final RoomState roomState;
 
     private final JWTUtil jwtUtil;
 
@@ -70,10 +72,8 @@ public class RoomService {
         Map<String, Object> claims = jwtUtil.validateToken(jwt);
         String kakaoId = (String) claims.get("kakaoId");
         SparkUser sparkUser = sparkUserRepository.findByKakaoId(kakaoId).orElseThrow(() -> new RuntimeException("유저 못찾음"));
-
         // 방에 입장할 때 락을 획득
         RLock lock = redissonClient.getLock("roomLock:" + roomJoinRequest.getRoomId());
-
         try {
             if (lock.tryLock(5, 10, TimeUnit.SECONDS)) { // 최대 대기 시간 5초, 락 보유 시간 10초로 설정
                 if (!canJoin(room, sparkUser)) throw new CustomTalkSparkException(ErrorCode.ROOM_FULL);
@@ -95,8 +95,10 @@ public class RoomService {
         List<RoomParticipantResponse> response = new ArrayList<>();
         List<RoomParticipate> roomParticipates = roomParticipateRepository.findByRoomIdWithSparkUser(roomId);
 
-        for (RoomParticipate rp : roomParticipates)
-            response.add(RoomParticipantResponse.from(rp));
+        for (RoomParticipate rp : roomParticipates){
+            SparkUser participateSparkUser = rp.getSparkUser();
+            response.add(RoomParticipantResponse.from(participateSparkUser, participateSparkUser.getCards().get(0), rp.isOwner()));
+        }
 
         return response;
     }
@@ -172,15 +174,20 @@ public class RoomService {
     }
 
     private boolean canJoin(Room room, SparkUser sparkUser) {
-        if (roomParticipateRepository.findByRoomAndSparkUser(room, sparkUser).isPresent()) {
+        if (roomState.getParticipantsByRoomId(room.getRoomId()).stream().anyMatch(
+                participate -> participate.getSparkUser().getId().equals(sparkUser.getId()))) {
             redisTemplate.opsForHash().increment(ROOM_COUNT_KEY, room.getRoomId().toString(), -1);
+            System.out.println(redisTemplate.opsForHash());
         }
         int currentCount = getParticipateCount(room.getRoomId());
         return currentCount < room.getMaxPeople();
     }
     private void addParticipateToRoom(Room room, SparkUser sparkUser, boolean isHost) {
-        if (roomParticipateRepository.findByRoomAndSparkUser(room, sparkUser).isPresent()) removeParticipateToRoom(room, sparkUser);
+        if (roomState.getParticipantsByRoomId(room.getRoomId()).stream().anyMatch(
+                participate -> participate.getSparkUser().getId().equals(sparkUser.getId()))) return;
+
         RoomParticipate roomParticipate = RoomParticipate.builder().room(room).sparkUser(sparkUser).isOwner(isHost).build();
+        roomState.addParticipant(room.getRoomId(), roomParticipate);
         roomParticipateRepository.save(roomParticipate);
         room.assignRoomParticipate(roomParticipate);
         redisTemplate.opsForHash().increment(ROOM_COUNT_KEY, room.getRoomId().toString(), 1);
