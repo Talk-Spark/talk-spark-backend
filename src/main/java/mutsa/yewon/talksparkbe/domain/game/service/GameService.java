@@ -15,6 +15,7 @@ import mutsa.yewon.talksparkbe.domain.game.service.util.GameState;
 import mutsa.yewon.talksparkbe.domain.game.service.util.QuestionGenerator;
 import mutsa.yewon.talksparkbe.domain.game.service.util.RoomState;
 import mutsa.yewon.talksparkbe.domain.sparkUser.entity.SparkUser;
+import mutsa.yewon.talksparkbe.domain.sparkUser.repository.SparkUserRepository;
 import mutsa.yewon.talksparkbe.global.exception.CustomTalkSparkException;
 import mutsa.yewon.talksparkbe.global.exception.ErrorCode;
 import org.springframework.stereotype.Service;
@@ -36,13 +37,26 @@ public class GameService {
     private final QuestionGenerator questionGenerator;
     private final StoredCardService storedCardService;
     private final RoomState roomState;
+    private final SparkUserRepository sparkUserRepository;
 
-    @Transactional(readOnly = true)
+    @Transactional
     public void startGame(Long roomId) {
         Room room = roomRepository.findById(roomId)
                 .orElseThrow(() -> new CustomTalkSparkException(ErrorCode.ROOM_NOT_FOUND));
 
-        System.out.println(roomState.getParticipantsByRoomId(roomId));
+        List<RoomParticipate> participants = roomState.getParticipantsByRoomId(roomId);
+
+        for (RoomParticipate rp : participants) {
+            Long SparkUserId = roomState.findUserIdByRoomIdAndParticipant(room.getRoomId(), rp);
+            SparkUser sparkUser = sparkUserRepository.findById(SparkUserId).orElseThrow(() -> new RuntimeException("유저 못찾음"));
+            RoomParticipate roomParticipate = RoomParticipate.builder()
+                    .isOwner(rp.isOwner())
+                    .sparkUser(sparkUser)
+                    .room(room)
+                    .build();
+            roomParticipateRepository.save(roomParticipate);
+        }
+
         roomState.clearParticipantsByRoomId(roomId);
 
         List<Card> selectedCards = room.getRoomParticipates().stream()

@@ -2,6 +2,7 @@ package mutsa.yewon.talksparkbe.domain.game.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import mutsa.yewon.talksparkbe.domain.card.entity.Card;
 import mutsa.yewon.talksparkbe.domain.sparkUser.entity.SparkUser;
 
 @Entity
@@ -14,7 +15,7 @@ public class RoomParticipate {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long roomParticipateId;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "spark_user_id")
     private SparkUser sparkUser;
 

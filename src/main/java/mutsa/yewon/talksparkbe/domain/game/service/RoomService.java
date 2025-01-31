@@ -91,11 +91,11 @@ public class RoomService {
 
     public List<RoomParticipantResponse> getParticipantList(Long roomId) {
         List<RoomParticipantResponse> response = new ArrayList<>();
-        List<RoomParticipate> roomParticipates = roomParticipateRepository.findByRoomIdWithSparkUser(roomId);
 
-        for (RoomParticipate rp : roomParticipates){
-            SparkUser participateSparkUser = rp.getSparkUser();
-            response.add(RoomParticipantResponse.from(participateSparkUser, participateSparkUser.getCards().get(0), rp.isOwner()));
+        for (RoomParticipate rp : roomState.getParticipantsByRoomId(roomId)){
+            Long SparkUserId = roomState.findUserIdByRoomIdAndParticipant(roomId, rp);
+            SparkUser sparkUser = sparkUserRepository.findById(SparkUserId).orElseThrow(() -> new RuntimeException("유저 못찾음"));
+            response.add(RoomParticipantResponse.from(sparkUser,sparkUser.getCards().get(0), rp.isOwner()));
         }
 
         return response;
@@ -107,14 +107,19 @@ public class RoomService {
         for (Room room : rooms) {
             String hostName = "";
             List<RoomParticipate> roomParticipates = roomParticipateRepository.findByRoomIdWithSparkUser(room.getRoomId());
-            int participantsNum = roomParticipates.size();
-            for (RoomParticipate rp : roomParticipates) {
-                if (rp.isOwner()) hostName = rp.getSparkUser().getName();
+            int participantsNum;
+            if(!room.isStarted()) {
+                participantsNum = roomState.getParticipantsByRoomId(room.getRoomId()).size();
+            } else {
+                participantsNum = roomParticipates.size();
             }
+
+            SparkUser sparkUser = sparkUserRepository.findById(room.getHostId()).orElseThrow(() -> new RuntimeException("호스트 유저 못찾음"));
+
             response.add(RoomListResponse.builder()
                     .roomId(room.getRoomId())
                     .roomName(room.getRoomName())
-                    .hostName(hostName)
+                    .hostName(sparkUser.getName())
                     .currentPeople(participantsNum)
                     .maxPeople(room.getMaxPeople())
                     .build());
@@ -186,13 +191,11 @@ public class RoomService {
 
         RoomParticipate roomParticipate = RoomParticipate.builder().room(room).sparkUser(sparkUser).isOwner(isHost).build();
         roomState.addParticipant(room.getRoomId(), roomParticipate);
-        roomParticipateRepository.save(roomParticipate);
-        room.assignRoomParticipate(roomParticipate);
         redisTemplate.opsForHash().increment(ROOM_COUNT_KEY, room.getRoomId().toString(), 1);
     }
     private void removeParticipateToRoom(Room room, SparkUser sparkUser) {
-        RoomParticipate roomParticipate = roomParticipateRepository.findByRoomAndSparkUser(room, sparkUser).orElseThrow();
-        roomParticipateRepository.delete(roomParticipate);
+        roomState.removeParticipant(room.getRoomId(), sparkUser);
+        System.out.println(redisTemplate.opsForHash());
         redisTemplate.opsForHash().increment(ROOM_COUNT_KEY, room.getRoomId().toString(), -1);
     }
     public int getParticipateCount(Long roomId) {
