@@ -5,12 +5,10 @@ import lombok.Setter;
 import mutsa.yewon.talksparkbe.domain.card.entity.Card;
 import mutsa.yewon.talksparkbe.domain.game.entity.RoomParticipate;
 import mutsa.yewon.talksparkbe.domain.game.service.dto.CardQuestion;
+import mutsa.yewon.talksparkbe.domain.sparkUser.entity.SparkUser;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Getter
 @Setter
@@ -31,11 +29,30 @@ public class RoomState {
         return roomParticipants.getOrDefault(roomId, new ArrayList<>());
     }
 
-    public void removeParticipant(Long roomId, RoomParticipate participant) {
+    public void removeParticipant(Long roomId, SparkUser sparkUser) {
         List<RoomParticipate> participants = roomParticipants.get(roomId);
         if (participants != null) {
-            participants.remove(participant);
+            Iterator<RoomParticipate> iterator = participants.iterator();
+            while (iterator.hasNext()) {
+                RoomParticipate p = iterator.next();
+                if (p.getSparkUser().getId().equals(sparkUser.getId())) {
+                    iterator.remove();
+                    break;
+                }
+            }
         }
+    }
+
+    public Long findUserIdByRoomIdAndParticipant(Long roomId, RoomParticipate participant) {
+        List<RoomParticipate> participants = roomParticipants.get(roomId);
+        if (participants != null) {
+            for (RoomParticipate p : participants) {
+                if (p.equals(participant)) {
+                    return p.getSparkUser().getId();
+                }
+            }
+        }
+        return null;
     }
 
     public void clearParticipantsByRoomId(Long roomId) {
