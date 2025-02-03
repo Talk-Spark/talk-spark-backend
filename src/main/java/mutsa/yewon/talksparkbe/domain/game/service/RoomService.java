@@ -107,7 +107,6 @@ public class RoomService {
         List<RoomListResponse> response = new ArrayList<>();
         List<Room> rooms = roomRepository.findByRoomNameContaining(searchName);
         for (Room room : rooms) {
-            String hostName = "";
             List<RoomParticipate> roomParticipates = roomParticipateRepository.findByRoomIdWithSparkUser(room.getRoomId());
             int participantsNum;
             if(!room.isStarted()) {
@@ -116,12 +115,12 @@ public class RoomService {
                 participantsNum = roomParticipates.size();
             }
 
-            SparkUser sparkUser = sparkUserRepository.findById(room.getHostId()).orElseThrow(() -> new RuntimeException("호스트 유저 못찾음"));
+            Optional<SparkUser> sparkUser = sparkUserRepository.findById(room.getHostId());
 
             response.add(RoomListResponse.builder()
                     .roomId(room.getRoomId())
                     .roomName(room.getRoomName())
-                    .hostName(sparkUser.getName())
+                    .hostName(sparkUser.map(SparkUser::getName).orElse("알수없음"))
                     .currentPeople(participantsNum)
                     .maxPeople(room.getMaxPeople())
                     .build());
