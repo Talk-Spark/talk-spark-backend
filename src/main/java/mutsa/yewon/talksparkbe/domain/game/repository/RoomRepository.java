@@ -16,6 +16,10 @@ public interface RoomRepository extends JpaRepository<Room, Long> {
             "where rp.isOwner = true and r.isFinished = false ")
     List<Room> findAllWithParticipates();
 
+
+    @Query("select r " +
+            "from Room r " +
+            "where r.isStarted = false and r.isFinished = false ")
     List<Room> findByRoomNameContaining(String searchName);
 
     Optional<Room> findByRoomName(String roomName);
