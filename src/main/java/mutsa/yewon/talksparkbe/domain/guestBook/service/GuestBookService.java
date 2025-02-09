@@ -59,11 +59,10 @@ public class GuestBookService {
         for(RoomParticipate roomParticipate : room.getRoomParticipates()) {
             GuestBookRoomSparkUser guestBookRoomSparkUser = GuestBookRoomSparkUser.builder()
                     .guestBookRoom(guestBookRoom)
-                    .sparkUser(sparkUser)
+                    .sparkUser(roomParticipate.getSparkUser())
                     .build();
             guestBookRoomSparkUserRepository.save(guestBookRoomSparkUser);
         }
-        return;
     }
     @Transactional
     public GuestBook createGuestBook(GuestBookPostRequestDTO guestBookPostRequestDTO, Boolean anonymity) {
