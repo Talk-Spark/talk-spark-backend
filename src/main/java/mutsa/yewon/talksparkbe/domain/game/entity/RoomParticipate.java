@@ -2,6 +2,7 @@ package mutsa.yewon.talksparkbe.domain.game.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import mutsa.yewon.talksparkbe.domain.card.entity.Card;
 import mutsa.yewon.talksparkbe.domain.sparkUser.entity.SparkUser;
 
 @Entity
