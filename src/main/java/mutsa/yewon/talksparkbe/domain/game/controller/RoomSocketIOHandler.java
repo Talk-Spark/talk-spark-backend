@@ -119,7 +119,6 @@ public class RoomSocketIOHandler {
     @Transactional
     public void startGameListeners() {
         server.addEventListener("joinGame", RoomJoinRequest.class, (client, data, ackSender) -> {
-            System.out.println("joinGame 받음. " + data.toString());
             server.getClient(client.getSessionId()).joinRoom(data.getRoomId().toString());
 
             String token = data.getAccessToken();
@@ -132,17 +131,14 @@ public class RoomSocketIOHandler {
         });
 
         server.addEventListener("prepareQuizzes", GameStartRequest.class, (client, data, ackSender) -> {
-            System.out.println("prepareQuizzes 받음. " + data.toString());
             gameService.startGame(data.getRoomId());
         });
 
         server.addEventListener("getQuestion", QuestionRequest.class, (client, data, ackSender) -> {
-            System.out.println("getQuestion 받음. " + data.toString());
             broadcastQuestion(data.getRoomId());
         });
 
         server.addEventListener("submitSelection", AnswerSubmitRequest.class, (client, data, ackSender) -> {
-            System.out.println("submitSelection 받음. " + data.toString());
             Long roomId = data.getRoomId();
             Long sparkUserId = data.getSparkUserId();
             String answer = data.getAnswer();
@@ -152,12 +148,10 @@ public class RoomSocketIOHandler {
                 broadcastSingleQuestionResult(roomId);
                 gameService.updateBlanks(roomId);
             }
-            System.out.println(gameService.explainStatus(roomId));
         });
 
         server.addEventListener("next", QuestionRequest.class, (client, data, ackSender) -> {
 
-            System.out.println("next 받음. " + data.toString());
             Long roomId = data.getRoomId();
 
             SwitchSubject switchSubject = gameService.isSwitchingSubject(roomId);
@@ -174,12 +168,11 @@ public class RoomSocketIOHandler {
             }
         });
 
+        // TODO : 모든 참가자들이 getEnd 요청 시 하단 로직 수행
         server.addEventListener("getEnd", EndRequest.class, (client, data, ackSender) -> {
-            System.out.println("getEnd 받음. " + data.toString());
-            System.out.println("getEnd RoomId " + data.getRoomId().toString());
             Long sparkUserId = data.getSparkUserId();
-            System.out.println("Room Operations: " + server.getRoomOperations(data.getRoomId().toString()));
-            server.getRoomOperations(data.getRoomId().toString()).sendEvent("scores", gameService.getScores(data.getRoomId()), gameService.getAllRelatedCards(data.getRoomId()));
+            server.getRoomOperations(data.getRoomId().toString()).sendEvent(
+                    "scores", gameService.getScores(data.getRoomId()), gameService.getAllRelatedCards(data.getRoomId()));
             gameService.insertCardCopies(data.getRoomId(), sparkUserId);
             roomService.changeFinished(data.getRoomId());
         });
@@ -196,12 +189,7 @@ public class RoomSocketIOHandler {
     @Transactional(readOnly = true)
     public void broadcastSingleQuestionResult(Long roomId) {
         List<CorrectAnswerDto> singleQuestionScoreBoard = gameService.getSingleQuestionScoreBoard(roomId);
-//        singleQuestionScoreBoard
-//                .forEach(it -> {
-//                    List<Card> cardList = cardRepository.findBySparkUserId(it.getSparkUserId());
-//                    it.setName(cardList.get(0).getName());
-//                    it.setColor(cardList.get(0).getCardThema());
-//                });
+
         if (!singleQuestionScoreBoard.isEmpty())
             server.getRoomOperations(roomId.toString()).sendEvent("singleQuestionScoreBoard", singleQuestionScoreBoard);
     }

@@ -6,7 +6,9 @@ import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletResponse;
 import mutsa.yewon.talksparkbe.domain.sparkUser.dto.SparkUserDTO;
+import mutsa.yewon.talksparkbe.domain.sparkUser.dto.SparkUserResponseDto;
 import mutsa.yewon.talksparkbe.global.dto.ResponseDTO;
 import mutsa.yewon.talksparkbe.global.exception.ErrorCode;
 import mutsa.yewon.talksparkbe.global.swagger.ApiErrorCodes;
@@ -29,7 +31,7 @@ public interface SparkUserControllerDocs {
             "  \"roleNames\": [\"USER\"],\n" +
             "  \"sparkUserId\": 1\n" +
             "}")))
-    Map<String, Object> login(String accessToken);
+    ResponseEntity<SparkUserResponseDto> login(String accessToken, HttpServletResponse response);
 
     @Operation(summary = "AccessToken 재발급", description = "RefreshToken을 이용한 AccessToken 재발급 API")
     @ApiErrorCodes({ErrorCode.TOKEN_REQUIRED, ErrorCode.JWT_TOKEN_EXPIRED, ErrorCode.INVALID_JWT_TOKEN})
@@ -41,7 +43,7 @@ public interface SparkUserControllerDocs {
                     }
                     """)))
 
-    Map<String, Object> refresh(String refreshToken);
+    Map<String, String> refresh(String refreshToken, HttpServletResponse response);
 
     @Operation(summary = "회원 탈퇴", description = "AccessToken을 이용해 회원 특정 후 회원 정보를 삭제하는 API")
     @ApiErrorCodes({ErrorCode.JWT_TOKEN_EXPIRED, ErrorCode.TOKEN_REQUIRED, ErrorCode.INVALID_JWT_TOKEN})

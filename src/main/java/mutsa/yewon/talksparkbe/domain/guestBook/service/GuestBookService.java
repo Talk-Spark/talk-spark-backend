@@ -45,8 +45,8 @@ public class GuestBookService {
 
     @Transactional
     public void createGuestBookData(Long roomId) {
-        SparkUser sparkUser = sparkUserRepository.findById(securityUtil.getLoggedInUserId()).orElseThrow(()
-                -> new CustomTalkSparkException(ErrorCode.USER_NOT_EXIST));
+//        SparkUser sparkUser = sparkUserRepository.findById(securityUtil.getLoggedInUserId()).orElseThrow(()
+//                -> new CustomTalkSparkException(ErrorCode.USER_NOT_EXIST));
 
         Room room = roomRepository.findById(roomId).orElseThrow(()
                 -> new CustomTalkSparkException(ErrorCode.ROOM_NOT_FOUND));

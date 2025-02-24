@@ -17,4 +17,5 @@ public class CorrectAnswerDto {
     private boolean isCorrect;
     private CardThema color;
 
+
 }

@@ -14,6 +14,10 @@ public class SecurityUtil {
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
+        if(authentication == null) {
+            throw new SecurityException("Authentication is null");
+        }
+
         SparkUserDTO sparkUser = (SparkUserDTO) authentication.getPrincipal();
 
         return sparkUser.getSparkUserId();

@@ -2,6 +2,8 @@ package mutsa.yewon.talksparkbe.domain.sparkUser.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import mutsa.yewon.talksparkbe.domain.card.repository.CardRepository;
+import mutsa.yewon.talksparkbe.domain.cardHolder.repository.CardHolderRepository;
 import mutsa.yewon.talksparkbe.domain.sparkUser.dto.SparkUserDTO;
 import mutsa.yewon.talksparkbe.domain.sparkUser.entity.SparkUser;
 import mutsa.yewon.talksparkbe.domain.sparkUser.entity.SparkUserRole;
@@ -30,6 +32,12 @@ import java.util.Random;
 public class SparkUserServiceImpl implements SparkUserService {
 
     private final SparkUserRepository sparkUserRepository;
+
+    private final CardRepository cardRepository;
+
+    private final CardHolderRepository cardHolderRepository;
+
+
 
     private final PasswordEncoder passwordEncoder;
     private final SecurityUtil securityUtil;
