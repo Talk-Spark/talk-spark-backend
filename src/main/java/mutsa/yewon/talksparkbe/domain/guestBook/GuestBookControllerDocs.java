@@ -28,27 +28,27 @@ import java.util.Map;
 //TODO: 방명록 API 설정
 @Tag(name = "방명록 API", description = "방명록에 관한 생성/조회/수정/삭제를 수행하는 API")
 public interface GuestBookControllerDocs {
-    @Operation(summary = "방명록 생성", description = "각 방에서 사용자의 방명록을 생성할 때 사용하는 API")
-    @ApiErrorCodes({ErrorCode.USER_NOT_EXIST, ErrorCode.JWT_TOKEN_EXPIRED, ErrorCode.TOKEN_REQUIRED, ErrorCode.INVALID_JWT_TOKEN})
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "201", description = "방명록 생성 성공",
-                    content = @Content(mediaType = "application/json",
-                            schema = @Schema(implementation = ResponseDTO.class),
-                            examples = {
-                                    @ExampleObject(
-                                            value = """
-                                                    {
-                                                        "status": 201,
-                                                        "message": "방명록 내용이 작성되었습니다.",
-                                                        "data": null
-                                                    }
-                                                    """
-                                    )
-                            }))
-    })
-    ResponseEntity<?> postGuestBook(@PathVariable("roomId") Long roomId,
-                                    @RequestParam(required = false) boolean anonymity,
-                                    @Valid @RequestBody GuestBookContent content);
+//    @Operation(summary = "방명록 생성", description = "각 방에서 사용자의 방명록을 생성할 때 사용하는 API")
+//    @ApiErrorCodes({ErrorCode.USER_NOT_EXIST, ErrorCode.JWT_TOKEN_EXPIRED, ErrorCode.TOKEN_REQUIRED, ErrorCode.INVALID_JWT_TOKEN})
+//    @ApiResponses(value = {
+//            @ApiResponse(responseCode = "201", description = "방명록 생성 성공",
+//                    content = @Content(mediaType = "application/json",
+//                            schema = @Schema(implementation = ResponseDTO.class),
+//                            examples = {
+//                                    @ExampleObject(
+//                                            value = """
+//                                                    {
+//                                                        "status": 201,
+//                                                        "message": "방명록 내용이 작성되었습니다.",
+//                                                        "data": null
+//                                                    }
+//                                                    """
+//                                    )
+//                            }))
+//    })
+//    ResponseEntity<?> postGuestBook(@PathVariable("roomId") Long roomId,
+//                                    @RequestParam(required = false) boolean anonymity,
+//                                    @Valid @RequestBody GuestBookContent content);
 
     @Operation(summary = "방명록 방 목록 조회", description = "방명록 방들을 검색어와 정렬방식에 따라 목록을 조회하는 API")
     @ApiErrorCodes({ErrorCode.USER_NOT_EXIST, ErrorCode.JWT_TOKEN_EXPIRED, ErrorCode.TOKEN_REQUIRED, ErrorCode.INVALID_JWT_TOKEN})
