@@ -24,10 +24,15 @@ public class GameState {
 
     public GameState(List<Card> cards, List<UserCardQuestions> userCardQuestions) {
         this.questions = new LinkedList<>();
-        userCardQuestions.forEach(q -> {
-                    playerInfo.put(q.getSparkUserId(), matchToQuestion(cards, q.getSparkUserId()));
-                    questions.addAll(q.getQuestions());
-                });
+        for (UserCardQuestions q : userCardQuestions) {
+            playerInfo.put(q.getSparkUserId(), matchToQuestion(cards, q.getSparkUserId()));
+            questions.addAll(q.getQuestions());
+            scores.put(q.getSparkUserId(), 0);
+        }
+//        userCardQuestions.forEach(q -> {
+//                    playerInfo.put(q.getSparkUserId(), matchToQuestion(cards, q.getSparkUserId()));
+//                    questions.addAll(q.getQuestions());
+//                });
         this.currentSubjectId = userCardQuestions.get(0).getSparkUserId();
     }
 

@@ -7,13 +7,13 @@ import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-@Schema(description = "API 응답 DTO")
+@Schema(description = "API 응답 DTO", oneOf = { ResponseDTO.class })
 public class ResponseDTO<D> {
 
-    @Schema(description = "응답 상태 코드")
+    @Schema(description = "응답 상태 코드", example = "200")
     private final int status;
 
-    @Schema(description = "응답 메세지")
+    @Schema(description = "응답 메세지", example = "api 응답 메세지")
     private final String message;
 
     @Schema(description = "응답 데이터")
