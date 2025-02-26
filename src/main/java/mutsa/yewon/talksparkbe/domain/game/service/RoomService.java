@@ -163,8 +163,9 @@ public class RoomService {
     }
 
     public boolean checkHost(Long roomId, SparkUser sparkUser) {
-        RoomParticipate ownerParticipate = roomParticipateRepository.findByRoomIdWithOwner(roomId).orElseThrow(() -> new CustomTalkSparkException(ErrorCode.ROOM_NOT_FOUND));
-        return (sparkUser.equals(ownerParticipate.getSparkUser()));
+        Room room = roomRepository.findById(roomId).orElseThrow(() -> new CustomTalkSparkException(ErrorCode.ROOM_NOT_FOUND));
+        SparkUser ownerParticipate = sparkUserRepository.findById(room.getHostId()).orElseThrow(() -> new CustomTalkSparkException(ErrorCode.USER_NOT_EXIST));
+        return (sparkUser.equals(ownerParticipate));
     }
 
     public List<RoomListResponse> listAllRooms() {
