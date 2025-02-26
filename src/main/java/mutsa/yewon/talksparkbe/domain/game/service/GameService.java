@@ -136,12 +136,26 @@ public class GameService {
         List<Long> addingCardIds = new ArrayList<>();
         List<Card> cards = playerInfo.values().stream().toList();
 
+        Map<Long, List<Long>> participantCardMap = new HashMap<>();
 
         for (Long participantId : participantIds) {
-            for (Card c : cards) {
-                if (!c.getSparkUser().getId().equals(participantId)) addingCardIds.add(c.getId());
-            }
+            List<Long> otherCards = playerInfo.values()
+                    .stream()
+                    .filter(card -> !card.getSparkUser().getId().equals(participantId))
+                    .map(Card::getId)
+                    .toList();
+            participantCardMap.put(participantId, otherCards);
         }
+
+        for (Map.Entry<Long, List<Long>> entry : participantCardMap.entrySet()) {
+            storedCardService.storeTeamCard(TeamCardHolderCreateDTO.of(entry.getKey(), room.getRoomName(), entry.getValue()));
+        }
+
+//        for (Long participantId : participantIds) {
+//            for (Card c : cards) {
+//                if (!c.getSparkUser().getId().equals(participantId)) addingCardIds.add(c.getId());
+//            }
+//        }
 
 //        List<Card> cardsToStore = playerInfo.entrySet()
 //                .stream()
@@ -149,7 +163,7 @@ public class GameService {
 //                .map(Map.Entry::getValue)
 //                .toList();
 //
-        storedCardService.storeTeamCard(TeamCardHolderCreateDTO.of(sparkUserId, room.getRoomName(), addingCardIds));
+//        storedCardService.storeTeamCard(TeamCardHolderCreateDTO.of(sparkUserId, room.getRoomName(), addingCardIds));
     }
 
     public void updateBlanks(Long roomId) {
