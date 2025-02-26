@@ -2,10 +2,11 @@ package mutsa.yewon.talksparkbe.domain.game.service;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import mutsa.yewon.talksparkbe.domain.card.dto.CardResponseDTO;
 import mutsa.yewon.talksparkbe.domain.card.entity.Card;
 import mutsa.yewon.talksparkbe.domain.cardHolder.dto.TeamCardHolderCreateDTO;
 import mutsa.yewon.talksparkbe.domain.cardHolder.service.StoredCardService;
+import mutsa.yewon.talksparkbe.domain.game.controller.dto.EndGameDto;
+import mutsa.yewon.talksparkbe.domain.game.controller.dto.EndGameResponseDto;
 import mutsa.yewon.talksparkbe.domain.game.entity.Room;
 import mutsa.yewon.talksparkbe.domain.game.entity.RoomParticipate;
 import mutsa.yewon.talksparkbe.domain.game.repository.RoomParticipateRepository;
@@ -38,6 +39,7 @@ public class GameService {
     private final StoredCardService storedCardService;
     private final RoomState roomState;
     private final SparkUserRepository sparkUserRepository;
+    private final RoomService roomService;
 
     @Transactional
     public void startGame(Long roomId) {
@@ -81,6 +83,29 @@ public class GameService {
         GameState gameState = gameStates.get(roomId);
         if (gameState == null || !gameState.hasNextQuestion()) return null;
         return gameState.getCurrentQuestion();
+    }
+
+    @Transactional
+    public EndGameResponseDto endGame(EndGameDto endGameDto){
+
+        Long roomId = endGameDto.getRoomId();
+
+        GameState gameState = gameStates.get(roomId);
+
+        if (gameState == null){
+            throw new CustomTalkSparkException(ErrorCode.GAME_NOT_FOUND);
+        }
+
+        Long playerId = endGameDto.getPlayerId();
+
+        insertCardCopies(roomId, playerId);
+
+        roomService.changeFinished(roomId);
+
+        removeGameState(roomId);
+
+        return EndGameResponseDto.of(gameState.getScores(),
+                gameState.getPlayerInfo().values().stream().map(CardResponseCustomDTO::fromCard).toList());
     }
 
     @Transactional(readOnly = true)
@@ -127,11 +152,12 @@ public class GameService {
         return gameState.getPlayerInfo().values().stream().map(CardResponseCustomDTO::fromCard).toList();
     }
 
-    @Transactional
-    public void insertCardCopies(Long roomId, Long sparkUserId) {
+    private void insertCardCopies(Long roomId, Long sparkUserId) {
         GameState gameState = gameStates.get(roomId);
+
         Map<Long, Card> playerInfo = gameState.getPlayerInfo();
-        Room room = roomRepository.findById(roomId).orElseThrow();
+        Room room = roomRepository.findById(roomId)
+                .orElseThrow(()-> new CustomTalkSparkException(ErrorCode.ROOM_NOT_FOUND));
         List<Long> participantIds = playerInfo.keySet().stream().toList();
         List<Long> addingCardIds = new ArrayList<>();
         List<Card> cards = playerInfo.values().stream().toList();
@@ -191,7 +217,7 @@ public class GameService {
         }
     }
 
-    public void endGame(Long roomId) {
+    private void removeGameState(Long roomId) {
         gameStates.remove(roomId);
     }
 }
