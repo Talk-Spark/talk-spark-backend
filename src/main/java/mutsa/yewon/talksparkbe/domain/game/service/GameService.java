@@ -45,6 +45,8 @@ public class GameService {
 
     @Transactional
     public void startGame(Long roomId) {
+        removeGameState(roomId);
+
         Room room = roomRepository.findById(roomId)
                 .orElseThrow(() -> new CustomTalkSparkException(ErrorCode.ROOM_NOT_FOUND));
 
@@ -91,22 +93,21 @@ public class GameService {
     public EndGameResponseDto endGame(EndGameDto endGameDto){
 
         Long roomId = endGameDto.getRoomId();
+        Room room = roomRepository.findById(roomId).orElseThrow(() -> new CustomTalkSparkException(ErrorCode.ROOM_NOT_FOUND));
 
         GameState gameState = gameStates.get(roomId);
 
-        if (gameState == null){
-            throw new CustomTalkSparkException(ErrorCode.GAME_NOT_FOUND);
+//        if (gameState == null){
+//            throw new CustomTalkSparkException(ErrorCode.GAME_NOT_FOUND);
+//        }
+
+        if (!room.isFinished()) {
+            Long playerId = endGameDto.getPlayerId();
+            insertCardCopies(roomId, playerId);
+
+            roomService.changeFinished(roomId);
+            guestBookService.createGuestBookData(roomId);
         }
-
-        Long playerId = endGameDto.getPlayerId();
-
-        insertCardCopies(roomId, playerId);
-
-        roomService.changeFinished(roomId);
-
-        guestBookService.createGuestBookData(roomId);
-
-        removeGameState(roomId);
 
         return EndGameResponseDto.of(gameState.getScores(),
                 gameState.getPlayerInfo().values().stream().map(CardResponseCustomDTO::fromCard).toList());
