@@ -45,7 +45,6 @@ public class GameService {
 
     @Transactional
     public void startGame(Long roomId) {
-        removeGameState(roomId);
 
         Room room = roomRepository.findById(roomId)
                 .orElseThrow(() -> new CustomTalkSparkException(ErrorCode.ROOM_NOT_FOUND));
@@ -107,6 +106,8 @@ public class GameService {
 
             roomService.changeFinished(roomId);
             guestBookService.createGuestBookData(roomId);
+
+//            removeGameState(roomId);
         }
 
         return EndGameResponseDto.of(gameState.getScores(),
