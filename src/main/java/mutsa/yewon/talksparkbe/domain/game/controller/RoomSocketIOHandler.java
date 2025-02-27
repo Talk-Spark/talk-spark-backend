@@ -5,8 +5,6 @@ import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import mutsa.yewon.talksparkbe.domain.card.entity.Card;
-import mutsa.yewon.talksparkbe.domain.card.entity.CardThema;
 import mutsa.yewon.talksparkbe.domain.card.repository.CardRepository;
 import mutsa.yewon.talksparkbe.domain.game.controller.request.*;
 import mutsa.yewon.talksparkbe.domain.game.service.dto.CardQuestion;
@@ -20,7 +18,6 @@ import mutsa.yewon.talksparkbe.global.exception.CustomTalkSparkException;
 import mutsa.yewon.talksparkbe.global.util.JWTUtil;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
-import mutsa.yewon.talksparkbe.global.util.SecurityUtil;
 
 import java.util.List;
 import java.util.Map;
@@ -174,15 +171,15 @@ public class RoomSocketIOHandler {
 //            }
         });
 
-        server.addEventListener("getEnd", EndRequest.class, (client, data, ackSender) -> {
-            Long sparkUserId = data.getSparkUserId();
-            Long roomId = data.getRoomId();
-
-            server.getRoomOperations(roomId.toString()).sendEvent("scores", gameService.getScores(roomId), gameService.getAllRelatedCards(roomId));
-            gameService.insertCardCopies(roomId, sparkUserId);
-            gameService.endGame(roomId); // 게임 종료 시 저장하고 있던 게임 정보는 삭제
-            roomService.changeFinished(roomId);
-        });
+//        server.addEventListener("getEnd", EndRequest.class, (client, data, ackSender) -> {
+//            Long sparkUserId = data.getSparkUserId();
+//            Long roomId = data.getRoomId();
+//
+//            server.getRoomOperations(roomId.toString()).sendEvent("scores", gameService.getScores(roomId), gameService.getAllRelatedCards(roomId));
+//            gameService.insertCardCopies(roomId, sparkUserId);
+//            gameService.removeGameState(roomId); // 게임 종료 시 저장하고 있던 게임 정보는 삭제
+//            roomService.changeFinished(roomId);
+//        });
     }
 
     private void sendSingleResult(Long roomId) {
