@@ -15,6 +15,7 @@ import mutsa.yewon.talksparkbe.domain.game.service.dto.*;
 import mutsa.yewon.talksparkbe.domain.game.service.util.GameState;
 import mutsa.yewon.talksparkbe.domain.game.service.util.QuestionGenerator;
 import mutsa.yewon.talksparkbe.domain.game.service.util.RoomState;
+import mutsa.yewon.talksparkbe.domain.guestBook.service.GuestBookService;
 import mutsa.yewon.talksparkbe.domain.sparkUser.entity.SparkUser;
 import mutsa.yewon.talksparkbe.domain.sparkUser.repository.SparkUserRepository;
 import mutsa.yewon.talksparkbe.global.exception.CustomTalkSparkException;
@@ -40,6 +41,7 @@ public class GameService {
     private final RoomState roomState;
     private final SparkUserRepository sparkUserRepository;
     private final RoomService roomService;
+    private final GuestBookService guestBookService;
 
     @Transactional
     public void startGame(Long roomId) {
@@ -101,6 +103,8 @@ public class GameService {
         insertCardCopies(roomId, playerId);
 
         roomService.changeFinished(roomId);
+
+        guestBookService.createGuestBookData(roomId);
 
         removeGameState(roomId);
 

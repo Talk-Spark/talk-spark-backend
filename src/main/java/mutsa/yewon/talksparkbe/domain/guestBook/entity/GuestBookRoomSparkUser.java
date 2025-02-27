@@ -4,6 +4,9 @@ import jakarta.persistence.*;
 import lombok.*;
 import mutsa.yewon.talksparkbe.domain.game.entity.Room;
 import mutsa.yewon.talksparkbe.domain.sparkUser.entity.SparkUser;
+import org.springframework.data.annotation.CreatedDate;
+
+import java.time.LocalDateTime;
 
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -24,6 +27,9 @@ public class GuestBookRoomSparkUser {
 
     @Column(nullable = false)
     private Boolean isGuestBookFavorited;
+
+    @CreatedDate
+    private LocalDateTime guestBookRoomSparkUserDateTime;
 
     @PrePersist
     public void prePersist() {
