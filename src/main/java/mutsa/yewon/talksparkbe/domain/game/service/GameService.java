@@ -12,7 +12,7 @@ import mutsa.yewon.talksparkbe.domain.game.entity.RoomParticipate;
 import mutsa.yewon.talksparkbe.domain.game.repository.RoomParticipateRepository;
 import mutsa.yewon.talksparkbe.domain.game.repository.RoomRepository;
 import mutsa.yewon.talksparkbe.domain.game.service.dto.*;
-import mutsa.yewon.talksparkbe.domain.game.service.util.GameState;
+import mutsa.yewon.talksparkbe.domain.game.service.util.GameStateManager;
 import mutsa.yewon.talksparkbe.domain.game.service.util.QuestionGenerator;
 import mutsa.yewon.talksparkbe.domain.game.service.util.RoomState;
 import mutsa.yewon.talksparkbe.domain.sparkUser.entity.SparkUser;
@@ -31,7 +31,7 @@ public class GameService {
     // TODO: 이거 레디스에 관리하면될듯
     // 방Id : 게임상태
     @Getter
-    private final Map<Long, GameState> gameStates = new HashMap<>();
+    private final Map<Long, GameStateManager> gameStates = new HashMap<>();
 
     private final RoomRepository roomRepository;
     private final RoomParticipateRepository roomParticipateRepository;
@@ -70,19 +70,14 @@ public class GameService {
 
         List<UserCardQuestions> questions = questionGenerator.execute(playerCards, room.getDifficulty()); // 선택된 명함들을 가지고 난이도를 기반으로 문제 만들기
 
-        GameState gameState = new GameState(playerCards, questions); // 게임 상태를 초기화
-        gameStates.put(roomId, gameState); // 특정 방 번호에 게임 상태 할당
+        GameStateManager gameStateManager = new GameStateManager(playerCards, questions); // 게임 상태를 초기화
+        gameStates.put(roomId, gameStateManager); // 특정 방 번호에 게임 상태 할당
 
-
-
-        // 각 참가자들마다의 빈칸정보를 만들기
-        createBlanks(roomId, questions);
     }
 
     public CardQuestion getQuestion(Long roomId) {
-        GameState gameState = gameStates.get(roomId);
-        if (gameState == null || !gameState.hasNextQuestion()) return null;
-        return gameState.getCurrentQuestion();
+        GameStateManager gameStateManager = gameStates.get(roomId);
+        return gameStateManager.getCurrentQuestion();
     }
 
     @Transactional
@@ -90,9 +85,9 @@ public class GameService {
 
         Long roomId = endGameDto.getRoomId();
 
-        GameState gameState = gameStates.get(roomId);
+        GameStateManager gameStateManager = gameStates.get(roomId);
 
-        if (gameState == null){
+        if (gameStateManager == null){
             throw new CustomTalkSparkException(ErrorCode.GAME_NOT_FOUND);
         }
 
@@ -102,10 +97,8 @@ public class GameService {
 
         roomService.changeFinished(roomId);
 
-        removeGameState(roomId);
-
-        return EndGameResponseDto.of(gameState.getScores(),
-                gameState.getPlayerInfo().values().stream().map(CardResponseCustomDTO::fromCard).toList());
+        return EndGameResponseDto.of(gameStateManager.getScores(),
+                gameStateManager.getAllPlayerCards());
     }
 
     @Transactional(readOnly = true)
@@ -118,44 +111,44 @@ public class GameService {
     }
 
     public void submitAnswer(Long roomId, Long sparkUserId, String answer) {
-        GameState gameState = Optional.ofNullable(gameStates.get(roomId)).orElseThrow();
-        gameState.recordScore(sparkUserId, answer);
+        GameStateManager gameStateManager = Optional.ofNullable(gameStates.get(roomId)).orElseThrow();
+        gameStateManager.recordScore(sparkUserId, answer);
     }
 
     public boolean allPeopleSubmitted(Long roomId) {
-        GameState gameState = gameStates.get(roomId);
-        return gameState.getCurrentQuestionAnswerNum().equals(gameState.getPlayerInfo().size());
+        GameStateManager gameStateManager = gameStates.get(roomId);
+        return gameStateManager.allAnswered();
     }
 
-    public List<CorrectAnswerDto> getSingleQuestionScoreBoard(Long roomId) {
-        GameState gameState = gameStates.get(roomId);
-        return gameState.getCurrentQuestionCorrect();
+    public List<AnswerDto> getSingleQuestionScoreBoard(Long roomId) {
+        GameStateManager gameStateManager = gameStates.get(roomId);
+        return gameStateManager.getScoreBoard();
     }
 
     public void loadNextQuestion(Long roomId) {
-        GameState gameState = gameStates.get(roomId);
-        gameState.loadNextQuestion();
+        GameStateManager gameStateManager = gameStates.get(roomId);
+        gameStateManager.prepareNextQuestion();
     }
 
     public SwitchSubject isSwitchingSubject(Long roomId) {
-        GameState gameState = gameStates.get(roomId);
-        return gameState.isSwitchingSubject();
+        GameStateManager gameStateManager = gameStates.get(roomId);
+        return gameStateManager.isSwitchingSubject();
     }
 
     public Map<Long, Integer> getScores(Long roomId) {
-        GameState gameState = gameStates.get(roomId);
-        return gameState == null ? Collections.emptyMap() : gameState.getScores();
+        GameStateManager gameStateManager = gameStates.get(roomId);
+        return gameStateManager == null ? Collections.emptyMap() : gameStateManager.getScores();
     }
 
     public List<CardResponseCustomDTO> getAllRelatedCards(Long roomId) {
-        GameState gameState = gameStates.get(roomId);
-        return gameState.getPlayerInfo().values().stream().map(CardResponseCustomDTO::fromCard).toList();
+        GameStateManager gameStateManager = gameStates.get(roomId);
+        return gameStateManager.getAllPlayerCards();
     }
 
     private void insertCardCopies(Long roomId, Long sparkUserId) {
-        GameState gameState = gameStates.get(roomId);
+        GameStateManager gameStateManager = gameStates.get(roomId);
 
-        Map<Long, Card> playerInfo = gameState.getPlayerInfo();
+        Map<Long, Card> playerInfo = gameStateManager.getPlayerManager().getPlayerCards();
         Room room = roomRepository.findById(roomId)
                 .orElseThrow(()-> new CustomTalkSparkException(ErrorCode.ROOM_NOT_FOUND));
         List<Long> participantIds = playerInfo.keySet().stream().toList();
@@ -177,26 +170,13 @@ public class GameService {
             storedCardService.storeTeamCard(TeamCardHolderCreateDTO.of(entry.getKey(), room.getRoomName(), entry.getValue()));
         }
 
-//        for (Long participantId : participantIds) {
-//            for (Card c : cards) {
-//                if (!c.getSparkUser().getId().equals(participantId)) addingCardIds.add(c.getId());
-//            }
-//        }
-
-//        List<Card> cardsToStore = playerInfo.entrySet()
-//                .stream()
-//                .filter(entry -> !entry.getKey().equals(sparkUserId))
-//                .map(Map.Entry::getValue)
-//                .toList();
-//
-//        storedCardService.storeTeamCard(TeamCardHolderCreateDTO.of(sparkUserId, room.getRoomName(), addingCardIds));
     }
 
     public void updateBlanks(Long roomId) {
-        GameState gameState = gameStates.get(roomId);
-        String fieldName = gameState.getCurrentQuestion().getFieldName();
-        Long cardOwnerId = gameState.getCurrentQuestion().getCardOwnerId();
-        gameState.getCardBlanksDtos().stream()
+        GameStateManager gameStateManager = gameStates.get(roomId);
+        String fieldName = gameStateManager.getCurrentQuestion().getFieldName();
+        Long cardOwnerId = gameStateManager.getCurrentQuestion().getCardOwnerId();
+        gameStateManager.getBlanks().stream()
                 .filter(cbd -> cbd.getSparkUserId().equals(cardOwnerId)).findFirst()
                 .ifPresent(cbd -> cbd.getBlanks().remove(fieldName));
     }
@@ -209,15 +189,8 @@ public class GameService {
                 .toList();
     }
 
-    private void createBlanks(Long roomId, List<UserCardQuestions> questions) {
-        for (UserCardQuestions ucq : questions) {
-            Long sparkUserId = ucq.getSparkUserId();
-            List<String> blanks = ucq.getQuestions().stream().map(CardQuestion::getFieldName).toList();
-            gameStates.get(roomId).getCardBlanksDtos().add(CardBlanksDto.of(sparkUserId, blanks));
-        }
-    }
 
-    private void removeGameState(Long roomId) {
+    public void removeGameState(Long roomId) {
         gameStates.remove(roomId);
     }
 }
