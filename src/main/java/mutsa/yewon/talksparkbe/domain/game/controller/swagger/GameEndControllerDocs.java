@@ -11,6 +11,7 @@ import mutsa.yewon.talksparkbe.global.dto.ResponseDTO;
 import mutsa.yewon.talksparkbe.global.exception.ErrorCode;
 import mutsa.yewon.talksparkbe.global.swagger.ApiErrorCodes;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 
 @Tag(name = "게임 종료 API")
@@ -19,4 +20,7 @@ public interface GameEndControllerDocs {
     @Operation(summary = "게임 종료 처리 API", description = "게임 종료 시 최종 점수를 공개하고 사용자 명함들을 모두 저장합니다.")
     @ApiErrorCodes({ErrorCode.GAME_NOT_FOUND})
     ResponseEntity<ResponseDTO<EndGameResponseDto>> endGame(@RequestBody EndGameDto endGameDto);
+
+    @Operation(summary = "게임 상태 삭제 API", description = "게임 종료 후 게임 상태를 삭제합니다.")
+    ResponseEntity<ResponseDTO<?>> changeGameStatus(@PathVariable Long gameId);
 }
