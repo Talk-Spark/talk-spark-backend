@@ -5,10 +5,7 @@ import lombok.RequiredArgsConstructor;
 import mutsa.yewon.talksparkbe.domain.game.entity.Room;
 import mutsa.yewon.talksparkbe.domain.game.repository.RoomRepository;
 import mutsa.yewon.talksparkbe.domain.guestBook.GuestBookControllerDocs;
-import mutsa.yewon.talksparkbe.domain.guestBook.dto.guestBook.GuestBookContent;
-import mutsa.yewon.talksparkbe.domain.guestBook.dto.guestBook.GuestBookListRequestDTO;
-import mutsa.yewon.talksparkbe.domain.guestBook.dto.guestBook.GuestBookPostRequestDTO;
-import mutsa.yewon.talksparkbe.domain.guestBook.dto.guestBook.GuestBookListResponse;
+import mutsa.yewon.talksparkbe.domain.guestBook.dto.guestBook.*;
 import mutsa.yewon.talksparkbe.domain.guestBook.dto.room.GuestBookRoomListResponse;
 import mutsa.yewon.talksparkbe.domain.guestBook.entity.GuestBook;
 import mutsa.yewon.talksparkbe.domain.guestBook.repository.GuestBookRepository;
@@ -36,26 +33,30 @@ public class GuestBookController implements GuestBookControllerDocs {
     private final GuestBookRoomService guestBookRoomService;
     private final SecurityUtil securityUtil;
 
+//    @PostMapping("/create")
+//    public ResponseEntity<?> postGuestBook(@RequestParam(required = true) Long roomId) {
+//
+//        try {
+//            Room room = roomRepository.findById(roomId).orElseThrow(
+//                    () -> new CustomTalkSparkException(ErrorCode.ROOM_NOT_FOUND));
+//            // 방명록 초기 데이터를 생성할 때는 항상 room의 게임이 끝나있어야 함.
+//            if(!room.isFinished()) {
+//                room.setFinished(true);
+//                roomRepository.save(room);
+//            }
+//            guestBookService.createGuestBookData(roomId);
+//            ResponseDTO<?> responseDTO = ResponseDTO.created("방명록 초기 데이터 생성하였습니다.");
+//            return ResponseEntity.status(201).body(responseDTO);
+//        } catch (IllegalArgumentException e) {
+//            throw new CustomTalkSparkException(ErrorCode.INVALID_FORMAT);
+//        }
+//    }
 
-    //TODO: RuntimeException("User not found") 에러코드로 리펙토링
-
-    @PostMapping("/create")
-    public ResponseEntity<?> postGuestBook(@RequestParam(required = true) Long roomId) {
-
-        try {
-            Room room = roomRepository.findById(roomId).orElseThrow(
-                    () -> new CustomTalkSparkException(ErrorCode.ROOM_NOT_FOUND));
-            // 방명록 초기 데이터를 생성할 때는 항상 room의 게임이 끝나있어야 함.
-            if(!room.isFinished()) {
-                room.setFinished(true);
-                roomRepository.save(room);
-            }
-            guestBookService.createGuestBookData(roomId);
-            ResponseDTO<?> responseDTO = ResponseDTO.created("방명록 초기 데이터 생성하였습니다.");
-            return ResponseEntity.status(201).body(responseDTO);
-        } catch (IllegalArgumentException e) {
-            throw new CustomTalkSparkException(ErrorCode.INVALID_FORMAT);
-        }
+    @GetMapping("/room-id")
+    public ResponseEntity<?> getRoomId(){
+        RoomIdResponseDTO roomIdResponseDTO = guestBookService.getRoomId(securityUtil.getLoggedInUserId());
+        ResponseDTO<?> responseDTO = ResponseDTO.created("방명록 생성시간을 기준으로 게임 방 id가 조회되었습니다.",roomIdResponseDTO);
+        return ResponseEntity.status(200).body(responseDTO);
     }
 
     @PostMapping("/{roomId}")

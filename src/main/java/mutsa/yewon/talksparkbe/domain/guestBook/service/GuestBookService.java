@@ -7,10 +7,7 @@ import mutsa.yewon.talksparkbe.domain.card.repository.CardRepository;
 import mutsa.yewon.talksparkbe.domain.game.entity.Room;
 import mutsa.yewon.talksparkbe.domain.game.entity.RoomParticipate;
 import mutsa.yewon.talksparkbe.domain.game.repository.RoomRepository;
-import mutsa.yewon.talksparkbe.domain.guestBook.dto.guestBook.GuestBookListDTO;
-import mutsa.yewon.talksparkbe.domain.guestBook.dto.guestBook.GuestBookListRequestDTO;
-import mutsa.yewon.talksparkbe.domain.guestBook.dto.guestBook.GuestBookPostRequestDTO;
-import mutsa.yewon.talksparkbe.domain.guestBook.dto.guestBook.GuestBookListResponse;
+import mutsa.yewon.talksparkbe.domain.guestBook.dto.guestBook.*;
 import mutsa.yewon.talksparkbe.domain.guestBook.entity.GuestBook;
 import mutsa.yewon.talksparkbe.domain.guestBook.entity.GuestBookRoom;
 import mutsa.yewon.talksparkbe.domain.guestBook.entity.GuestBookRoomSparkUser;
@@ -25,9 +22,7 @@ import mutsa.yewon.talksparkbe.global.util.SecurityUtil;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-import java.util.Objects;
-import java.util.Random;
+import java.util.*;
 import java.util.stream.Collectors;
 
 
@@ -140,4 +135,12 @@ public class GuestBookService {
                             .build())
                     .collect(Collectors.toList());
         }
+
+    public RoomIdResponseDTO getRoomId(Long sparkUserId) {
+        GuestBookRoomSparkUser latestGuestBookRoomSparkUser = guestBookRoomSparkUserRepository
+                .findTopBySparkUserIdOrderByGuestBookRoomSparkUserDateTimeDesc(sparkUserId)
+                .orElseThrow(() -> new CustomTalkSparkException(ErrorCode.GUESTBOOK_ROOM_NOT_FOUND));
+
+        return new RoomIdResponseDTO(latestGuestBookRoomSparkUser.getGuestBookRoom().getGuestBookRoomId());
     }
+}

@@ -15,6 +15,7 @@ import mutsa.yewon.talksparkbe.domain.game.service.dto.*;
 import mutsa.yewon.talksparkbe.domain.game.service.util.GameState;
 import mutsa.yewon.talksparkbe.domain.game.service.util.QuestionGenerator;
 import mutsa.yewon.talksparkbe.domain.game.service.util.RoomState;
+import mutsa.yewon.talksparkbe.domain.guestBook.service.GuestBookService;
 import mutsa.yewon.talksparkbe.domain.sparkUser.entity.SparkUser;
 import mutsa.yewon.talksparkbe.domain.sparkUser.repository.SparkUserRepository;
 import mutsa.yewon.talksparkbe.global.exception.CustomTalkSparkException;
@@ -40,9 +41,11 @@ public class GameService {
     private final RoomState roomState;
     private final SparkUserRepository sparkUserRepository;
     private final RoomService roomService;
+    private final GuestBookService guestBookService;
 
     @Transactional
     public void startGame(Long roomId) {
+
         Room room = roomRepository.findById(roomId)
                 .orElseThrow(() -> new CustomTalkSparkException(ErrorCode.ROOM_NOT_FOUND));
 
@@ -89,20 +92,23 @@ public class GameService {
     public EndGameResponseDto endGame(EndGameDto endGameDto){
 
         Long roomId = endGameDto.getRoomId();
+        Room room = roomRepository.findById(roomId).orElseThrow(() -> new CustomTalkSparkException(ErrorCode.ROOM_NOT_FOUND));
 
         GameState gameState = gameStates.get(roomId);
 
-        if (gameState == null){
-            throw new CustomTalkSparkException(ErrorCode.GAME_NOT_FOUND);
+//        if (gameState == null){
+//            throw new CustomTalkSparkException(ErrorCode.GAME_NOT_FOUND);
+//        }
+
+        if (!room.isFinished()) {
+            Long playerId = endGameDto.getPlayerId();
+            insertCardCopies(roomId, playerId);
+
+            roomService.changeFinished(roomId);
+            guestBookService.createGuestBookData(roomId);
+
+//            removeGameState(roomId);
         }
-
-        Long playerId = endGameDto.getPlayerId();
-
-        insertCardCopies(roomId, playerId);
-
-        roomService.changeFinished(roomId);
-
-        removeGameState(roomId);
 
         return EndGameResponseDto.of(gameState.getScores(),
                 gameState.getPlayerInfo().values().stream().map(CardResponseCustomDTO::fromCard).toList());
