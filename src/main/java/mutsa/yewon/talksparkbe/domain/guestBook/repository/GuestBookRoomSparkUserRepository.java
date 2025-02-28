@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -15,4 +16,6 @@ public interface GuestBookRoomSparkUserRepository extends JpaRepository<GuestBoo
     @Query("select r from GuestBookRoomSparkUser r where r.guestBookRoom.room.roomId = :roomId and r.sparkUser.id = :sparkUserId")
     Optional<GuestBookRoomSparkUser> findByGuestBookRoomIdAndSparkUserId(@NotNull(message = "roomId는 반드시 필요합니다.") Long roomId,
                                                                          @NotNull(message = "sparkUserId는 반드시 필요합니다.") Long sparkUserId);
+
+    Optional<GuestBookRoomSparkUser> findTopBySparkUserIdOrderByGuestBookRoomSparkUserDateTimeDesc(Long sparkUserId);
 }

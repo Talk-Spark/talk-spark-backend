@@ -28,27 +28,50 @@ import java.util.Map;
 //TODO: 방명록 API 설정
 @Tag(name = "방명록 API", description = "방명록에 관한 생성/조회/수정/삭제를 수행하는 API")
 public interface GuestBookControllerDocs {
-//    @Operation(summary = "방명록 생성", description = "각 방에서 사용자의 방명록을 생성할 때 사용하는 API")
-//    @ApiErrorCodes({ErrorCode.USER_NOT_EXIST, ErrorCode.JWT_TOKEN_EXPIRED, ErrorCode.TOKEN_REQUIRED, ErrorCode.INVALID_JWT_TOKEN})
-//    @ApiResponses(value = {
-//            @ApiResponse(responseCode = "201", description = "방명록 생성 성공",
-//                    content = @Content(mediaType = "application/json",
-//                            schema = @Schema(implementation = ResponseDTO.class),
-//                            examples = {
-//                                    @ExampleObject(
-//                                            value = """
-//                                                    {
-//                                                        "status": 201,
-//                                                        "message": "방명록 내용이 작성되었습니다.",
-//                                                        "data": null
-//                                                    }
-//                                                    """
-//                                    )
-//                            }))
-//    })
-//    ResponseEntity<?> postGuestBook(@PathVariable("roomId") Long roomId,
-//                                    @RequestParam(required = false) boolean anonymity,
-//                                    @Valid @RequestBody GuestBookContent content);
+    @Operation(summary = "방명록 생성", description = "각 방에서 사용자의 방명록을 생성할 때 사용하는 API")
+    @ApiErrorCodes({ErrorCode.USER_NOT_EXIST, ErrorCode.JWT_TOKEN_EXPIRED, ErrorCode.TOKEN_REQUIRED, ErrorCode.INVALID_JWT_TOKEN})
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "방명록 생성 성공",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = ResponseDTO.class),
+                            examples = {
+                                    @ExampleObject(
+                                            value = """
+                                                    {
+                                                        "status": 201,
+                                                        "message": "방명록 내용이 작성되었습니다.",
+                                                        "data": null
+                                                    }
+                                                    """
+                                    )
+                            }))
+    })
+    ResponseEntity<?> postGuestBook(@PathVariable("roomId") Long roomId,
+                                    @RequestParam(required = false) boolean anonymity,
+                                    @Valid @RequestBody GuestBookContent content);
+
+    @Operation(summary = "게임 방 ID 조회", description = "방명록 내용을 조회하기 전, 게임 방 ID를 조회하는 API")
+    @ApiErrorCodes({ErrorCode.USER_NOT_EXIST, ErrorCode.JWT_TOKEN_EXPIRED, ErrorCode.TOKEN_REQUIRED, ErrorCode.INVALID_JWT_TOKEN})
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "방명록 생성시간을 기준으로 게임 방 id가 조회 성공",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = ResponseDTO.class),
+                            examples = {
+                                    @ExampleObject(
+                                            value = """
+                                                    {
+                                                      "status": 200,
+                                                      "message": "방명록 생성시간을 기준으로 게임 방 id가 조회되었습니다.",
+                                                      "data": {
+                                                        "roomId" : 2
+                                                       }
+                                                    }
+                                                    """
+                                    )}
+                    ))
+    })
+    ResponseEntity<?> getRoomId();
+
 
     @Operation(summary = "방명록 방 목록 조회", description = "방명록 방들을 검색어와 정렬방식에 따라 목록을 조회하는 API")
     @ApiErrorCodes({ErrorCode.USER_NOT_EXIST, ErrorCode.JWT_TOKEN_EXPIRED, ErrorCode.TOKEN_REQUIRED, ErrorCode.INVALID_JWT_TOKEN})
@@ -183,23 +206,23 @@ public interface GuestBookControllerDocs {
     })
     ResponseEntity<?> UpdateGuestBookRoomFavorites(@PathVariable("roomId") Long roomId);
 
-    @Operation(summary = "방명록 데이터 생성", description = "게임 종료 후 방명록 관련 테이블를 생성하는 API")
-    @ApiErrorCodes({ErrorCode.USER_NOT_EXIST, ErrorCode.JWT_TOKEN_EXPIRED, ErrorCode.TOKEN_REQUIRED, ErrorCode.INVALID_JWT_TOKEN})
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "201", description = "방명록 데이터 생성 성공",
-                    content = @Content(mediaType = "application/json",
-                            schema = @Schema(implementation = ResponseDTO.class),
-                            examples = {
-                                    @ExampleObject(
-                                            value = """
-                                                    {
-                                                        "status": 201,
-                                                        "message": "방명록 초기 데이터 생성하였습니다.",
-                                                        "data": null
-                                                    }
-                                                    """
-                                    )
-                            }))
-    })
-    ResponseEntity<?> postGuestBook(@RequestParam(required = true) Long roomId);
+//    @Operation(summary = "방명록 데이터 생성", description = "게임 종료 후 방명록 관련 테이블를 생성하는 API")
+//    @ApiErrorCodes({ErrorCode.USER_NOT_EXIST, ErrorCode.JWT_TOKEN_EXPIRED, ErrorCode.TOKEN_REQUIRED, ErrorCode.INVALID_JWT_TOKEN})
+//    @ApiResponses(value = {
+//            @ApiResponse(responseCode = "201", description = "방명록 데이터 생성 성공",
+//                    content = @Content(mediaType = "application/json",
+//                            schema = @Schema(implementation = ResponseDTO.class),
+//                            examples = {
+//                                    @ExampleObject(
+//                                            value = """
+//                                                    {
+//                                                        "status": 201,
+//                                                        "message": "방명록 초기 데이터 생성하였습니다.",
+//                                                        "data": null
+//                                                    }
+//                                                    """
+//                                    )
+//                            }))
+//    })
+//    ResponseEntity<?> postGuestBook(@RequestParam(required = true) Long roomId);
 }
