@@ -11,15 +11,15 @@ import mutsa.yewon.talksparkbe.domain.card.entity.CardThema;
 @AllArgsConstructor
 @Builder
 @Setter
-public class CorrectAnswerDto {
+public class AnswerDto {
 
     private Long sparkUserId;
     private String name;
     private boolean isCorrect;
     private CardThema color;
 
-    public static CorrectAnswerDto of(Long sparkUserId, boolean isCorrect, Card card){
-        return CorrectAnswerDto.builder()
+    public static AnswerDto of(Long sparkUserId, boolean isCorrect, Card card){
+        return AnswerDto.builder()
                 .sparkUserId(sparkUserId)
                 .isCorrect(isCorrect)
                 .name(card.getName())

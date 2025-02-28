@@ -10,7 +10,7 @@ import mutsa.yewon.talksparkbe.domain.game.controller.request.*;
 import mutsa.yewon.talksparkbe.domain.game.service.dto.CardQuestion;
 import mutsa.yewon.talksparkbe.domain.game.service.GameService;
 import mutsa.yewon.talksparkbe.domain.game.service.RoomService;
-import mutsa.yewon.talksparkbe.domain.game.service.dto.CorrectAnswerDto;
+import mutsa.yewon.talksparkbe.domain.game.service.dto.AnswerDto;
 import mutsa.yewon.talksparkbe.domain.game.service.dto.SwitchSubject;
 import mutsa.yewon.talksparkbe.domain.sparkUser.entity.SparkUser;
 import mutsa.yewon.talksparkbe.domain.sparkUser.repository.SparkUserRepository;
@@ -202,7 +202,7 @@ public class RoomSocketIOHandler {
 
     @Transactional(readOnly = true)
     public void broadcastSingleQuestionResult(Long roomId) {
-        List<CorrectAnswerDto> singleQuestionScoreBoard = gameService.getSingleQuestionScoreBoard(roomId);
+        List<AnswerDto> singleQuestionScoreBoard = gameService.getSingleQuestionScoreBoard(roomId);
 
         if (!singleQuestionScoreBoard.isEmpty())
             server.getRoomOperations(roomId.toString()).sendEvent("singleQuestionScoreBoard", singleQuestionScoreBoard);

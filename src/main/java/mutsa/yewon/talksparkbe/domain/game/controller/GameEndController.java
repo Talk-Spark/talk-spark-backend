@@ -13,10 +13,7 @@ import mutsa.yewon.talksparkbe.domain.game.service.RoomService;
 import mutsa.yewon.talksparkbe.domain.game.service.dto.CardResponseCustomDTO;
 import mutsa.yewon.talksparkbe.global.dto.ResponseDTO;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
@@ -32,4 +29,13 @@ public class GameEndController implements GameEndControllerDocs {
         return ResponseEntity.ok(ResponseDTO.ok("플레이어 명함 저장 완료.",
                 gameService.endGame(endGameDto)));
     }
+
+    @DeleteMapping("/api/game/{gameId}")
+    public ResponseEntity<ResponseDTO<?>> changeGameStatus(@PathVariable Long gameId){
+        gameService.removeGameState(gameId);
+
+        return ResponseEntity.ok(ResponseDTO.ok("게임이 종료되었습니다."));
+    }
+
+
 }
