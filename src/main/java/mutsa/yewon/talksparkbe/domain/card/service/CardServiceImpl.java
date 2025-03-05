@@ -26,9 +26,9 @@ public class CardServiceImpl implements CardService {
     private final SparkUserRepository sparkUserRepository;
 
     @Override
-    public Long createCard(CardCreateDTO cardCreateDTO) {
+    public Long createCard(CardCreateDTO cardCreateDTO, Long sparkUserId) {
 
-        SparkUser sparkUser = sparkUserRepository.findById(cardCreateDTO.getSparkUserId())
+        SparkUser sparkUser = sparkUserRepository.findById(sparkUserId)
                 .orElseThrow(() -> new CustomTalkSparkException(ErrorCode.USER_NOT_EXIST));
 
         Card card = CardCreateDTO.toCard(cardCreateDTO, sparkUser);

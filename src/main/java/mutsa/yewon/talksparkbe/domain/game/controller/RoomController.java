@@ -26,7 +26,6 @@ public class RoomController {
     private final RoomService roomService;
     private final SparkUserRepository sparkUserRepository;
     private final JWTUtil jwtUtil;
-    private final SecurityUtil securityUtil;
 
     @PostMapping
     public ResponseEntity<RoomCreateResponse> roomCreate(@RequestBody RoomCreateRequest roomCreateRequest,

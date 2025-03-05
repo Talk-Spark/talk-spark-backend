@@ -7,10 +7,10 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.Map;
 
-@Transactional
+@Transactional(readOnly = true)
 public interface CardService {
 
-    Long createCard(CardCreateDTO cardCreateDTO);
+    Long createCard(CardCreateDTO cardCreateDTO, Long sparkUserId);
     List<CardResponseDTO> getCards(Long sparkUserId);
     CardResponseDTO getCard(Long id);
     Map<String,Long> modifyCard(Long id, CardCreateDTO cardCreateDTO);

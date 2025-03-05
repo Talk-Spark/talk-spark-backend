@@ -31,7 +31,6 @@ public class GuestBookController implements GuestBookControllerDocs {
     private final RoomRepository roomRepository;
     private final GuestBookService guestBookService;
     private final GuestBookRoomService guestBookRoomService;
-    private final SecurityUtil securityUtil;
 
 //    @PostMapping("/create")
 //    public ResponseEntity<?> postGuestBook(@RequestParam(required = true) Long roomId) {
@@ -54,7 +53,7 @@ public class GuestBookController implements GuestBookControllerDocs {
 
     @GetMapping("/room-id")
     public ResponseEntity<?> getRoomId(){
-        RoomIdResponseDTO roomIdResponseDTO = guestBookService.getRoomId(securityUtil.getLoggedInUserId());
+        RoomIdResponseDTO roomIdResponseDTO = guestBookService.getRoomId(SecurityUtil.getLoggedInUserId());
         ResponseDTO<?> responseDTO = ResponseDTO.created("방명록 생성시간을 기준으로 게임 방 id가 조회되었습니다.",roomIdResponseDTO);
         return ResponseEntity.status(200).body(responseDTO);
     }
@@ -65,7 +64,7 @@ public class GuestBookController implements GuestBookControllerDocs {
                                            @Valid @RequestBody GuestBookContent content) {
 
         try {
-            GuestBookPostRequestDTO guestBookPostRequestDTO = new GuestBookPostRequestDTO(securityUtil.getLoggedInUserId(),roomId, content);
+            GuestBookPostRequestDTO guestBookPostRequestDTO = new GuestBookPostRequestDTO(SecurityUtil.getLoggedInUserId(),roomId, content);
             GuestBook guestBook = guestBookService.createGuestBook(guestBookPostRequestDTO, anonymity);
             ResponseDTO<?> responseDTO = ResponseDTO.created("방명록 내용이 작성되었습니다.");
             return ResponseEntity.status(201).body(responseDTO);
@@ -78,7 +77,7 @@ public class GuestBookController implements GuestBookControllerDocs {
     public ResponseEntity<?> getGuestBookList(@PathVariable("roomId") Long roomId) {
 
         try {
-            GuestBookListRequestDTO guestBookListRequestDTO = new GuestBookListRequestDTO(roomId, securityUtil.getLoggedInUserId());
+            GuestBookListRequestDTO guestBookListRequestDTO = new GuestBookListRequestDTO(roomId, SecurityUtil.getLoggedInUserId());
             GuestBookListResponse guestBookListResponse = guestBookService.getGuestBookList(guestBookListRequestDTO);
             ResponseDTO<?> responseDTO = ResponseDTO.ok("방명록 내용이 조회되었습니다.", guestBookListResponse);
             return ResponseEntity.status(200).body(responseDTO);
@@ -92,7 +91,7 @@ public class GuestBookController implements GuestBookControllerDocs {
                                                   @RequestParam(required = false) String sortBy) {
 
         try {
-            GuestBookRoomListResponse guestBookRoomListResponse = guestBookRoomService.getGuestBookRoomList(securityUtil.getLoggedInUserId(),search,sortBy);
+            GuestBookRoomListResponse guestBookRoomListResponse = guestBookRoomService.getGuestBookRoomList(SecurityUtil.getLoggedInUserId(),search,sortBy);
             ResponseDTO<?> responseDTO = ResponseDTO.ok("방명록 방들이 조회되었습니다.", guestBookRoomListResponse);
             return ResponseEntity.status(200).body(responseDTO);
         } catch (IllegalArgumentException e) {
@@ -105,7 +104,7 @@ public class GuestBookController implements GuestBookControllerDocs {
     public ResponseEntity<?> deleteGuestBookRoom(@PathVariable("roomId") Long roomId) {
 
         try {
-            guestBookRoomService.deleteGuestBookRoom(securityUtil.getLoggedInUserId(), roomId);
+            guestBookRoomService.deleteGuestBookRoom(SecurityUtil.getLoggedInUserId(), roomId);
             ResponseDTO<?> responseDTO = ResponseDTO.ok("방명록 방이 삭제되었습니다.");
             return ResponseEntity.status(200).body(responseDTO);
         } catch (IllegalArgumentException e) {
@@ -118,7 +117,7 @@ public class GuestBookController implements GuestBookControllerDocs {
     public ResponseEntity<?> UpdateGuestBookRoomFavorites(@PathVariable("roomId") Long roomId){
 
         try {
-            guestBookRoomService.updateGuestBookRoomFavorites(securityUtil.getLoggedInUserId(), roomId);
+            guestBookRoomService.updateGuestBookRoomFavorites(SecurityUtil.getLoggedInUserId(), roomId);
             ResponseDTO<?> responseDTO = ResponseDTO.ok("방명록 방 즐겨찾기가 수정되었습니다.");
             return ResponseEntity.status(200).body(responseDTO);
         } catch (IllegalArgumentException e) {

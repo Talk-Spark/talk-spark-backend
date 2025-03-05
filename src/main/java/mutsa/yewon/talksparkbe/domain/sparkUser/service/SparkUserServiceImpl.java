@@ -32,7 +32,6 @@ public class SparkUserServiceImpl implements SparkUserService {
     private final SparkUserRepository sparkUserRepository;
 
     private final PasswordEncoder passwordEncoder;
-    private final SecurityUtil securityUtil;
 
     @Override
     public SparkUserDTO getKakaoUser(String accessToken) {

@@ -26,12 +26,10 @@ public class CardController implements CardControllerDocs {
 
     private final CardService cardService;
 
-    private final SecurityUtil securityUtil;
-
     @PostMapping("/api/cards")
     public ResponseEntity<?> createCard(@Valid @RequestBody CardCreateDTO cardCreateDTO) {
 
-        Long cardId = cardService.createCard(cardCreateDTO);
+        Long cardId = cardService.createCard(cardCreateDTO,SecurityUtil.getLoggedInUserId());
 
         ResponseDTO<Map<String, Long>> card = ResponseDTO.created("명함이 생성되었습니다.", Map.of("cardId", cardId));
 
@@ -41,7 +39,7 @@ public class CardController implements CardControllerDocs {
     @GetMapping("/api/cards")
     public ResponseEntity<?> getCards() {
 
-        List<CardResponseDTO> cards = cardService.getCards(securityUtil.getLoggedInUserId());
+        List<CardResponseDTO> cards = cardService.getCards(SecurityUtil.getLoggedInUserId());
 
         return ResponseEntity.status(200).body(ResponseDTO.ok("사용자 명함 조회 성공", cards));
     }

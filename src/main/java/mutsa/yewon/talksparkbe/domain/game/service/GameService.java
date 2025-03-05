@@ -148,6 +148,11 @@ public class GameService {
         return gameStateManager.isSwitchingSubject();
     }
 
+    public void switchCurrentPlayerId(Long roomId) {
+        GameStateManager gameStateManager = gameStates.get(roomId);
+        gameStateManager.switchCurrentPlayerId();
+    }
+
     public Map<Long, Integer> getScores(Long roomId) {
         GameStateManager gameStateManager = gameStates.get(roomId);
         return gameStateManager == null ? Collections.emptyMap() : gameStateManager.getScores();
