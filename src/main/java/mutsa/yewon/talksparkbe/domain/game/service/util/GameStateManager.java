@@ -80,6 +80,10 @@ public class GameStateManager {
         return questionManager.isSwitchingSubject();
     }
 
+    public void switchCurrentPlayerId(){
+        questionManager.switchCurrentPlayerId();
+    }
+
     public Card getCurrentCard() {
         return playerManager.getCurrentCard(questionManager.getCurrentPlayerId());
     }

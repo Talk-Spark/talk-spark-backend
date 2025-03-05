@@ -13,6 +13,7 @@ import mutsa.yewon.talksparkbe.domain.sparkUser.repository.SparkUserRepository;
 import mutsa.yewon.talksparkbe.global.exception.CustomTalkSparkException;
 import mutsa.yewon.talksparkbe.global.exception.ErrorCode;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,6 +35,7 @@ public class StoredCardServiceImpl implements StoredCardService {
 
 
     @Override
+    @Transactional
     public Long storeIndCard(IndCardHolderCreateDTO indCardHolderCreateDTO) {
         SparkUser sparkUser = sparkUserRepository.findById(indCardHolderCreateDTO.getSparkUserId())
                 .orElseThrow(() -> new CustomTalkSparkException(ErrorCode.USER_NOT_EXIST));
@@ -51,29 +53,35 @@ public class StoredCardServiceImpl implements StoredCardService {
     }
 
     @Override
+    @Transactional
     public Long storeTeamCard(TeamCardHolderCreateDTO teamCardHolderCreateDTO) {
         SparkUser sparkUser = sparkUserRepository.findById(teamCardHolderCreateDTO.getSparkUserId())
                 .orElseThrow(() -> new CustomTalkSparkException(ErrorCode.USER_NOT_EXIST));
 
-        List<Card> cards = new ArrayList<>();
+//        List<Card> cards = new ArrayList<>();
+//
+//        for (Long cardId : teamCardHolderCreateDTO.getCardIds()) {
+//            Card card = cardRepository.findById(cardId)
+//                    .orElseThrow(() -> new CustomTalkSparkException(ErrorCode.CARD_NOT_EXIST));
+//
+//            cards.add(card);
+//        }
 
-        for (Long cardId : teamCardHolderCreateDTO.getCardIds()) {
-            Card card = cardRepository.findById(cardId)
-                    .orElseThrow(() -> new CustomTalkSparkException(ErrorCode.CARD_NOT_EXIST));
-
-            cards.add(card);
-        }
+        List<Card> cards = cardRepository.findAllById(teamCardHolderCreateDTO.getCardIds());
 
         CardHolder cardHolder =
                 CardHolder.cardToTeamCardHolder(teamCardHolderCreateDTO.getTeamName(), sparkUser, cards);
 
-        for (Card card : cards) {
-            StoredCard.cardTostore(cardHolder, card);
-        }
+//        for (Card card : cards) {
+//            StoredCard.cardTostore(cardHolder, card);
+//        }
+
+        cardHolder.addStoredCards(cards);
 
         sparkUser.addCardHolder(cardHolder);
 
         cardHolderRepository.save(cardHolder);
+
         return cardHolder.getId();
     }
 
@@ -140,6 +148,7 @@ public class StoredCardServiceImpl implements StoredCardService {
     }
 
     @Override
+    @Transactional
     public Map<String, Long> bookMarkCard(Long cardHolderId) {
         CardHolder cardHolder = cardHolderRepository.findById(cardHolderId)
                 .orElseThrow(() -> new CustomTalkSparkException(ErrorCode.CARDHOLDER_NOT_EXIST));
@@ -152,6 +161,7 @@ public class StoredCardServiceImpl implements StoredCardService {
     }
 
     @Override
+    @Transactional
     public Map<String, Long> deleteCardHolder(Long cardHolderId) {
         CardHolder cardHolder = cardHolderRepository.findById(cardHolderId)
                 .orElseThrow(() -> new CustomTalkSparkException(ErrorCode.CARDHOLDER_NOT_EXIST));

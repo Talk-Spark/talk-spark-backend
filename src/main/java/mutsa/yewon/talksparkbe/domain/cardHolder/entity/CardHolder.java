@@ -105,4 +105,11 @@ public class CardHolder {
     public void bookMarkCard(){
         this.bookMark = !this.bookMark;
     }
+
+    public void addStoredCards(List<Card> cards) {
+        for (Card card : cards) {
+            StoredCard storedCard = StoredCard.cardTostore(this, card);
+            storedCards.add(storedCard);
+        }
+    }
 }
