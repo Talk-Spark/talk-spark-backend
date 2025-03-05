@@ -36,11 +36,10 @@ public class GuestBookService {
     private final GuestBookRoomSparkUserRepository guestBookRoomSparkUserRepository;
     private final CardRepository cardRepository;
     private final RoomRepository roomRepository;
-    private final SecurityUtil securityUtil;
 
     @Transactional
     public void createGuestBookData(Long roomId) {
-        SparkUser sparkUser = sparkUserRepository.findById(securityUtil.getLoggedInUserId()).orElseThrow(()
+        SparkUser sparkUser = sparkUserRepository.findById(SecurityUtil.getLoggedInUserId()).orElseThrow(()
                 -> new CustomTalkSparkException(ErrorCode.USER_NOT_EXIST));
 
         Room room = roomRepository.findById(roomId).orElseThrow(()

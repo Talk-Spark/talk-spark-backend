@@ -53,12 +53,14 @@ public class GameQuestionManager {
         Long nextQuestionOwnerId = questions.get(currentQuestionIndex + 1).getCardOwnerId();
 
         if (!nextQuestionOwnerId.equals(currentPlayerId)) {
-            currentPlayerId = nextQuestionOwnerId;
             return SwitchSubject.TRUE;
         }
         else {
             return SwitchSubject.FALSE;
         }
+    }
 
+    public void switchCurrentPlayerId(){
+        currentPlayerId = questions.get(currentQuestionIndex + 1).getCardOwnerId();
     }
 }

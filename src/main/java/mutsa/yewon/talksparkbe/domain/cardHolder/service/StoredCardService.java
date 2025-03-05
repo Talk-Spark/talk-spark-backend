@@ -6,7 +6,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.Map;
 
-@Transactional
+@Transactional(readOnly = true)
 public interface StoredCardService {
 
     Long storeIndCard(IndCardHolderCreateDTO indCardHolderCreateDTO);

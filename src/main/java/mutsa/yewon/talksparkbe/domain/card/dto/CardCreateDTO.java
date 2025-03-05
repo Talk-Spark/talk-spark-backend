@@ -62,8 +62,6 @@ public class CardCreateDTO {
                 .cardThema(dto.getCardThema())
                 .build();
 
-        card.addCard(user);
-
         return card;
     }
 

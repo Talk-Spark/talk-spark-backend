@@ -20,7 +20,6 @@ import java.util.Map;
 public class CardHolderController implements CardHolderControllerDocs {
 
     private final StoredCardService storedCardService;
-    private final SecurityUtil securityUtil;
 
     @PostMapping("/api/store/ind")
     public ResponseEntity<?> storeIndCard(@RequestBody IndCardHolderCreateDTO indCardHolderCreateDTO) {
@@ -46,7 +45,7 @@ public class CardHolderController implements CardHolderControllerDocs {
     public ResponseEntity<?> getStoredCards(@RequestParam(required = false, defaultValue = "Default") String searchType) {
 
         CardHolderListDTO cardHolderListDTOs = storedCardService.getCardHolderDTOs(searchType,
-                securityUtil.getLoggedInUserId());
+                SecurityUtil.getLoggedInUserId());
 
         return ResponseEntity.status(200).body(ResponseDTO.ok("정렬 조건에 따라 보관된 명함들을 조회합니다.",
                 cardHolderListDTOs));
@@ -75,9 +74,7 @@ public class CardHolderController implements CardHolderControllerDocs {
 
     @GetMapping("/api/storedCards/main")
     public ResponseDTO<?> getMainPageCards(){
-        Long loggedInUserId = securityUtil.getLoggedInUserId();
-
-        List<MainPageCardHolderDTO> mainPageCards = storedCardService.getMainPageCards(loggedInUserId);
+        List<MainPageCardHolderDTO> mainPageCards = storedCardService.getMainPageCards(SecurityUtil.getLoggedInUserId());
 
         return ResponseDTO.ok("메인 페이지에 사용될 보관된 명함들 입니다.", mainPageCards);
     }

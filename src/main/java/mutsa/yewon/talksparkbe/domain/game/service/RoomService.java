@@ -45,8 +45,7 @@ public class RoomService {
     private final RedissonClient redissonClient;
 
     private final StringRedisTemplate redisTemplate;
-    
-    private final SecurityUtil securityUtil;
+
     private final RoomState roomState;
 
     private final JWTUtil jwtUtil;

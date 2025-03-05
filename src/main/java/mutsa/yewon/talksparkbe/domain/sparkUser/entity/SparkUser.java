@@ -30,6 +30,7 @@ public class SparkUser {
 
     private String password;
 
+    // TODO: 명함은 유저당 하나씩이므로 @OneToOne으로 설정
     @Builder.Default
     @OneToMany(mappedBy = "sparkUser", cascade = CascadeType.ALL)
     private List<Card> cards = new ArrayList<>();
