@@ -34,6 +34,7 @@ public class SparkUserServiceImpl implements SparkUserService {
     private final PasswordEncoder passwordEncoder;
 
     @Override
+    @Transactional
     public SparkUserDTO getKakaoUser(String accessToken) {
 
         log.info(accessToken);
