@@ -12,6 +12,7 @@ import mutsa.yewon.talksparkbe.global.exception.CustomTalkSparkException;
 import mutsa.yewon.talksparkbe.global.exception.ErrorCode;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Map;
@@ -26,6 +27,7 @@ public class CardServiceImpl implements CardService {
     private final SparkUserRepository sparkUserRepository;
 
     @Override
+    @Transactional
     public Long createCard(CardCreateDTO cardCreateDTO, Long sparkUserId) {
 
         SparkUser sparkUser = sparkUserRepository.findById(sparkUserId)
@@ -61,6 +63,7 @@ public class CardServiceImpl implements CardService {
     }
 
     @Override
+    @Transactional
     public Map<String, Long> modifyCard(Long id, CardCreateDTO cardCreateDTO) {
 
         Card card = cardRepository.findById(id)
@@ -75,6 +78,7 @@ public class CardServiceImpl implements CardService {
     }
 
     @Override
+    @Transactional
     public Map<String, Long> deleteCard(Long id) {
 
         Card card = cardRepository.findById(id)
