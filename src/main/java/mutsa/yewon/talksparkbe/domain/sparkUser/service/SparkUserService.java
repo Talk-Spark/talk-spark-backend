@@ -4,7 +4,7 @@ import mutsa.yewon.talksparkbe.domain.sparkUser.dto.SparkUserDTO;
 import mutsa.yewon.talksparkbe.domain.sparkUser.entity.SparkUser;
 import org.springframework.transaction.annotation.Transactional;
 
-@Transactional
+@Transactional(readOnly = true)
 public interface SparkUserService {
 
 
