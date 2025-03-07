@@ -43,5 +43,6 @@ public class GuestBookRoomSparkUser {
         this.guestBookRoom = guestBookRoom;
         this.sparkUser = sparkUser;
         this.isGuestBookFavorited = false;
+        this.guestBookRoomSparkUserDateTime = LocalDateTime.now();
     }
 }
