@@ -2,6 +2,8 @@ package mutsa.yewon.talksparkbe.domain.game.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import mutsa.yewon.talksparkbe.domain.card.entity.Card;
+import mutsa.yewon.talksparkbe.domain.card.repository.CardRepository;
 import mutsa.yewon.talksparkbe.domain.game.controller.request.RoomCreateRequest;
 import mutsa.yewon.talksparkbe.domain.game.controller.request.RoomJoinRequest;
 import mutsa.yewon.talksparkbe.domain.game.entity.Room;
@@ -51,6 +53,7 @@ public class RoomService {
     private final JWTUtil jwtUtil;
 
     private static final String ROOM_COUNT_KEY = "room:participateCount";
+    private final CardRepository cardRepository;
 
     @Transactional
     public Room createRoom(RoomCreateRequest roomCreateRequest, Long sparkUserId) {
@@ -119,12 +122,12 @@ public class RoomService {
                 participantsNum = roomParticipates.size();
             }
 
-            Optional<SparkUser> sparkUser = sparkUserRepository.findById(room.getHostId());
+            Optional<Card> card = cardRepository.findById(room.getHostId());
 
             response.add(RoomListResponse.builder()
                     .roomId(room.getRoomId())
                     .roomName(room.getRoomName())
-                    .hostName(sparkUser.map(SparkUser::getName).orElse("알수없음"))
+                    .hostName(card.map(Card::getName).orElse("알수없음"))
                     .currentPeople(participantsNum)
                     .maxPeople(room.getMaxPeople())
                     .build());
