@@ -64,11 +64,6 @@ public class GameService {
 
         roomState.clearParticipantsByRoomId(roomId);
 
-//        List<Card> selectedCards = room.getRoomParticipates().stream()
-//                .map(RoomParticipate::getSparkUser)
-//                .map(SparkUser::getCards)
-//                .map(cardList -> cardList.get(0)) // 갖고 있는 카드들 중 각각 가장 첫번째 카드 선택
-//                .toList(); // 참가자들의 명함 한장씩을 선택함
         List<Card> playerCards = getPlayerCards(room); // 참가자들의 명함 한장씩을 선택함
 
         List<UserCardQuestions> questions = questionGenerator.execute(playerCards, room.getDifficulty()); // 선택된 명함들을 가지고 난이도를 기반으로 문제 만들기
@@ -87,27 +82,16 @@ public class GameService {
     public EndGameResponseDto endGame(EndGameDto endGameDto){
 
         Long roomId = endGameDto.getRoomId();
-        Room room = roomRepository.findById(roomId).orElseThrow(() -> new CustomTalkSparkException(ErrorCode.ROOM_NOT_FOUND));
 
         GameStateManager gameStateManager = gameStates.get(roomId);
 
         if (gameStateManager == null){
             throw new CustomTalkSparkException(ErrorCode.GAME_NOT_FOUND);
         }
-//        if (gameState == null){
-//            throw new CustomTalkSparkException(ErrorCode.GAME_NOT_FOUND);
-//        }
 
-        if (!room.isFinished()) {
-            Long playerId = endGameDto.getPlayerId();
-            insertCardCopies(roomId, playerId);
-
-            roomService.changeFinished(roomId);
+        if (roomRepository.updateRoomFinished(roomId) > 0) {
+            insertCardCopies(roomId);
             guestBookService.createGuestBookData(roomId);
-
-        return EndGameResponseDto.of(gameStateManager.getScores(),
-                gameStateManager.getAllPlayerCards());
-//            removeGameState(roomId);
         }
 
         return EndGameResponseDto.of(gameStateManager.getScores(),
@@ -163,7 +147,7 @@ public class GameService {
         return gameStateManager.getAllPlayerCards();
     }
 
-    private void insertCardCopies(Long roomId, Long sparkUserId) {
+    private void insertCardCopies(Long roomId) {
         GameStateManager gameStateManager = gameStates.get(roomId);
 
         Map<Long, Card> playerInfo = gameStateManager.getPlayerManager().getPlayerCards();

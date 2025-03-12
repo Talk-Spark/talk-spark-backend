@@ -11,11 +11,7 @@ public class EndGameDto {
     @Schema(description = "방 식별자", example = "1")
     private Long roomId;
 
-    @Schema(description = "게임 참가자 식별자", example = "2")
-    private Long playerId;
-
-    public EndGameDto(Long roomId, Long playerId) {
+    public EndGameDto(Long roomId) {
         this.roomId = roomId;
-        this.playerId = playerId;
     }
 }
