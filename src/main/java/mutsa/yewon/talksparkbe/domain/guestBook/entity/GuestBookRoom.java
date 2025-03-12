@@ -27,7 +27,7 @@ public class GuestBookRoom {
     private List<GuestBookRoomSparkUser> guestBookRoomSparkUsers
             = new ArrayList<>();
 
-    @OneToOne
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "room_id")
     private Room room;
 
