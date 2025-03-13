@@ -15,6 +15,8 @@ import java.util.List;
 @AllArgsConstructor
 public class MainPageCardHolderDTO {
 
+    private Long cardHolderId;
+
     private String teamName;
 
     @Builder.Default
@@ -26,6 +28,7 @@ public class MainPageCardHolderDTO {
                 .map(storedCard -> StoredCardDTO.entityToDTO(storedCard, cardHolder)).toList();
 
         return MainPageCardHolderDTO.builder()
+                .cardHolderId(cardHolder.getId())
                 .teamName(cardHolder.getName())
                 .cards(storedCardDTOS)
                 .build();

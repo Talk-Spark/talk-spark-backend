@@ -73,7 +73,7 @@ public class CardHolderController implements CardHolderControllerDocs {
     }
 
     @GetMapping("/api/storedCards/main")
-    public ResponseDTO<?> getMainPageCards(){
+    public ResponseDTO<List<MainPageCardHolderDTO>> getMainPageCards(){
         List<MainPageCardHolderDTO> mainPageCards = storedCardService.getMainPageCards(SecurityUtil.getLoggedInUserId());
 
         return ResponseDTO.ok("메인 페이지에 사용될 보관된 명함들 입니다.", mainPageCards);

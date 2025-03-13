@@ -106,18 +106,6 @@ public class GameStateManager {
                 .map(CardResponseCustomDTO::fromCard).toList();
     }
 
-    public List<Long> getPlayerIds() {
-        return new ArrayList<>(playerManager.getPlayerInfo().keySet());
-    }
-
-    public List<Long> getCardIdsToStore(Long sparkUserId) {
-
-        return playerManager.getPlayerCards().keySet().stream()
-                .filter(card -> !card.equals(sparkUserId))
-                .toList();
-
-    }
-
     public List<CardBlanksDto> getBlanks() {
         return questionManager.getBlanks().values().stream().toList();
     }
