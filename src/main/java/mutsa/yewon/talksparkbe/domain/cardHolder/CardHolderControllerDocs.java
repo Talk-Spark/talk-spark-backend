@@ -8,10 +8,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import mutsa.yewon.talksparkbe.domain.cardHolder.dto.CardHolderDTO;
-import mutsa.yewon.talksparkbe.domain.cardHolder.dto.CardHolderListDTO;
-import mutsa.yewon.talksparkbe.domain.cardHolder.dto.IndCardHolderCreateDTO;
-import mutsa.yewon.talksparkbe.domain.cardHolder.dto.TeamCardHolderCreateDTO;
+import mutsa.yewon.talksparkbe.domain.cardHolder.dto.*;
 import mutsa.yewon.talksparkbe.global.dto.ResponseDTO;
 import mutsa.yewon.talksparkbe.global.exception.ErrorCode;
 import mutsa.yewon.talksparkbe.global.swagger.ApiErrorCodes;
@@ -19,6 +16,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
+
+import java.util.List;
 
 @Tag(name = "명함 보관함 API", description = "개별 명함, 팀별 명함에 대한 저장/조회/삭제를 수행합니다.")
 public interface CardHolderControllerDocs {
@@ -251,4 +250,8 @@ public interface CardHolderControllerDocs {
             }))
     })
     ResponseEntity<?> getCardHoldersByName(@RequestParam String name);
+
+    @Operation(summary = "메인 화면 보관된 명함", description = "메인 화면에 필요한 보관된 명함 미리보기 데이터 요청 API")
+    @ApiErrorCodes({ErrorCode.JWT_TOKEN_EXPIRED, ErrorCode.TOKEN_REQUIRED, ErrorCode.CARDHOLDER_NOT_EXIST})
+    ResponseDTO<List<MainPageCardHolderDTO>> getMainPageCards();
 }
