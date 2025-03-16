@@ -138,6 +138,6 @@ public class GuestBookService {
                 .findTopBySparkUserIdOrderByGuestBookRoomSparkUserDateTimeDesc(sparkUserId)
                 .orElseThrow(() -> new CustomTalkSparkException(ErrorCode.GUESTBOOK_ROOM_NOT_FOUND));
 
-        return new RoomIdResponseDTO(latestGuestBookRoomSparkUser.getGuestBookRoom().getGuestBookRoomId());
+        return new RoomIdResponseDTO(latestGuestBookRoomSparkUser.getGuestBookRoom().getRoom().getRoomId());
     }
 }

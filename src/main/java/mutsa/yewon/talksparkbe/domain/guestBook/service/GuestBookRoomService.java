@@ -65,7 +65,7 @@ public class GuestBookRoomService {
                     guestBookRooms = guestBookRooms.stream()
                             .sorted(Comparator.comparing(guestBookRoom -> guestBookRoom.getRoom().getRoomName()))
                             .toList();
-            case "isFavorited" ->
+            case "favorites" ->
                     guestBookRooms = guestBookRooms.stream()
                             .filter(guestBookRoom -> guestBookRoom.getGuestBookRoomSparkUsers().stream()
                                     .anyMatch(guestBookRoomSparkUser -> guestBookRoomSparkUser.getIsGuestBookFavorited().equals(true)))

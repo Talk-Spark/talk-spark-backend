@@ -9,6 +9,7 @@ import mutsa.yewon.talksparkbe.domain.game.controller.request.AnswerSubmitReques
 import mutsa.yewon.talksparkbe.domain.game.controller.request.GameStartRequest;
 import mutsa.yewon.talksparkbe.domain.game.controller.request.QuestionRequest;
 import mutsa.yewon.talksparkbe.domain.game.controller.request.RoomJoinRequest;
+import mutsa.yewon.talksparkbe.domain.game.entity.QuestionTip;
 import mutsa.yewon.talksparkbe.domain.game.service.GameService;
 import mutsa.yewon.talksparkbe.domain.game.service.RoomService;
 import mutsa.yewon.talksparkbe.domain.game.service.dto.AnswerDto;
@@ -59,6 +60,7 @@ public class SocketIoGameHandler {
 
     private void getQuestion(SocketIOClient socketIOClient, QuestionRequest data, AckRequest ackRequest) {
         broadcastQuestion(data.getRoomId());
+        questionTip(data.getRoomId());
     }
 
     private void submitAnswer(SocketIOClient socketIOClient, AnswerSubmitRequest data, AckRequest ackRequest) {
@@ -98,6 +100,12 @@ public class SocketIoGameHandler {
         String roomName = roomService.getRoomName(roomId);
         server.getRoomOperations(roomId.toString()).sendEvent("question",
                 gameService.getCurrentCard(roomId), gameService.getCurrentCardBlanks(roomId), question, roomName);
+    }
+
+    private void questionTip(Long roomId) {
+        String field = gameService.getQuestion(roomId).getFieldName();
+        String randomQuestions = String.join("\n", QuestionTip.valueOf(field).getRandomQuestions());
+        server.getRoomOperations(roomId.toString()).sendEvent("questionTip", randomQuestions);
     }
 
     private void broadcastSingleQuestionResult(Long roomId) {
