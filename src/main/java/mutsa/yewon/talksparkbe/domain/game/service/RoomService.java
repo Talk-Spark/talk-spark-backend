@@ -122,12 +122,12 @@ public class RoomService {
                 participantsNum = roomParticipates.size();
             }
 
-            Optional<Card> card = cardRepository.findById(room.getHostId());
+            List<Card> card = cardRepository.findBySparkUserId(room.getHostId());
 
             response.add(RoomListResponse.builder()
                     .roomId(room.getRoomId())
                     .roomName(room.getRoomName())
-                    .hostName(card.map(Card::getName).orElse("알수없음"))
+                    .hostName(card.stream().map(Card::getName).findFirst().orElse("알수없음"))
                     .currentPeople(participantsNum)
                     .maxPeople(room.getMaxPeople())
                     .build());
