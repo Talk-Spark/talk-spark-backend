@@ -211,4 +211,8 @@ public class GameService {
     public void removeGameState(Long roomId) {
         gameStates.remove(roomId);
     }
+
+    public String getQuestionTip(Long roomId, String field) {
+        return gameStates.get(roomId).getQuestionTip(roomId, field);
+    }
 }

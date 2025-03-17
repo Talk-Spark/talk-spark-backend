@@ -1,10 +1,13 @@
 package mutsa.yewon.talksparkbe.domain.game.service.util;
 
 import lombok.Getter;
+import mutsa.yewon.talksparkbe.domain.game.entity.QuestionTip;
 import mutsa.yewon.talksparkbe.domain.game.service.dto.CardBlanksDto;
 import mutsa.yewon.talksparkbe.domain.game.service.dto.CardQuestion;
 import mutsa.yewon.talksparkbe.domain.game.service.dto.SwitchSubject;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -18,6 +21,8 @@ public class GameQuestionManager {
     private Long currentPlayerId;
 
     private Map<Long, CardBlanksDto> blanks;
+
+    private Map<Long, List<String>> roomQuestionTips = new HashMap<>();
 
     public GameQuestionManager(List<CardQuestion> questions, Map<Long, CardBlanksDto> blanks) {
         this.questions = questions;
@@ -41,6 +46,7 @@ public class GameQuestionManager {
 
     public void loadNextQuestion() {
         currentQuestionIndex++;
+        resetQuestionTips();
     }
 
 
@@ -58,6 +64,17 @@ public class GameQuestionManager {
         else {
             return SwitchSubject.FALSE;
         }
+    }
+
+    public List<String> getQuestionTips(Long roomId, String field) {
+        return roomQuestionTips.computeIfAbsent(roomId, k -> {
+            List<String> randomQuestions = QuestionTip.valueOf(field).getRandomQuestions();
+            return new ArrayList<>(randomQuestions); // 저장 후 반환
+        });
+    }
+
+    public void resetQuestionTips() {
+        roomQuestionTips.clear();
     }
 
     public void switchCurrentPlayerId(){
