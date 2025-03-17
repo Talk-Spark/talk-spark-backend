@@ -104,8 +104,8 @@ public class SocketIoGameHandler {
 
     private void questionTip(Long roomId) {
         String field = gameService.getQuestion(roomId).getFieldName();
-        String randomQuestions = String.join("\n", QuestionTip.valueOf(field).getRandomQuestions());
-        server.getRoomOperations(roomId.toString()).sendEvent("questionTip", randomQuestions);
+        System.out.println(gameService.getQuestionTip(roomId, field));
+        server.getRoomOperations(roomId.toString()).sendEvent("questionTip", gameService.getQuestionTip(roomId, field));
     }
 
     private void broadcastSingleQuestionResult(Long roomId) {

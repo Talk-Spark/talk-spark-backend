@@ -3,6 +3,7 @@ package mutsa.yewon.talksparkbe.domain.game.service.util;
 import lombok.Getter;
 import lombok.extern.log4j.Log4j2;
 import mutsa.yewon.talksparkbe.domain.card.entity.Card;
+import mutsa.yewon.talksparkbe.domain.game.entity.QuestionTip;
 import mutsa.yewon.talksparkbe.domain.game.service.dto.*;
 
 import java.util.*;
@@ -104,6 +105,22 @@ public class GameStateManager {
     public List<CardResponseCustomDTO> getAllPlayerCards() {
         return playerManager.getAllPlayerCards().stream()
                 .map(CardResponseCustomDTO::fromCard).toList();
+    }
+
+    public List<Long> getPlayerIds() {
+        return new ArrayList<>(playerManager.getPlayerInfo().keySet());
+    }
+
+    public List<Long> getCardIdsToStore(Long sparkUserId) {
+
+        return playerManager.getPlayerCards().keySet().stream()
+                .filter(card -> !card.equals(sparkUserId))
+                .toList();
+
+    }
+
+    public String getQuestionTip (Long roomId, String field){
+        return String.join("\n", questionManager.getQuestionTips(roomId,field));
     }
 
     public List<CardBlanksDto> getBlanks() {
