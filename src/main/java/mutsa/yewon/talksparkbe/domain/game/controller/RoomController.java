@@ -1,6 +1,7 @@
 package mutsa.yewon.talksparkbe.domain.game.controller;
 
 import lombok.RequiredArgsConstructor;
+import mutsa.yewon.talksparkbe.domain.game.RoomControllerDocs;
 import mutsa.yewon.talksparkbe.domain.game.controller.request.RoomCreateRequest;
 import mutsa.yewon.talksparkbe.domain.game.entity.QuestionTip;
 import mutsa.yewon.talksparkbe.domain.game.service.RoomService;
@@ -9,6 +10,8 @@ import mutsa.yewon.talksparkbe.domain.game.service.dto.httpResponse.RoomDetailsR
 import mutsa.yewon.talksparkbe.domain.game.service.dto.httpResponse.RoomListResponse;
 import mutsa.yewon.talksparkbe.domain.sparkUser.entity.SparkUser;
 import mutsa.yewon.talksparkbe.domain.sparkUser.repository.SparkUserRepository;
+import mutsa.yewon.talksparkbe.global.exception.CustomTalkSparkException;
+import mutsa.yewon.talksparkbe.global.exception.ErrorCode;
 import mutsa.yewon.talksparkbe.global.util.JWTUtil;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,7 +24,7 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/rooms")
 @RequiredArgsConstructor
-public class RoomController {
+public class RoomController implements RoomControllerDocs {
 
     private final RoomService roomService;
     private final SparkUserRepository sparkUserRepository;
@@ -33,7 +36,8 @@ public class RoomController {
         String jwt = token.replace("Bearer ", "");
         Map<String, Object> claims = jwtUtil.validateToken(jwt);
         String kakaoId = (String) claims.get("kakaoId");
-        SparkUser sparkUser = sparkUserRepository.findByKakaoId(kakaoId).orElseThrow(() -> new RuntimeException("유저 못찾음"));
+        SparkUser sparkUser = sparkUserRepository.findByKakaoId(kakaoId)
+                .orElseThrow(() -> new CustomTalkSparkException(ErrorCode.USER_NOT_EXIST));
 
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(
