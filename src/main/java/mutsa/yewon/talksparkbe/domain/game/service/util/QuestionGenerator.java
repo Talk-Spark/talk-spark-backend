@@ -25,13 +25,15 @@ public class QuestionGenerator {
 
         Map<String, Set<String>> listOfOptions = new HashMap<>();
 
-        Map<String, Integer> fieldCount = new HashMap<>();
+//        Map<String, Integer> fieldCount = new HashMap<>();
         int numOfPeople = cards.size();
 
         // 각 필드마다, 이 필드를 채워놓은 놈이 사람수만큼은 되어야 문제로 출제 가능
         for (DummyOption k : keys) {
 
-            Set<String> options = new HashSet<>(); // 보기로 만들 후보들
+            Set<String> options = new HashSet<>(k.getDummyOptions()); // 보기로 만들 후보들
+
+            log.info(k.getOption() + " 기본적으로 가지고 있는 옵션들 : " + options);
 
             for (Card c : cards){
 
@@ -63,10 +65,10 @@ public class QuestionGenerator {
                 }
             }
             listOfOptions.put(k.getOption(), options);
-            fieldCount.put(k.getOption(), options.size()); // 각 필드를 채워놓은 놈의 숫자 맵
+//            fieldCount.put(k.getOption(), options.size());
 
             log.info("각 명함 항목들의 데이터로 보기를 만들어냅니다. " + listOfOptions);
-            log.info("각 항목 당 답을 한 인원 수 " + fieldCount);
+//            log.info("각 항목 당 답을 한 인원 수 " + fieldCount);
 
         }
 
@@ -74,12 +76,12 @@ public class QuestionGenerator {
             List<String> fields = new ArrayList<>(List.of("mbti", "hobby", "lookAlike", "selfDescription", "tmi"));
             List<CardQuestion> questions = new ArrayList<>(); // 문제들을 담을 리스트
 
-            if(numOfPeople <= 4){
-                fields.removeIf(field -> getFieldValue(c, field) == null || fieldCount.get(field) < numOfPeople); // 인원수가 4명이하인 경우, 답안을 제출한 인원 수가 현재 인원 수보다 작으면 문제 출제 불가
-            }
-            else{
-                fields.removeIf(field -> getFieldValue(c, field) == null || fieldCount.get(field) < 4);
-            }
+//            if(numOfPeople <= 4){
+//                fields.removeIf(field -> getFieldValue(c, field) == null || fieldCount.get(field) < numOfPeople); // 인원수가 4명이하인 경우, 답안을 제출한 인원 수가 현재 인원 수보다 작으면 문제 출제 불가
+//            }
+//            else{
+//                fields.removeIf(field -> getFieldValue(c, field) == null || fieldCount.get(field) < 4);
+//            }
 
             Collections.shuffle(fields);
 
@@ -126,11 +128,11 @@ public class QuestionGenerator {
 
     // 보기 생성: 다른 참가자의 해당 필드 값 + 정답
     private List<String> generateOptions(String correctAnswer, Set<String> cardData, int numOfPeople) {
-        int maxOptionNum = Math.min(4, numOfPeople);
-
-        if(maxOptionNum < 4){
-            return new ArrayList<>(cardData);
-        }
+//        int maxOptionNum = Math.min(4, numOfPeople);
+//
+//        if(maxOptionNum < 4){
+//            return new ArrayList<>(cardData);
+//        }
 
         List<String> canBeOptions = new ArrayList<>(cardData);
 
