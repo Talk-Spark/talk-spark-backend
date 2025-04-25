@@ -15,6 +15,7 @@ import java.io.IOException;
 import java.time.ZonedDateTime;
 import java.util.Date;
 import java.util.Map;
+import java.util.UUID;
 
 @Log4j2
 @Component
@@ -38,6 +39,7 @@ public class JWTUtil {
 
         String jwt = Jwts.builder()
                 .setClaims(claims)
+                .setId(UUID.randomUUID().toString())
                 .setHeader(Map.of("typ", "JWT"))
                 .setIssuedAt(Date.from(ZonedDateTime.now().toInstant()))
                 .setExpiration(Date.from(ZonedDateTime.now().plusMinutes(min).toInstant()))

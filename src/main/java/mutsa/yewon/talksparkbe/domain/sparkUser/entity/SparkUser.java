@@ -30,6 +30,8 @@ public class SparkUser {
 
     private String password;
 
+    private boolean deleted;
+
     // TODO: 명함은 유저당 하나씩이므로 @OneToOne으로 설정
     @Builder.Default
     @OneToMany(mappedBy = "sparkUser", cascade = CascadeType.ALL)
@@ -77,6 +79,10 @@ public class SparkUser {
     public void addGuestBookUser(GuestBookRoomSparkUser guestBookUser) {
         guestBookUser.setSparkUser(this);
         guestBookRoomSparkUsers.add(guestBookUser);
+    }
+
+    public void deleteUser(){
+        deleted = true;
     }
 
     public void clearMemberRoleList() {
