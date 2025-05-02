@@ -6,8 +6,11 @@ import mutsa.yewon.talksparkbe.domain.sparkUser.dto.SparkUserDTO;
 import mutsa.yewon.talksparkbe.domain.sparkUser.entity.SparkUser;
 import mutsa.yewon.talksparkbe.domain.sparkUser.entity.SparkUserRole;
 import mutsa.yewon.talksparkbe.domain.sparkUser.repository.SparkUserRepository;
+import mutsa.yewon.talksparkbe.domain.sparkUser.service.response.SparkUserResponse;
+import mutsa.yewon.talksparkbe.domain.sparkUser.service.response.TokenResponse;
 import mutsa.yewon.talksparkbe.global.exception.CustomTalkSparkException;
 import mutsa.yewon.talksparkbe.global.exception.ErrorCode;
+import mutsa.yewon.talksparkbe.global.util.JWTUtil;
 import mutsa.yewon.talksparkbe.global.util.SecurityUtil;
 import org.springframework.http.*;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -33,61 +36,41 @@ public class SparkUserServiceImpl implements SparkUserService {
 
     private final PasswordEncoder passwordEncoder;
 
+    private final JWTUtil jwtUtil;
+
+    private final RefreshTokenService refreshTokenService;
+
+    private final KakaoUserService kakaoUserService;
+
     @Override
     @Transactional
-    public SparkUserDTO getKakaoUser(String accessToken) {
+    public SparkUserResponse loginOrRegister(String kakaoAccessToken) {
 
-        log.info(accessToken);
-
-        Map<String, String> kakaoData = getKakaoUserNickname(accessToken);
+        Map<String, String> kakaoData = kakaoUserService.getKakaoUserNickname(kakaoAccessToken);
 
         String kakaoId = kakaoData.get("kakaoId");
         String name = kakaoData.get("name");
 
         Optional<SparkUser> sparkUser = sparkUserRepository.findByKakaoId(kakaoId);
 
-        if(sparkUser.isPresent()) {
-            SparkUserDTO sparkUserDTO = SparkUserDTO.from(sparkUser.get());
-            return sparkUserDTO;
-        }
+        Map<String, Object> claims = null;
 
-        SparkUser createdUser = makeSparkUser(kakaoId,name);
+        claims = sparkUser.isPresent() ?
+                SparkUserDTO.from(sparkUser.get()).getClaims() : SparkUserDTO.from(makeSparkUser(kakaoId, name)).getClaims();
 
-        sparkUserRepository.save(createdUser);
+        String accessToken = jwtUtil.generateToken(claims, 60);
+        String refreshToken = jwtUtil.generateToken(claims, 60 * 60 * 7);
 
-        SparkUserDTO sparkUserDTO = SparkUserDTO.from(createdUser);
+        refreshTokenService.saveRefreshToken(refreshToken);
 
-        return sparkUserDTO;
+        return new SparkUserResponse(claims, accessToken, refreshToken);
+
     }
 
-    private Map<String,String> getKakaoUserNickname(String accessToken) {
-        String kakaoGetUserURL = "https://kapi.kakao.com/v2/user/me";
-
-        log.info(accessToken);
-
-        WebClient webClient = WebClient.builder().build();
-
-        LinkedHashMap response = webClient.get()
-                .uri(kakaoGetUserURL)
-                .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
-                .header("Content-Type", "application/x-www-form-urlencoded;charset=utf-8")
-                .retrieve()
-                .onStatus(HttpStatusCode::is4xxClientError, clientResponse -> Mono.error(new CustomTalkSparkException(ErrorCode.INVALID_PARAMETER)))
-                .onStatus(HttpStatusCode::is5xxServerError, clientResponse -> Mono.error(new CustomTalkSparkException(ErrorCode.INTERNAL_SERVER_ERROR)))
-                .bodyToMono(LinkedHashMap.class)
-                .block();
-
-
-        String kakaoId = String.valueOf(response.get("id"));
-
-        LinkedHashMap<String, String> properties = (LinkedHashMap<String, String>) response.get("properties");
-
-
-        String name = properties.get("nickname");
-
-
-        return Map.of("kakaoId", kakaoId, "name", name);
+    public TokenResponse reissueToken(String refreshToken) {
+        return TokenResponse.from(refreshTokenService.getNewRefreshToken(refreshToken));
     }
+
 
     private SparkUser makeSparkUser(String kakaoId, String name) {
         String tempPassword = makeTempPassword();
@@ -95,6 +78,7 @@ public class SparkUserServiceImpl implements SparkUserService {
         SparkUser sparkUser = SparkUser.builder()
                 .kakaoId(kakaoId)
                 .name(name)
+                .deleted(false)
                 .password(passwordEncoder.encode(tempPassword)).build();
 
         sparkUser.addMemberRole(SparkUserRole.USER);
@@ -129,14 +113,26 @@ public class SparkUserServiceImpl implements SparkUserService {
 
     @Override
     @Transactional
-    public Long deleteAccount(Long sparkUserId) {
+    public Long deleteAccount(String accessToken) {
 
-        sparkUserRepository.findById(sparkUserId)
-                        .orElseThrow(()-> new CustomTalkSparkException(ErrorCode.USER_NOT_EXIST));
+        Map<String, Object> claims = jwtUtil.validateToken(accessToken);
 
-        sparkUserRepository.deleteById(sparkUserId);
+        Number sparkUserIdNumber = (Number) claims.get("sparkUserId");
+        Long sparkUserId = (sparkUserIdNumber != null) ? sparkUserIdNumber.longValue() : null;
 
-        return sparkUserId;
+        SparkUser sparkUser = sparkUserRepository.findById(sparkUserId)
+                .orElseThrow(() -> new CustomTalkSparkException(ErrorCode.USER_NOT_EXIST));
+
+        sparkUser.deleteUser();
+
+        return sparkUser.getId();
+
+//        sparkUserRepository.findById(sparkUserId)
+//                        .orElseThrow(()-> new CustomTalkSparkException(ErrorCode.USER_NOT_EXIST));
+//
+//        sparkUserRepository.deleteById(sparkUserId);
+//
+//        return sparkUserId;
     }
 
 }
