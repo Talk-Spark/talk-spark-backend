@@ -2,23 +2,25 @@ package mutsa.yewon.talksparkbe.domain.game.service.util;
 
 import lombok.Getter;
 import mutsa.yewon.talksparkbe.domain.card.entity.Card;
+import mutsa.yewon.talksparkbe.domain.game.controller.dto.GameCardInfo;
 import mutsa.yewon.talksparkbe.domain.game.service.dto.AnswerDto;
 import mutsa.yewon.talksparkbe.domain.game.service.dto.PlayerInfo;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 @Getter
 public class GamePlayerManager {
 
     private Map<Long, PlayerInfo> playerInfo;
 
-    private List<AnswerDto> answers = new ArrayList<>();
+    private List<AnswerDto> answers = new CopyOnWriteArrayList<>();
 
-    private Map<Long, Card> playerCards;
+    private Map<Long, GameCardInfo> playerCards;
 
-    public GamePlayerManager(Map<Long, PlayerInfo> playerInfo, Map<Long, Card> playerCards) {
+    public GamePlayerManager(Map<Long, PlayerInfo> playerInfo, Map<Long, GameCardInfo> playerCards) {
         this.playerInfo = playerInfo;
         this.playerCards = playerCards;
     }
@@ -41,7 +43,7 @@ public class GamePlayerManager {
 
     }
 
-    public Card getCurrentCard(Long currentPlayerId) {
+    public GameCardInfo getCurrentCard(Long currentPlayerId) {
 
         return playerCards.get(currentPlayerId);
     }
@@ -50,7 +52,7 @@ public class GamePlayerManager {
         answers.clear();
     }
 
-    public List<Card> getAllPlayerCards() {
+    public List<GameCardInfo> getAllPlayerCards() {
         return new ArrayList<>(playerCards.values());
     }
 }

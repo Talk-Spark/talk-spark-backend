@@ -6,6 +6,7 @@ import jakarta.annotation.PreDestroy;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import mutsa.yewon.talksparkbe.domain.game.controller.request.*;
+import mutsa.yewon.talksparkbe.domain.game.service.GameService;
 import mutsa.yewon.talksparkbe.domain.game.service.RoomService;
 import mutsa.yewon.talksparkbe.global.exception.CustomTalkSparkException;
 import org.springframework.stereotype.Component;
@@ -17,6 +18,7 @@ public class SockectIoRoomHandler {
 
     private final SocketIOServer server;
     private final RoomService roomService;
+    private final GameService gameService;
 
     @PostConstruct
     public void startServer() {
@@ -72,6 +74,11 @@ public class SockectIoRoomHandler {
                 System.out.println("leaveRoom 받음. " + data.toString());
                 System.out.println("data 에서 액세스토큰 = " + data.getAccessToken());
                 roomService.leaveRoom(data);
+
+                if (roomService.getParticipateCount(data.getRoomId()) <= 0) {
+                    gameService.removeGameState(data.getRoomId());
+                }
+
                 server.getClient(client.getSessionId()).leaveRoom(data.getRoomId().toString());
                 server.getRoomOperations(data.getRoomId().toString()).sendEvent("roomUpdate", roomService.getParticipantList(data.getRoomId()));
             } catch (CustomTalkSparkException ce) {

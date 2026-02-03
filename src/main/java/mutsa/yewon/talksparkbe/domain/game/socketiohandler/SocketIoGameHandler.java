@@ -10,6 +10,7 @@ import mutsa.yewon.talksparkbe.domain.game.controller.request.GameStartRequest;
 import mutsa.yewon.talksparkbe.domain.game.controller.request.QuestionRequest;
 import mutsa.yewon.talksparkbe.domain.game.controller.request.RoomJoinRequest;
 import mutsa.yewon.talksparkbe.domain.game.entity.QuestionTip;
+import mutsa.yewon.talksparkbe.domain.game.repository.GameRedisRepository;
 import mutsa.yewon.talksparkbe.domain.game.service.GameService;
 import mutsa.yewon.talksparkbe.domain.game.service.RoomService;
 import mutsa.yewon.talksparkbe.domain.game.service.dto.AnswerDto;
@@ -32,6 +33,7 @@ public class SocketIoGameHandler {
     private final SocketIOServer server;
     private final JWTUtil jwtUtil;
     private final SparkUserRepository sparkUserRepository;
+    private final GameRedisRepository gameRedisRepository;
 
     @PostConstruct
     public void registerListeners() {
@@ -158,6 +160,7 @@ public class SocketIoGameHandler {
         String answer = data.getAnswer();
 
         gameService.submitAnswer(roomId, sparkUserId, answer);
+
         if (gameService.allPeopleSubmitted(roomId)) {
             broadcastSingleQuestionResult(roomId);
             gameService.updateBlanks(roomId);

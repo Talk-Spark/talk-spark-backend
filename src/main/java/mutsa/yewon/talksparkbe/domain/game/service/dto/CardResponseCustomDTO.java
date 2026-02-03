@@ -5,8 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import mutsa.yewon.talksparkbe.domain.card.entity.Card;
 import mutsa.yewon.talksparkbe.domain.card.entity.CardThema;
+import mutsa.yewon.talksparkbe.domain.game.controller.dto.GameCardInfo;
 
 @Data
 @Builder
@@ -46,24 +46,23 @@ public class CardResponseCustomDTO {
     private String tmi;
 
     @Schema(description = "카드 소유자의 ID", example = "1001")
-    private Long ownerId;
+    private Long userId;
 
     @Schema(description = "카드의 테마", example = "BLUE")
     private CardThema cardThema;
 
-    public static CardResponseCustomDTO fromCard(Card card) {
+    public static CardResponseCustomDTO fromCard(GameCardInfo card) {
         return CardResponseCustomDTO.builder()
-                .id(card.getId())
+                .id(card.getCardId())
                 .age(card.getAge())
                 .hobby(card.getHobby())
                 .lookAlike(card.getLookAlike())
                 .selfDescription(card.getSlogan())
                 .tmi(card.getTmi())
                 .name(card.getName())
-                .kakaoId(card.getSparkUser().getKakaoId())
                 .major(card.getMajor())
                 .mbti(card.getMbti())
-                .ownerId(card.getSparkUser().getId())
+                .userId(card.getUserId())
                 .cardThema(card.getCardThema())
                 .build();
     }

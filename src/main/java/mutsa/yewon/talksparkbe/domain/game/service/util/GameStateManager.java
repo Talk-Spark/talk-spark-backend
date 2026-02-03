@@ -3,6 +3,7 @@ package mutsa.yewon.talksparkbe.domain.game.service.util;
 import lombok.Getter;
 import lombok.extern.log4j.Log4j2;
 import mutsa.yewon.talksparkbe.domain.card.entity.Card;
+import mutsa.yewon.talksparkbe.domain.game.controller.dto.GameCardInfo;
 import mutsa.yewon.talksparkbe.domain.game.entity.QuestionTip;
 import mutsa.yewon.talksparkbe.domain.game.service.dto.*;
 
@@ -22,11 +23,11 @@ public class GameStateManager {
 
     private final GamePlayerManager playerManager;
 
-    public GameStateManager(List<Card> cards, List<UserCardQuestions> userCardQuestions) {
+    public GameStateManager(List<GameCardInfo> cards, List<UserCardQuestions> userCardQuestions) {
 
         Map<Long, PlayerInfo> playerInfos = createPlayerInfos(cards);
 
-        Map<Long, Card> playerCards = collectPlayerCards(cards);
+        Map<Long, GameCardInfo> playerCards = collectPlayerCards(cards);
 
         List<CardQuestion> cardQuestions = extractCardQuestions(userCardQuestions);
 
@@ -41,10 +42,10 @@ public class GameStateManager {
         this.playerManager = new GamePlayerManager(playerInfos, playerCards);
     }
 
-    private Map<Long, Integer> initScoreBoard(List<Card> cards) {
+    private Map<Long, Integer> initScoreBoard(List<GameCardInfo> cards) {
         return cards.stream()
                 .collect(toMap(
-                        card -> card.getSparkUser().getId(),
+                        GameCardInfo::getUserId,
                         card -> 0
                 ));
     }
@@ -85,7 +86,7 @@ public class GameStateManager {
         questionManager.switchCurrentPlayerId();
     }
 
-    public Card getCurrentCard() {
+    public GameCardInfo getCurrentCard() {
         return playerManager.getCurrentCard(questionManager.getCurrentPlayerId());
     }
 
@@ -128,18 +129,18 @@ public class GameStateManager {
     }
 
 
-    private Map<Long, PlayerInfo> createPlayerInfos(List<Card> cards){
+    private Map<Long, PlayerInfo> createPlayerInfos(List<GameCardInfo> cards){
         return cards.stream()
                 .collect(toMap(
-                        card -> card.getSparkUser().getId(),
-                        card -> new PlayerInfo(card.getSparkUser().getId(), card.getName(), card.getCardThema())
+                        GameCardInfo::getUserId,
+                        card -> new PlayerInfo(card.getUserId(), card.getName(), card.getCardThema())
                 ));
     }
 
-    private Map<Long, Card> collectPlayerCards(List<Card> cards) {
+    private Map<Long, GameCardInfo> collectPlayerCards(List<GameCardInfo> cards) {
         return cards.stream()
                 .collect(toMap(
-                        card -> card.getSparkUser().getId(),
+                        GameCardInfo::getUserId,
                         card -> card
                 ));
     }

@@ -139,7 +139,6 @@ public class RoomService {
     public boolean leaveRoom(RoomJoinRequest roomJoinRequest) {
         Room room = roomRepository.findById(roomJoinRequest.getRoomId()).orElseThrow(() -> new RuntimeException("방 못찾음"));
 
-        System.out.println("roomJoinRequest 에서 토큰 = " + roomJoinRequest.getAccessToken());
         String jwt = roomJoinRequest.getAccessToken().replace("Bearer ", "");
         Map<String, Object> claims = jwtUtil.validateToken(jwt);
         String kakaoId = (String) claims.get("kakaoId");
