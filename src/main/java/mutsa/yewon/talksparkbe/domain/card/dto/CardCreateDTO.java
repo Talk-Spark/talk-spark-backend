@@ -15,9 +15,6 @@ import mutsa.yewon.talksparkbe.domain.sparkUser.entity.SparkUser;
 @AllArgsConstructor
 public class CardCreateDTO {
 
-    @Schema(description = "사용자 식별자", example = "1")
-    private Long sparkUserId ;
-
     @NotBlank(message = "이름은 필수항목입니다.")
     @Schema(description = "이름", example = "박승범")
     private String name;

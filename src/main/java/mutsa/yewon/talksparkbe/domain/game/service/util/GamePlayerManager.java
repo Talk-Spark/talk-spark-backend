@@ -1,7 +1,8 @@
 package mutsa.yewon.talksparkbe.domain.game.service.util;
 
 import lombok.Getter;
-import mutsa.yewon.talksparkbe.domain.card.entity.Card;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import mutsa.yewon.talksparkbe.domain.game.controller.dto.GameCardInfo;
 import mutsa.yewon.talksparkbe.domain.game.service.dto.AnswerDto;
 import mutsa.yewon.talksparkbe.domain.game.service.dto.PlayerInfo;
@@ -9,14 +10,15 @@ import mutsa.yewon.talksparkbe.domain.game.service.dto.PlayerInfo;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 @Getter
+@Setter
+@NoArgsConstructor
 public class GamePlayerManager {
 
     private Map<Long, PlayerInfo> playerInfo;
 
-    private List<AnswerDto> answers = new CopyOnWriteArrayList<>();
+    private List<AnswerDto> answers = new ArrayList<>();
 
     private Map<Long, GameCardInfo> playerCards;
 

@@ -21,6 +21,7 @@ public class Room {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long roomId;
 
+    @Column(unique = true)
     private String roomName; // 방 이름
 
     private String code;

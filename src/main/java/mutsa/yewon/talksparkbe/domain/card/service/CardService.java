@@ -10,7 +10,7 @@ import java.util.Map;
 @Transactional(readOnly = true)
 public interface CardService {
 
-    Long createCard(CardCreateDTO cardCreateDTO, Long sparkUserId);
+    Long createCard(CardCreateDTO cardCreateDTO, String kakaoId);
     List<CardResponseDTO> getCards(Long sparkUserId);
     CardResponseDTO getCard(Long id);
     Map<String,Long> modifyCard(Long id, CardCreateDTO cardCreateDTO);

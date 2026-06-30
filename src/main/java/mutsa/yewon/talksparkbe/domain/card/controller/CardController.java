@@ -12,8 +12,9 @@ import mutsa.yewon.talksparkbe.domain.card.CardControllerDocs;
 import mutsa.yewon.talksparkbe.domain.card.dto.CardCreateDTO;
 import mutsa.yewon.talksparkbe.domain.card.dto.CardResponseDTO;
 import mutsa.yewon.talksparkbe.domain.card.service.CardService;
+import mutsa.yewon.talksparkbe.domain.sparkUser.dto.SparkUserDTO;
 import mutsa.yewon.talksparkbe.global.dto.ResponseDTO;
-import mutsa.yewon.talksparkbe.global.util.SecurityUtil;
+import mutsa.yewon.talksparkbe.global.security.CurrentUser;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -27,9 +28,10 @@ public class CardController implements CardControllerDocs {
     private final CardService cardService;
 
     @PostMapping("/api/cards")
-    public ResponseEntity<?> createCard(@Valid @RequestBody CardCreateDTO cardCreateDTO) {
+    public ResponseEntity<?> createCard(@CurrentUser SparkUserDTO currentUser,
+                                        @Valid @RequestBody CardCreateDTO cardCreateDTO) {
 
-        Long cardId = cardService.createCard(cardCreateDTO,SecurityUtil.getLoggedInUserId());
+        Long cardId = cardService.createCard(cardCreateDTO, currentUser.getKakaoId());
 
         ResponseDTO<Map<String, Long>> card = ResponseDTO.created("명함이 생성되었습니다.", Map.of("cardId", cardId));
 
@@ -37,9 +39,9 @@ public class CardController implements CardControllerDocs {
     }
 
     @GetMapping("/api/cards")
-    public ResponseEntity<?> getCards() {
+    public ResponseEntity<?> getCards(@CurrentUser SparkUserDTO currentUser) {
 
-        List<CardResponseDTO> cards = cardService.getCards(SecurityUtil.getLoggedInUserId());
+        List<CardResponseDTO> cards = cardService.getCards(currentUser.getSparkUserId());
 
         return ResponseEntity.status(200).body(ResponseDTO.ok("사용자 명함 조회 성공", cards));
     }

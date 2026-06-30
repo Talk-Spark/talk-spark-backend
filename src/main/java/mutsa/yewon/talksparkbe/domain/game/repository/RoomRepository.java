@@ -2,6 +2,8 @@ package mutsa.yewon.talksparkbe.domain.game.repository;
 
 import mutsa.yewon.talksparkbe.domain.game.entity.Room;
 import mutsa.yewon.talksparkbe.domain.sparkUser.entity.SparkUser;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -19,10 +21,8 @@ public interface RoomRepository extends JpaRepository<Room, Long> {
     List<Room> findAllWithParticipates();
 
 
-    @Query("select r " +
-            "from Room r " +
-            "where r.isStarted = false and r.isFinished = false ")
-    List<Room> findByRoomNameContaining(String searchName);
+    // 검색어로 시작하는(검색어%) 방 찾기
+    Page<Room> findByRoomNameStartingWith(String searchName, Pageable pageable);
 
     Optional<Room> findByRoomName(String roomName);
 

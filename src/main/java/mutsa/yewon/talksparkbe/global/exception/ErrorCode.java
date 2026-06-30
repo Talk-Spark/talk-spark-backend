@@ -30,8 +30,9 @@ public enum ErrorCode {
     NO_BOOKMARKED_CONTENT(HttpStatus.NOT_FOUND, "즐겨찾기 된 명함이 없습니다."),
     NO_MATCHING_CARDHOLDER(HttpStatus.NOT_FOUND, "해당하는 이름의 명함이 존재하지 않습니다."),
     NOT_ROOM_USER(HttpStatus.NOT_FOUND, "해당 방의 참여자가 아닙니다."),
-    GAME_NOT_FOUND(HttpStatus.NOT_FOUND, "해당하는 방에 진행중인 게임이 없습니다.");
-
+    GAME_NOT_FOUND(HttpStatus.NOT_FOUND, "해당하는 방에 진행중인 게임이 없습니다."),
+    NOT_HOST(HttpStatus.BAD_REQUEST, "방장이 아닙니다."),
+    NOT_ENOUGH_PLAYERS(HttpStatus.BAD_REQUEST, "최소 2명이상이 대기중이어야 가능합니다.");
 
 
     private final HttpStatus httpStatus;

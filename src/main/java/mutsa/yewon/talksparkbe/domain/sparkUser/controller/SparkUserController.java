@@ -27,10 +27,10 @@ public class SparkUserController implements SparkUserControllerDocs {
 
 
     @PostMapping("/api/member/kakao")
-    public SparkUserResponse loginOrRegister(@RequestHeader("Authorization") String kakaoAccessToken) {
+    public SparkUserResponse loginOrRegister(@RequestParam("accessToken") String accessToken) {
 
 
-        return sparkUserService.loginOrRegister(kakaoAccessToken);
+        return sparkUserService.loginOrRegister(accessToken);
 //
 //        Map<String, Object> claims = kakaoUser.getClaims();
 //

@@ -1,6 +1,8 @@
 package mutsa.yewon.talksparkbe.domain.game.service.util;
 
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.extern.log4j.Log4j2;
 import mutsa.yewon.talksparkbe.domain.card.entity.Card;
 import mutsa.yewon.talksparkbe.domain.game.controller.dto.GameCardInfo;
@@ -13,15 +15,16 @@ import java.util.stream.Collectors;
 import static java.util.stream.Collectors.toMap;
 
 @Getter
+@Setter
+@NoArgsConstructor
 @Log4j2
 public class GameStateManager {
- // 현재 문제의 정답 여부, 답을 한 인원 수
 
-    private final GameQuestionManager questionManager;
+    private GameQuestionManager questionManager;
 
-    private final GameScoreManager scoreManager;
+    private GameScoreManager scoreManager;
 
-    private final GamePlayerManager playerManager;
+    private GamePlayerManager playerManager;
 
     public GameStateManager(List<GameCardInfo> cards, List<UserCardQuestions> userCardQuestions) {
 

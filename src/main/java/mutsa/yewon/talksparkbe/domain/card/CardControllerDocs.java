@@ -13,9 +13,11 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import mutsa.yewon.talksparkbe.domain.card.dto.CardCreateDTO;
 import mutsa.yewon.talksparkbe.domain.card.dto.CardResponseDTO;
+import mutsa.yewon.talksparkbe.domain.sparkUser.dto.SparkUserDTO;
 import mutsa.yewon.talksparkbe.global.dto.ResponseDTO;
 import mutsa.yewon.talksparkbe.global.exception.ErrorCode;
 import mutsa.yewon.talksparkbe.global.exception.ErrorResponseEntity;
+import mutsa.yewon.talksparkbe.global.security.CurrentUser;
 import mutsa.yewon.talksparkbe.global.swagger.ApiErrorCode;
 import mutsa.yewon.talksparkbe.global.swagger.ApiErrorCodes;
 import org.springframework.data.repository.query.Param;
@@ -49,7 +51,8 @@ public interface CardControllerDocs {
                     ),
             }))
     })
-    ResponseEntity<?> createCard(@Valid @RequestBody CardCreateDTO cardCreateDTO);
+    ResponseEntity<?> createCard(@CurrentUser SparkUserDTO currentUser,
+                                  @Valid @RequestBody CardCreateDTO cardCreateDTO);
 
     @Operation(summary = "사용자의 모든 명함을 조회", description = "사용자의 식별자를 기반으로 모든 명함을 조회하는 API")
     @ApiErrorCodes({ErrorCode.USER_NOT_EXIST, ErrorCode.JWT_TOKEN_EXPIRED, ErrorCode.MUST_MAKE_CARD_FIRST,ErrorCode.TOKEN_REQUIRED, ErrorCode.INVALID_JWT_TOKEN})
@@ -98,7 +101,7 @@ public interface CardControllerDocs {
                     )
             }))
     })
-    ResponseEntity<?> getCards();
+    ResponseEntity<?> getCards(@CurrentUser SparkUserDTO currentUser);
 
     @Operation(summary = "특정 명함 조회", description = "명함 식별자를 기반으로 조회하는 API")
     @ApiErrorCodes({ErrorCode.CARD_NOT_EXIST, ErrorCode.JWT_TOKEN_EXPIRED,ErrorCode.TOKEN_REQUIRED, ErrorCode.INVALID_JWT_TOKEN})

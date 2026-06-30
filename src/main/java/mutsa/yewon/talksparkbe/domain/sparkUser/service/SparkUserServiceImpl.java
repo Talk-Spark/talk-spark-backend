@@ -55,8 +55,14 @@ public class SparkUserServiceImpl implements SparkUserService {
 
         Map<String, Object> claims = null;
 
-        claims = sparkUser.isPresent() ?
-                SparkUserDTO.from(sparkUser.get()).getClaims() : SparkUserDTO.from(makeSparkUser(kakaoId, name)).getClaims();
+        if(sparkUser.isPresent()) {
+            claims = SparkUserDTO.from(sparkUser.get()).getClaims();
+        }else{
+            SparkUser newSparkUser = makeSparkUser(kakaoId, name);
+            sparkUserRepository.save(newSparkUser);
+
+            claims = SparkUserDTO.from(newSparkUser).getClaims();
+        }
 
         String accessToken = jwtUtil.generateToken(claims, 60);
         String refreshToken = jwtUtil.generateToken(claims, 60 * 60 * 7);

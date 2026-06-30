@@ -53,7 +53,8 @@ public class JWTCheckFilter extends OncePerRequestFilter {
                 "/api/rooms",
                 "/api/rooms/is-duplicate",
                 "/api/rooms/question-tip",
-                "/test"
+                "/test",
+                "/ws"       // STOMP WebSocket 핸드셰이크 (JWT는 CONNECT 프레임에서 StompAuthInterceptor가 처리)
         };
 
         return Arrays.stream(excludePath).anyMatch(requestURI::startsWith);

@@ -1,6 +1,8 @@
 package mutsa.yewon.talksparkbe.domain.game.service.util;
 
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import mutsa.yewon.talksparkbe.domain.game.entity.QuestionTip;
 import mutsa.yewon.talksparkbe.domain.game.service.dto.CardBlanksDto;
 import mutsa.yewon.talksparkbe.domain.game.service.dto.CardQuestion;
@@ -12,6 +14,8 @@ import java.util.List;
 import java.util.Map;
 
 @Getter
+@Setter
+@NoArgsConstructor
 public class GameQuestionManager {
 
     private List<CardQuestion> questions;

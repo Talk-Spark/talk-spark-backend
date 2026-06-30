@@ -8,6 +8,7 @@ import mutsa.yewon.talksparkbe.domain.game.service.dto.httpResponse.RoomDetailsR
 import mutsa.yewon.talksparkbe.domain.game.service.dto.httpResponse.RoomListResponse;
 import mutsa.yewon.talksparkbe.global.exception.ErrorCode;
 import mutsa.yewon.talksparkbe.global.swagger.ApiErrorCodes;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -25,7 +26,7 @@ public interface RoomControllerDocs {
                                                   @RequestHeader("Authorization") String token);
 
     @Operation(summary = "방 검색 API", description = "방 이름을 통해서 방을 검색하는 API")
-    ResponseEntity<List<RoomListResponse>> roomSearch(@RequestParam String searchName);
+    ResponseEntity<Page<RoomListResponse>> roomSearch(@RequestParam String searchName, @RequestParam int page, @RequestParam int size);
 
     @Operation(summary = "방 정보 검색 API", description = "방 id 기반으로 방 정보 검색 API")
     ResponseEntity<RoomDetailsResponse> roomDetails(@PathVariable Long roomId);

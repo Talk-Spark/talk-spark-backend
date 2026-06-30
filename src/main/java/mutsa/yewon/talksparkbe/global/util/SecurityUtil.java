@@ -1,12 +1,13 @@
 package mutsa.yewon.talksparkbe.global.util;
 
 import lombok.extern.log4j.Log4j2;
+import lombok.extern.slf4j.Slf4j;
 import mutsa.yewon.talksparkbe.domain.sparkUser.dto.SparkUserDTO;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
-@Log4j2
+@Slf4j
 public class SecurityUtil {
 
     public static Long getLoggedInUserId() {

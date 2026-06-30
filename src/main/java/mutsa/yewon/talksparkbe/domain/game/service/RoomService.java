@@ -2,7 +2,6 @@ package mutsa.yewon.talksparkbe.domain.game.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import mutsa.yewon.talksparkbe.domain.card.entity.Card;
 import mutsa.yewon.talksparkbe.domain.card.repository.CardRepository;
 import mutsa.yewon.talksparkbe.domain.game.controller.request.RoomCreateRequest;
 import mutsa.yewon.talksparkbe.domain.game.controller.request.RoomJoinRequest;
@@ -13,7 +12,8 @@ import mutsa.yewon.talksparkbe.domain.game.repository.RoomRepository;
 import mutsa.yewon.talksparkbe.domain.game.service.dto.httpResponse.RoomDetailsResponse;
 import mutsa.yewon.talksparkbe.domain.game.service.dto.httpResponse.RoomListResponse;
 import mutsa.yewon.talksparkbe.domain.game.service.dto.httpResponse.RoomParticipantResponse;
-import mutsa.yewon.talksparkbe.domain.game.service.util.RoomState;
+import mutsa.yewon.talksparkbe.domain.game.repository.RoomRedisRepository;
+import mutsa.yewon.talksparkbe.domain.game.service.util.RoomParticipantInfo;
 import mutsa.yewon.talksparkbe.domain.sparkUser.entity.SparkUser;
 import mutsa.yewon.talksparkbe.domain.sparkUser.repository.SparkUserRepository;
 import mutsa.yewon.talksparkbe.global.exception.CustomTalkSparkException;
@@ -21,6 +21,9 @@ import mutsa.yewon.talksparkbe.global.exception.ErrorCode;
 import mutsa.yewon.talksparkbe.global.util.JWTUtil;
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -48,7 +51,7 @@ public class RoomService {
 
     private final StringRedisTemplate redisTemplate;
 
-    private final RoomState roomState;
+    private final RoomRedisRepository roomRedisRepository;
 
     private final JWTUtil jwtUtil;
 
@@ -59,20 +62,23 @@ public class RoomService {
     public Room createRoom(RoomCreateRequest roomCreateRequest, Long sparkUserId) {
         if (roomRepository.findByRoomName(roomCreateRequest.getRoomName()).isPresent())
             throw new CustomTalkSparkException(ErrorCode.ROOM_NAME_DUPLICATE);
-        Room room = Room.builder()
-                .roomName(roomCreateRequest.getRoomName())
-                .difficulty(roomCreateRequest.getDifficulty())
-                .maxPeople(roomCreateRequest.getMaxPeople())
-                .hostId(sparkUserId)
-                .build();
-        room = roomRepository.save(room);
+        try {
+            Room room = Room.builder()
+                    .roomName(roomCreateRequest.getRoomName())
+                    .difficulty(roomCreateRequest.getDifficulty())
+                    .maxPeople(roomCreateRequest.getMaxPeople())
+                    .hostId(sparkUserId)
+                    .build();
+            return roomRepository.save(room);
 
-        redisTemplate.opsForHash().put(ROOM_COUNT_KEY, room.getRoomId().toString(), "0");
-        return room;
+        } catch (DataIntegrityViolationException e) {
+            // 3. 동시성 이슈로 뚫려서 들어온 요청을 여기서 최종 방어
+            throw new CustomTalkSparkException(ErrorCode.ROOM_NAME_DUPLICATE);
+        }
     }
 
     @Transactional
-    public boolean joinRoom(RoomJoinRequest roomJoinRequest) {
+    public void joinRoom(RoomJoinRequest roomJoinRequest) {
         Room room = roomRepository.findById(roomJoinRequest.getRoomId()).orElseThrow(() -> new RuntimeException("방 못찾음"));
 
         String jwt = roomJoinRequest.getAccessToken().replace("Bearer ", "");
@@ -87,7 +93,6 @@ public class RoomService {
                 else {
                     boolean isHost = room.getHostId().equals(sparkUser.getId());
                     addParticipateToRoom(room, sparkUser, isHost);
-                    return true;
                 }
             } else throw new CustomTalkSparkException(ErrorCode.LOCK_TIMEOUT); // 락을 획득하지 못한 경우 (대기 시간 초과)
         } catch (InterruptedException e) {
@@ -101,42 +106,23 @@ public class RoomService {
     public List<RoomParticipantResponse> getParticipantList(Long roomId) {
         List<RoomParticipantResponse> response = new ArrayList<>();
 
-        for (RoomParticipate rp : roomState.getParticipantsByRoomId(roomId)){
-            Long SparkUserId = roomState.findUserIdByRoomIdAndParticipant(roomId, rp);
-            SparkUser sparkUser = sparkUserRepository.findById(SparkUserId).orElseThrow(() -> new RuntimeException("유저 못찾음"));
-            response.add(RoomParticipantResponse.from(sparkUser,sparkUser.getCards().get(0), rp.isOwner()));
+        for (RoomParticipantInfo info : roomRedisRepository.getParticipants(roomId)) {
+            SparkUser sparkUser = sparkUserRepository.findById(info.sparkUserId())
+                    .orElseThrow(() -> new RuntimeException("유저 못찾음"));
+            response.add(RoomParticipantResponse.from(sparkUser, sparkUser.getCards().get(0), info.owner()));
         }
 
         return response;
     }
 
-    public List<RoomListResponse> searchRooms(String searchName) {
-        List<RoomListResponse> response = new ArrayList<>();
-        List<Room> rooms = roomRepository.findByRoomNameContaining(searchName);
-        for (Room room : rooms) {
-            List<RoomParticipate> roomParticipates = roomParticipateRepository.findByRoomIdWithSparkUser(room.getRoomId());
-            int participantsNum;
-            if(!room.isStarted()) {
-                participantsNum = roomState.getParticipantsByRoomId(room.getRoomId()).size();
-            } else {
-                participantsNum = roomParticipates.size();
-            }
+    public Page<RoomListResponse> searchRooms(String searchName, Pageable pageable) {
+        Page<Room> rooms = roomRepository.findByRoomNameStartingWith(searchName, pageable);
 
-            List<Card> card = cardRepository.findBySparkUserId(room.getHostId());
-
-            response.add(RoomListResponse.builder()
-                    .roomId(room.getRoomId())
-                    .roomName(room.getRoomName())
-                    .hostName(card.stream().map(Card::getName).findFirst().orElse("알수없음"))
-                    .currentPeople(participantsNum)
-                    .maxPeople(room.getMaxPeople())
-                    .build());
-        }
-        return response;
+        return rooms.map(RoomListResponse::from);
     }
 
     @Transactional
-    public boolean leaveRoom(RoomJoinRequest roomJoinRequest) {
+    public void leaveRoom(RoomJoinRequest roomJoinRequest) {
         Room room = roomRepository.findById(roomJoinRequest.getRoomId()).orElseThrow(() -> new RuntimeException("방 못찾음"));
 
         String jwt = roomJoinRequest.getAccessToken().replace("Bearer ", "");
@@ -152,7 +138,6 @@ public class RoomService {
                 if (!canJoin(room,sparkUser)) throw new CustomTalkSparkException(ErrorCode.ROOM_FULL);
                 else {
                     removeParticipateToRoom(room, sparkUser);
-                    return true;
                 }
             } else throw new CustomTalkSparkException(ErrorCode.LOCK_TIMEOUT);
         } catch (InterruptedException e) {
@@ -185,25 +170,22 @@ public class RoomService {
     }
 
     private boolean canJoin(Room room, SparkUser sparkUser) {
-        if (roomState.getParticipantsByRoomId(room.getRoomId()).stream().anyMatch(
-                participate -> participate.getSparkUser().getId().equals(sparkUser.getId()))) {
+        if (roomRedisRepository.hasParticipant(room.getRoomId(), sparkUser.getId())) {
             redisTemplate.opsForHash().increment(ROOM_COUNT_KEY, room.getRoomId().toString(), -1);
-            System.out.println(redisTemplate.opsForHash());
         }
         int currentCount = getParticipateCount(room.getRoomId());
         return currentCount < room.getMaxPeople();
     }
-    private void addParticipateToRoom(Room room, SparkUser sparkUser, boolean isHost) {
-        if (roomState.getParticipantsByRoomId(room.getRoomId()).stream().anyMatch(
-                participate -> participate.getSparkUser().getId().equals(sparkUser.getId()))) return;
 
-        RoomParticipate roomParticipate = RoomParticipate.builder().room(room).sparkUser(sparkUser).isOwner(isHost).build();
-        roomState.addParticipant(room.getRoomId(), roomParticipate);
+    private void addParticipateToRoom(Room room, SparkUser sparkUser, boolean isHost) {
+        if (roomRedisRepository.hasParticipant(room.getRoomId(), sparkUser.getId())) return;
+
+        roomRedisRepository.addParticipant(room.getRoomId(), sparkUser.getId(), isHost);
         redisTemplate.opsForHash().increment(ROOM_COUNT_KEY, room.getRoomId().toString(), 1);
     }
+
     private void removeParticipateToRoom(Room room, SparkUser sparkUser) {
-        roomState.removeParticipant(room.getRoomId(), sparkUser);
-        System.out.println(redisTemplate.opsForHash());
+        roomRedisRepository.removeParticipant(room.getRoomId(), sparkUser.getId());
         redisTemplate.opsForHash().increment(ROOM_COUNT_KEY, room.getRoomId().toString(), -1);
     }
     public int getParticipateCount(Long roomId) {
@@ -212,8 +194,26 @@ public class RoomService {
     }
 
     @Transactional
-    public void changeStarted(Long roomId) {
-        roomRepository.findById(roomId).orElseThrow().start();
+    public void changeStarted(Long roomId, String accessToken) {
+        Room room = roomRepository.findById(roomId)
+                .orElseThrow(() -> new CustomTalkSparkException(ErrorCode.ROOM_NOT_FOUND));
+
+        String token = accessToken.replace("Bearer ", "");
+        Map<String, Object> claims = jwtUtil.validateToken(token);
+        String kakaoId = (String) claims.get("kakaoId");
+        SparkUser requestUser = sparkUserRepository.findByKakaoId(kakaoId)
+                .orElseThrow(() -> new CustomTalkSparkException(ErrorCode.USER_NOT_EXIST));
+
+        if (!room.getHostId().equals(requestUser.getId())) {
+            throw new CustomTalkSparkException(ErrorCode.NOT_HOST);
+        }
+
+        int participateCount = getParticipateCount(roomId);
+        if (participateCount < 2) {
+            throw new CustomTalkSparkException(ErrorCode.NOT_ENOUGH_PLAYERS);
+        }
+
+        room.start();
     }
 
     public void changeFinished(Long roomId) {

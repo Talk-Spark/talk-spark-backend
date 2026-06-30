@@ -1,9 +1,13 @@
 package mutsa.yewon.talksparkbe.domain.game.service.dto;
 
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import mutsa.yewon.talksparkbe.domain.card.entity.CardThema;
 
 @Getter
+@Setter
+@NoArgsConstructor
 public class PlayerInfo {
 
     private Long playerId;

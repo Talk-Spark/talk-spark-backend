@@ -13,6 +13,9 @@ import mutsa.yewon.talksparkbe.domain.sparkUser.repository.SparkUserRepository;
 import mutsa.yewon.talksparkbe.global.exception.CustomTalkSparkException;
 import mutsa.yewon.talksparkbe.global.exception.ErrorCode;
 import mutsa.yewon.talksparkbe.global.util.JWTUtil;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -46,8 +49,13 @@ public class RoomController implements RoomControllerDocs {
     }
 
     @GetMapping
-    public ResponseEntity<List<RoomListResponse>> roomSearch(@RequestParam String searchName) {
-        return ResponseEntity.ok(roomService.searchRooms(searchName));
+    public ResponseEntity<Page<RoomListResponse>> roomSearch(@RequestParam String searchName,
+                                                             @RequestParam(defaultValue = "1") int page,
+                                                             @RequestParam(defaultValue = "20") int size) {
+
+        Pageable pageable = PageRequest.of(page, size);
+
+        return ResponseEntity.ok(roomService.searchRooms(searchName, pageable));
     }
 
     @GetMapping("/{roomId}")
@@ -76,15 +84,5 @@ public class RoomController implements RoomControllerDocs {
         String randomQuestions = String.join("\n", QuestionTip.valueOf(field).getRandomQuestions());
         return ResponseEntity.ok(randomQuestions);
     }
-
-//    @GetMapping("/{roomId}/name")
-//    public ResponseEntity<?> roomName(@PathVariable Long roomId) {
-//        return ResponseEntity.ok(roomService.getRoomName(roomId));
-//    }
-//
-//    @GetMapping("/all")
-//    public ResponseEntity<?> roomList() {
-//        return ResponseEntity.ok(roomService.listAllRooms());
-//    }
 
 }
